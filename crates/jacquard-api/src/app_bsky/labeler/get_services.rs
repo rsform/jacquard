@@ -39,8 +39,7 @@ pub struct GetServicesOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum GetServicesOutputViewsItem<'a> {
     #[serde(rename = "app.bsky.labeler.defs#labelerView")]
     LabelerView(Box<LabelerView<'a>>),

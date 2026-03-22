@@ -176,8 +176,7 @@ impl jacquard_common::IntoStatic for BoardConfigAspectRatio<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum BoardConfigBackgroundImage<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -410,8 +409,7 @@ pub struct ContributorConfig<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ContributorConfigContributor<'a> {
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<StrongRef<'a>>),
@@ -422,8 +420,7 @@ pub enum ContributorConfigContributor<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ContributorConfigHoverImage<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -434,8 +431,7 @@ pub enum ContributorConfigHoverImage<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ContributorConfigImage<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -446,8 +442,7 @@ pub enum ContributorConfigImage<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ContributorConfigVideo<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -459,7 +454,7 @@ pub enum ContributorConfigVideo<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "org.hyperboards.board", tag = "$type")]
 pub struct Board<'a> {
     ///Board-level visual configuration (background, colors, aspect ratio).
     #[serde(skip_serializing_if = "Option::is_none")]

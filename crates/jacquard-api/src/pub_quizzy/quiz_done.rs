@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "pub.quizzy.quizDone", tag = "$type")]
 pub struct QuizDone<'a> {
     ///Reference to the quizBegin record
     #[serde(borrow)]

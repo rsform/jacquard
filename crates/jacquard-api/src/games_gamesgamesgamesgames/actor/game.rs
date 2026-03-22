@@ -52,7 +52,11 @@ pub struct GameRef<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "games.gamesgamesgamesgames.actor.game",
+    tag = "$type"
+)]
 pub struct Game<'a> {
     pub created_at: Datetime,
     ///Reference to the game record.
@@ -190,8 +194,7 @@ impl jacquard_common::IntoStatic for GamePlatform<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum GameSignaturesItem<'a> {
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<StrongRef<'a>>),
@@ -417,51 +420,51 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
         type CreatedAt;
         type Game;
+        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
         type CreatedAt = Unset;
         type Game = Unset;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type Platform = Set<members::platform>;
-        type CreatedAt = S::CreatedAt;
-        type Game = S::Game;
+        type Platform = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Platform = S::Platform;
         type CreatedAt = Set<members::created_at>;
         type Game = S::Game;
+        type Platform = S::Platform;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Platform = S::Platform;
         type CreatedAt = S::CreatedAt;
         type Game = Set<members::game>;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type CreatedAt = S::CreatedAt;
+        type Game = S::Game;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
     }
 }
 
@@ -574,9 +577,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::Platform: game_state::IsSet,
     S::CreatedAt: game_state::IsSet,
     S::Game: game_state::IsSet,
+    S::Platform: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {

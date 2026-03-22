@@ -448,56 +448,47 @@ pub struct Embedded<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAcceptedPaymentMethod<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedActionableFeedbackPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAdditionalProperty<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAdditionalType<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAddress<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAgentInteractionStatistic<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAggregateRating<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAlternateName<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAlumni<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -506,50 +497,42 @@ pub enum EmbeddedAlumni<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAmenityFeature<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAreaServed<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAudience<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAvailableLanguage<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAward<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAwards<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedBranchCode<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedBranchOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -558,8 +541,7 @@ pub enum EmbeddedBranchOf<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedBrand<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
     BrandEmbedded(Box<brand::Embedded<'a>>),
@@ -570,68 +552,57 @@ pub enum EmbeddedBrand<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCheckinTime<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCheckoutTime<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCompanyRegistration<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContactPoint<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContactPoints<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainedIn<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainedInPlace<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainsPlace<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCorrectionsPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCurrenciesAccepted<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDepartment<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -640,32 +611,27 @@ pub enum EmbeddedDepartment<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDescription<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDisambiguatingDescription<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDissolutionDate<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDiversityPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDiversityStaffingReport<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Article#embedded")]
     ArticleEmbedded(Box<article::Embedded<'a>>),
@@ -674,20 +640,17 @@ pub enum EmbeddedDiversityStaffingReport<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDuns<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEmail<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEmployee<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -696,8 +659,7 @@ pub enum EmbeddedEmployee<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEmployees<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -706,14 +668,12 @@ pub enum EmbeddedEmployees<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEthicsPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEvent<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<'a>>),
@@ -722,8 +682,7 @@ pub enum EmbeddedEvent<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEvents<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<'a>>),
@@ -732,14 +691,12 @@ pub enum EmbeddedEvents<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFaxNumber<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFounder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -750,8 +707,7 @@ pub enum EmbeddedFounder<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFounders<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -760,20 +716,17 @@ pub enum EmbeddedFounders<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFoundingDate<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFoundingLocation<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFunder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -784,158 +737,132 @@ pub enum EmbeddedFunder<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFunding<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeo<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoContains<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCoveredBy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCovers<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCrosses<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoDisjoint<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoEquals<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoIntersects<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoOverlaps<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoTouches<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoWithin<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGlobalLocationNumber<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasCertification<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasCredential<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasDriveThroughService<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasGs1DigitalLink<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMap<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMemberProgram<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMerchantReturnPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasOfferCatalog<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasPos<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasProductReturnPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasShippingService<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIdentifier<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedImage<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
@@ -944,68 +871,57 @@ pub enum EmbeddedImage<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedInteractionStatistic<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsAccessibleForFree<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsicV4<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIso6523Code<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKeywords<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKnowsAbout<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKnowsLanguage<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLatitude<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLegalAddress<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLegalName<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLegalRepresentative<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -1014,20 +930,17 @@ pub enum EmbeddedLegalRepresentative<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLeiCode<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLocation<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLogo<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
@@ -1036,20 +949,17 @@ pub enum EmbeddedLogo<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLongitude<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMainEntityOfPage<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMakesOffer<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<'a>>),
@@ -1058,26 +968,22 @@ pub enum EmbeddedMakesOffer<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMap<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaps<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaximumAttendeeCapacity<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMember<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -1088,8 +994,7 @@ pub enum EmbeddedMember<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMemberOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -1098,8 +1003,7 @@ pub enum EmbeddedMemberOf<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMembers<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -1110,56 +1014,47 @@ pub enum EmbeddedMembers<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNaics<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedName<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNonprofitStatus<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNumberOfEmployees<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNumberOfRooms<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOpeningHours<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOpeningHoursSpecification<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOwnershipFundingInfo<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOwns<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<'a>>),
@@ -1168,8 +1063,7 @@ pub enum EmbeddedOwns<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedParentOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -1178,20 +1072,17 @@ pub enum EmbeddedParentOrganization<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPaymentAccepted<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPetsAllowed<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPhoto<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
@@ -1200,8 +1091,7 @@ pub enum EmbeddedPhoto<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPhotos<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
@@ -1210,86 +1100,72 @@ pub enum EmbeddedPhotos<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPotentialAction<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPriceRange<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublicAccess<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublishingPrinciples<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReview<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReviews<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSameAs<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSeeks<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedServiceArea<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSkills<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSlogan<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSmokingAllowed<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSpecialOpeningHoursSpecification<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSponsor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -1300,14 +1176,12 @@ pub enum EmbeddedSponsor<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedStarRating<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSubOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -1316,8 +1190,7 @@ pub enum EmbeddedSubOrganization<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSubjectOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<'a>>),
@@ -1326,43 +1199,41 @@ pub enum EmbeddedSubjectOf<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTaxId<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTelephone<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTourBookingPage<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedUnnamedSourcesPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedUrl<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedVatId<'a> {}
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.flockfeeds.lexical.type.Hotel",
+    tag = "$type"
+)]
 pub struct Hotel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -1770,56 +1641,47 @@ pub struct Hotel<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAcceptedPaymentMethod<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelActionableFeedbackPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAdditionalProperty<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAdditionalType<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAddress<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAgentInteractionStatistic<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAggregateRating<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAlternateName<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAlumni<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -1828,50 +1690,42 @@ pub enum HotelAlumni<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAmenityFeature<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAreaServed<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAudience<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAvailableLanguage<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAward<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelAwards<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelBranchCode<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelBranchOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -1880,8 +1734,7 @@ pub enum HotelBranchOf<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelBrand<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
     BrandEmbedded(Box<brand::Embedded<'a>>),
@@ -1892,68 +1745,57 @@ pub enum HotelBrand<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelCheckinTime<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelCheckoutTime<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelCompanyRegistration<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelContactPoint<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelContactPoints<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelContainedIn<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelContainedInPlace<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelContainsPlace<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelCorrectionsPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelCurrenciesAccepted<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelDepartment<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -1962,32 +1804,27 @@ pub enum HotelDepartment<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelDescription<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelDisambiguatingDescription<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelDissolutionDate<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelDiversityPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelDiversityStaffingReport<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Article#embedded")]
     ArticleEmbedded(Box<article::Embedded<'a>>),
@@ -1996,20 +1833,17 @@ pub enum HotelDiversityStaffingReport<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelDuns<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelEmail<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelEmployee<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -2018,8 +1852,7 @@ pub enum HotelEmployee<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelEmployees<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -2028,14 +1861,12 @@ pub enum HotelEmployees<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelEthicsPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelEvent<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<'a>>),
@@ -2044,8 +1875,7 @@ pub enum HotelEvent<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelEvents<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<'a>>),
@@ -2054,14 +1884,12 @@ pub enum HotelEvents<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelFaxNumber<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelFounder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -2072,8 +1900,7 @@ pub enum HotelFounder<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelFounders<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -2082,20 +1909,17 @@ pub enum HotelFounders<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelFoundingDate<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelFoundingLocation<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelFunder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -2106,158 +1930,132 @@ pub enum HotelFunder<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelFunding<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeo<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoContains<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoCoveredBy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoCovers<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoCrosses<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoDisjoint<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoEquals<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoIntersects<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoOverlaps<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoTouches<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGeoWithin<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelGlobalLocationNumber<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasCertification<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasCredential<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasDriveThroughService<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasGs1DigitalLink<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasMap<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasMemberProgram<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasMerchantReturnPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasOfferCatalog<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasPos<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasProductReturnPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelHasShippingService<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelIdentifier<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelImage<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
@@ -2266,68 +2064,57 @@ pub enum HotelImage<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelInteractionStatistic<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelIsAccessibleForFree<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelIsicV4<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelIso6523Code<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelKeywords<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelKnowsAbout<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelKnowsLanguage<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelLatitude<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelLegalAddress<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelLegalName<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelLegalRepresentative<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<'a>>),
@@ -2336,20 +2123,17 @@ pub enum HotelLegalRepresentative<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelLeiCode<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelLocation<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelLogo<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
@@ -2358,20 +2142,17 @@ pub enum HotelLogo<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelLongitude<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelMainEntityOfPage<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelMakesOffer<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<'a>>),
@@ -2380,26 +2161,22 @@ pub enum HotelMakesOffer<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelMap<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelMaps<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelMaximumAttendeeCapacity<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelMember<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -2410,8 +2187,7 @@ pub enum HotelMember<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelMemberOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -2420,8 +2196,7 @@ pub enum HotelMemberOf<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelMembers<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -2432,56 +2207,47 @@ pub enum HotelMembers<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelNaics<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelName<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelNonprofitStatus<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelNumberOfEmployees<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelNumberOfRooms<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelOpeningHours<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelOpeningHoursSpecification<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelOwnershipFundingInfo<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelOwns<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<'a>>),
@@ -2490,8 +2256,7 @@ pub enum HotelOwns<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelParentOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -2500,20 +2265,17 @@ pub enum HotelParentOrganization<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelPaymentAccepted<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelPetsAllowed<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelPhoto<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
@@ -2522,8 +2284,7 @@ pub enum HotelPhoto<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelPhotos<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
@@ -2532,86 +2293,72 @@ pub enum HotelPhotos<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelPotentialAction<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelPriceRange<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelPublicAccess<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelPublishingPrinciples<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelReview<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelReviews<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSameAs<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSeeks<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelServiceArea<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSkills<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSlogan<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSmokingAllowed<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSpecialOpeningHoursSpecification<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSponsor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -2622,14 +2369,12 @@ pub enum HotelSponsor<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelStarRating<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSubOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<'a>>),
@@ -2638,8 +2383,7 @@ pub enum HotelSubOrganization<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelSubjectOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<'a>>),
@@ -2648,38 +2392,32 @@ pub enum HotelSubjectOf<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelTaxId<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelTelephone<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelTourBookingPage<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelUnnamedSourcesPolicy<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelUrl<'a> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum HotelVatId<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 

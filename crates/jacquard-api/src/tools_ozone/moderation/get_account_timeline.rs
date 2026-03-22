@@ -988,51 +988,51 @@ pub mod timeline_item_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EventSubjectType;
         type Count;
         type EventType;
+        type EventSubjectType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EventSubjectType = Unset;
         type Count = Unset;
         type EventType = Unset;
-    }
-    ///State transition - sets the `event_subject_type` field to Set
-    pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
-    impl<S: State> State for SetEventSubjectType<S> {
-        type EventSubjectType = Set<members::event_subject_type>;
-        type Count = S::Count;
-        type EventType = S::EventType;
+        type EventSubjectType = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type EventSubjectType = S::EventSubjectType;
         type Count = Set<members::count>;
         type EventType = S::EventType;
+        type EventSubjectType = S::EventSubjectType;
     }
     ///State transition - sets the `event_type` field to Set
     pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventType<S> {}
     impl<S: State> State for SetEventType<S> {
-        type EventSubjectType = S::EventSubjectType;
         type Count = S::Count;
         type EventType = Set<members::event_type>;
+        type EventSubjectType = S::EventSubjectType;
+    }
+    ///State transition - sets the `event_subject_type` field to Set
+    pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
+    impl<S: State> State for SetEventSubjectType<S> {
+        type Count = S::Count;
+        type EventType = S::EventType;
+        type EventSubjectType = Set<members::event_subject_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event_subject_type` field
-        pub struct event_subject_type(());
         ///Marker type for the `count` field
         pub struct count(());
         ///Marker type for the `event_type` field
         pub struct event_type(());
+        ///Marker type for the `event_subject_type` field
+        pub struct event_subject_type(());
     }
 }
 
@@ -1128,9 +1128,9 @@ where
 impl<'a, S> TimelineItemSummaryBuilder<'a, S>
 where
     S: timeline_item_summary_state::State,
-    S::EventSubjectType: timeline_item_summary_state::IsSet,
     S::Count: timeline_item_summary_state::IsSet,
     S::EventType: timeline_item_summary_state::IsSet,
+    S::EventSubjectType: timeline_item_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TimelineItemSummary<'a> {

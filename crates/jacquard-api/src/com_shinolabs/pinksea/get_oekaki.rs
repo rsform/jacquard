@@ -40,8 +40,7 @@ pub struct GetOekakiOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum GetOekakiOutputParent<'a> {
     #[serde(rename = "com.shinolabs.pinksea.appViewDefs#hydratedOekaki")]
     AppViewDefsHydratedOekaki(Box<HydratedOekaki<'a>>),

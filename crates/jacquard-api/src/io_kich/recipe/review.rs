@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.kich.recipe.review", tag = "$type")]
 pub struct Review<'a> {
     ///Optional review comment in GitHub-flavored markdown
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -153,51 +153,51 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type Rating;
         type CreatedAt;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type Rating = Unset;
         type CreatedAt = Unset;
-        type Subject = Unset;
-    }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRating<S> {}
-    impl<S: State> State for SetRating<S> {
-        type Rating = Set<members::rating>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Rating = S::Rating;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
         type Rating = S::Rating;
         type CreatedAt = S::CreatedAt;
-        type Subject = Set<members::subject>;
+    }
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRating<S> {}
+    impl<S: State> State for SetRating<S> {
+        type Subject = S::Subject;
+        type Rating = Set<members::rating>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Rating = S::Rating;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `rating` field
         pub struct rating(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
@@ -318,9 +318,9 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
+    S::Subject: review_state::IsSet,
     S::Rating: review_state::IsSet,
     S::CreatedAt: review_state::IsSet,
-    S::Subject: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {

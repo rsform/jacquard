@@ -87,37 +87,37 @@ pub mod heading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Plaintext;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Plaintext = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Plaintext = S::Plaintext;
+        type Level = Unset;
     }
     ///State transition - sets the `plaintext` field to Set
     pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlaintext<S> {}
     impl<S: State> State for SetPlaintext<S> {
-        type Level = S::Level;
         type Plaintext = Set<members::plaintext>;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Plaintext = S::Plaintext;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `plaintext` field
         pub struct plaintext(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -218,8 +218,8 @@ impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
 impl<'a, S> HeadingBuilder<'a, S>
 where
     S: heading_state::State,
-    S::Level: heading_state::IsSet,
     S::Plaintext: heading_state::IsSet,
+    S::Level: heading_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Heading<'a> {

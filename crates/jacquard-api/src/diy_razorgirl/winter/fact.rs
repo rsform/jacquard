@@ -28,7 +28,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "diy.razorgirl.winter.fact", tag = "$type")]
 pub struct Fact<'a> {
     #[serde(borrow)]
     pub args: Vec<CowStr<'a>>,
@@ -161,49 +161,49 @@ pub mod fact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Predicate;
+        type CreatedAt;
         type Args;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Predicate = Unset;
+        type CreatedAt = Unset;
         type Args = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Predicate = S::Predicate;
-        type Args = S::Args;
     }
     ///State transition - sets the `predicate` field to Set
     pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPredicate<S> {}
     impl<S: State> State for SetPredicate<S> {
-        type CreatedAt = S::CreatedAt;
         type Predicate = Set<members::predicate>;
+        type CreatedAt = S::CreatedAt;
+        type Args = S::Args;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Predicate = S::Predicate;
+        type CreatedAt = Set<members::created_at>;
         type Args = S::Args;
     }
     ///State transition - sets the `args` field to Set
     pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArgs<S> {}
     impl<S: State> State for SetArgs<S> {
-        type CreatedAt = S::CreatedAt;
         type Predicate = S::Predicate;
+        type CreatedAt = S::CreatedAt;
         type Args = Set<members::args>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `predicate` field
         pub struct predicate(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `args` field
         pub struct args(());
     }
@@ -368,8 +368,8 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 impl<'a, S> FactBuilder<'a, S>
 where
     S: fact_state::State,
-    S::CreatedAt: fact_state::IsSet,
     S::Predicate: fact_state::IsSet,
+    S::CreatedAt: fact_state::IsSet,
     S::Args: fact_state::IsSet,
 {
     /// Build the final struct

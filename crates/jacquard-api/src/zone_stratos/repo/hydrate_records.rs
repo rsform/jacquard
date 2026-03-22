@@ -215,49 +215,49 @@ pub mod record_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Value;
+        type Cid;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Value = Unset;
+        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Value = S::Value;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Cid = S::Cid;
         type Value = Set<members::value>;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Value = S::Value;
+        type Cid = Set<members::cid>;
         type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Value = S::Value;
+        type Cid = S::Cid;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -348,8 +348,8 @@ where
 impl<'a, S> RecordViewBuilder<'a, S>
 where
     S: record_view_state::State,
-    S::Cid: record_view_state::IsSet,
     S::Value: record_view_state::IsSet,
+    S::Cid: record_view_state::IsSet,
     S::Uri: record_view_state::IsSet,
 {
     /// Build the final struct

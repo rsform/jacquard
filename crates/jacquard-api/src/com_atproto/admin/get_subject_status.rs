@@ -50,8 +50,7 @@ pub struct GetSubjectStatusOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum GetSubjectStatusOutputSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<'a>>),

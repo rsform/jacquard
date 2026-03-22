@@ -47,14 +47,6 @@
             "type": "string",
             "description": "DID of successor hold for migration redirect",
             "format": "did"
-          },
-          "supporterBadgeTiers": {
-            "type": "array",
-            "description": "Tier names that earn a supporter badge on user profiles",
-            "items": {
-              "type": "string",
-              "maxLength": 64
-            }
           }
         }
       }

@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "com.chrisvanderloo.project", tag = "$type")]
 pub struct Project<'a> {
     #[serde(borrow)]
     pub description: CowStr<'a>,
@@ -174,8 +174,8 @@ pub mod project_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Title;
         type Description;
+        type Title;
         type Language;
     }
     /// Empty state - all required fields are unset
@@ -183,8 +183,8 @@ pub mod project_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Title = Unset;
         type Description = Unset;
+        type Title = Unset;
         type Language = Unset;
     }
     ///State transition - sets the `repo` field to Set
@@ -192,17 +192,8 @@ pub mod project_state {
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type Repo = Set<members::repo>;
+        type Description = S::Description;
         type Title = S::Title;
-        type Description = S::Description;
-        type Language = S::Language;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Repo = S::Repo;
-        type Title = Set<members::title>;
-        type Description = S::Description;
         type Language = S::Language;
     }
     ///State transition - sets the `description` field to Set
@@ -210,8 +201,17 @@ pub mod project_state {
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
         type Repo = S::Repo;
-        type Title = S::Title;
         type Description = Set<members::description>;
+        type Title = S::Title;
+        type Language = S::Language;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Repo = S::Repo;
+        type Description = S::Description;
+        type Title = Set<members::title>;
         type Language = S::Language;
     }
     ///State transition - sets the `language` field to Set
@@ -219,8 +219,8 @@ pub mod project_state {
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
         type Repo = S::Repo;
-        type Title = S::Title;
         type Description = S::Description;
+        type Title = S::Title;
         type Language = Set<members::language>;
     }
     /// Marker types for field names
@@ -228,10 +228,10 @@ pub mod project_state {
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `language` field
         pub struct language(());
     }
@@ -361,8 +361,8 @@ impl<'a, S> ProjectBuilder<'a, S>
 where
     S: project_state::State,
     S::Repo: project_state::IsSet,
-    S::Title: project_state::IsSet,
     S::Description: project_state::IsSet,
+    S::Title: project_state::IsSet,
     S::Language: project_state::IsSet,
 {
     /// Build the final struct

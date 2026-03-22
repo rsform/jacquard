@@ -30,7 +30,11 @@ use crate::org_farmapps::temp::ecrop::CodeType;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.farmapps.temp.agroconnect.cl022",
+    tag = "$type"
+)]
 pub struct Cl022<'a> {
     ///Date when added to the list
     #[serde(skip_serializing_if = "Option::is_none")]

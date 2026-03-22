@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "tech.tokimeki.takibi.spark", tag = "$type")]
 pub struct Spark<'a> {
     pub created_at: Datetime,
     ///Short text (up to 30 graphemes)

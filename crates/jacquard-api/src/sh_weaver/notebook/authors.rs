@@ -44,8 +44,7 @@ pub struct AuthorListItem<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum AuthorListItemProfile<'a> {
     #[serde(rename = "app.bsky.actor.defs#profileViewBasic")]
     ProfileViewBasic(Box<ProfileViewBasic<'a>>),
@@ -57,7 +56,7 @@ pub enum AuthorListItemProfile<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.weaver.notebook.authors", tag = "$type")]
 pub struct Authors<'a> {
     #[serde(borrow)]
     pub author_list: Vec<authors::AuthorListItem<'a>>,

@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "science.alt.dataset.label", tag = "$type")]
 pub struct Label<'a> {
     ///Timestamp when this label was created
     pub created_at: Datetime,
@@ -166,49 +166,49 @@ pub mod label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type DatasetUri;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type DatasetUri = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type DatasetUri = S::DatasetUri;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `dataset_uri` field to Set
     pub struct SetDatasetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDatasetUri<S> {}
     impl<S: State> State for SetDatasetUri<S> {
-        type Name = S::Name;
         type DatasetUri = Set<members::dataset_uri>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type DatasetUri = S::DatasetUri;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type DatasetUri = S::DatasetUri;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `dataset_uri` field
         pub struct dataset_uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -331,8 +331,8 @@ impl<'a, S: label_state::State> LabelBuilder<'a, S> {
 impl<'a, S> LabelBuilder<'a, S>
 where
     S: label_state::State,
-    S::Name: label_state::IsSet,
     S::DatasetUri: label_state::IsSet,
+    S::Name: label_state::IsSet,
     S::CreatedAt: label_state::IsSet,
 {
     /// Build the final struct

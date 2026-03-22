@@ -90,7 +90,7 @@ pub struct InstructionStep<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.kich.recipe.recipe", tag = "$type")]
 pub struct Recipe<'a> {
     ///Cooking time in minutes
     #[serde(skip_serializing_if = "Option::is_none")]

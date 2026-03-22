@@ -44,7 +44,11 @@ pub struct Attachment<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "tools.smokesignal.blahg.content.post",
+    tag = "$type"
+)]
 pub struct Post<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]

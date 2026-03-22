@@ -31,7 +31,11 @@ use crate::org_hypercerts::Uri;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.claim.contributorInformation",
+    tag = "$type"
+)]
 pub struct ContributorInformation<'a> {
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
@@ -52,8 +56,7 @@ pub struct ContributorInformation<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ContributorInformationImage<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),

@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "coop.hypha.spores.site.layout",
+    tag = "$type"
+)]
 pub struct Layout<'a> {
     ///Ordered list of section AT-URIs to display
     #[serde(borrow)]

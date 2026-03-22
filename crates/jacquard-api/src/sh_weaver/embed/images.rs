@@ -52,8 +52,7 @@ pub struct Image<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ImageDimensions<'a> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
     AspectRatio(Box<AspectRatio<'a>>),
@@ -106,8 +105,7 @@ pub struct ViewImage<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ViewImageDimensions<'a> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
     AspectRatio(Box<AspectRatio<'a>>),
@@ -862,51 +860,51 @@ pub mod view_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Fullsize;
         type Thumb;
         type Alt;
-        type Fullsize;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Fullsize = Unset;
         type Thumb = Unset;
         type Alt = Unset;
-        type Fullsize = Unset;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Thumb = Set<members::thumb>;
-        type Alt = S::Alt;
-        type Fullsize = S::Fullsize;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Thumb = S::Thumb;
-        type Alt = Set<members::alt>;
-        type Fullsize = S::Fullsize;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
+        type Fullsize = Set<members::fullsize>;
         type Thumb = S::Thumb;
         type Alt = S::Alt;
-        type Fullsize = Set<members::fullsize>;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Fullsize = S::Fullsize;
+        type Thumb = Set<members::thumb>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Fullsize = S::Fullsize;
+        type Thumb = S::Thumb;
+        type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `fullsize` field
+        pub struct fullsize(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
         ///Marker type for the `alt` field
         pub struct alt(());
-        ///Marker type for the `fullsize` field
-        pub struct fullsize(());
     }
 }
 
@@ -1030,9 +1028,9 @@ where
 impl<'a, S> ViewImageBuilder<'a, S>
 where
     S: view_image_state::State,
+    S::Fullsize: view_image_state::IsSet,
     S::Thumb: view_image_state::IsSet,
     S::Alt: view_image_state::IsSet,
-    S::Fullsize: view_image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewImage<'a> {

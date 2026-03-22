@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "dev.sensorthings.sensor", tag = "$type")]
 pub struct Sensor<'a> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -163,51 +163,51 @@ pub mod sensor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type EncodingType;
         type Name;
+        type EncodingType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type EncodingType = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type EncodingType = S::EncodingType;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `encoding_type` field to Set
-    pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEncodingType<S> {}
-    impl<S: State> State for SetEncodingType<S> {
-        type CreatedAt = S::CreatedAt;
-        type EncodingType = Set<members::encoding_type>;
-        type Name = S::Name;
+        type EncodingType = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type EncodingType = S::EncodingType;
         type Name = Set<members::name>;
+        type EncodingType = S::EncodingType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `encoding_type` field to Set
+    pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEncodingType<S> {}
+    impl<S: State> State for SetEncodingType<S> {
+        type Name = S::Name;
+        type EncodingType = Set<members::encoding_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type EncodingType = S::EncodingType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `encoding_type` field
-        pub struct encoding_type(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `encoding_type` field
+        pub struct encoding_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -328,9 +328,9 @@ where
 impl<'a, S> SensorBuilder<'a, S>
 where
     S: sensor_state::State,
-    S::CreatedAt: sensor_state::IsSet,
-    S::EncodingType: sensor_state::IsSet,
     S::Name: sensor_state::IsSet,
+    S::EncodingType: sensor_state::IsSet,
+    S::CreatedAt: sensor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sensor<'a> {

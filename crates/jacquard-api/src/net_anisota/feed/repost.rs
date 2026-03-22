@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "net.anisota.feed.repost", tag = "$type")]
 pub struct Repost<'a> {
     ///Client-declared timestamp when this repost was created.
     pub created_at: Datetime,

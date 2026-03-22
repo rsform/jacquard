@@ -50,7 +50,11 @@ pub struct Artifact<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "garden.lexicon.exultant-zebra.distribution",
+    tag = "$type"
+)]
 pub struct Distribution<'a> {
     ///The list of downloadable artifacts for this distribution.
     #[serde(borrow)]

@@ -135,37 +135,37 @@ pub mod create_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type MessageUri;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type MessageUri = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type MessageUri = S::MessageUri;
+        type Streamer = Unset;
     }
     ///State transition - sets the `message_uri` field to Set
     pub struct SetMessageUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessageUri<S> {}
     impl<S: State> State for SetMessageUri<S> {
-        type Streamer = S::Streamer;
         type MessageUri = Set<members::message_uri>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type MessageUri = S::MessageUri;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `message_uri` field
         pub struct message_uri(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -235,8 +235,8 @@ where
 impl<'a, S> CreateGateBuilder<'a, S>
 where
     S: create_gate_state::State,
-    S::Streamer: create_gate_state::IsSet,
     S::MessageUri: create_gate_state::IsSet,
+    S::Streamer: create_gate_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateGate<'a> {

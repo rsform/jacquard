@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.atwork.endorsementProof",
+    tag = "$type"
+)]
 pub struct EndorsementProof<'a> {
     ///The CID (Content Identifier) of the endorsement content that this proof validates. The endorsement's signatures array references this proof record.
     #[serde(borrow)]

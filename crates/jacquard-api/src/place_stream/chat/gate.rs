@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "place.stream.chat.gate", tag = "$type")]
 pub struct Gate<'a> {
     ///URI of the hidden chat message.
     #[serde(borrow)]

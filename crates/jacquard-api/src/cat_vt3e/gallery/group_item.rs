@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "cat.vt3e.gallery.groupItem", tag = "$type")]
 pub struct GroupItem<'a> {
     pub added_at: Datetime,
     ///uri of the group that the image belongs to
@@ -119,50 +119,50 @@ pub mod group_item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Image;
-        type Group;
         type AddedAt;
+        type Group;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Image = Unset;
-        type Group = Unset;
         type AddedAt = Unset;
+        type Group = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
         type Image = Set<members::image>;
+        type AddedAt = S::AddedAt;
         type Group = S::Group;
-        type AddedAt = S::AddedAt;
-    }
-    ///State transition - sets the `group` field to Set
-    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGroup<S> {}
-    impl<S: State> State for SetGroup<S> {
-        type Image = S::Image;
-        type Group = Set<members::group>;
-        type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
         type Image = S::Image;
-        type Group = S::Group;
         type AddedAt = Set<members::added_at>;
+        type Group = S::Group;
+    }
+    ///State transition - sets the `group` field to Set
+    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGroup<S> {}
+    impl<S: State> State for SetGroup<S> {
+        type Image = S::Image;
+        type AddedAt = S::AddedAt;
+        type Group = Set<members::group>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `image` field
         pub struct image(());
-        ///Marker type for the `group` field
-        pub struct group(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `group` field
+        pub struct group(());
     }
 }
 
@@ -270,8 +270,8 @@ impl<'a, S> GroupItemBuilder<'a, S>
 where
     S: group_item_state::State,
     S::Image: group_item_state::IsSet,
-    S::Group: group_item_state::IsSet,
     S::AddedAt: group_item_state::IsSet,
+    S::Group: group_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GroupItem<'a> {

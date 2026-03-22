@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "garden.goals.category", tag = "$type")]
 pub struct Category<'a> {
     ///Unique identifier for the category (UUID)
     #[serde(borrow)]

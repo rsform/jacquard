@@ -36,8 +36,7 @@ pub struct Paragraph<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ParagraphContentItem<'a> {
     #[serde(rename = "blog.pckt.block.text")]
     Text(Box<Text<'a>>),

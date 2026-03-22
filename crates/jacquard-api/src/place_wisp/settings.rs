@@ -48,7 +48,7 @@ pub struct CustomHeader<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "place.wisp.settings", tag = "$type")]
 pub struct Settings<'a> {
     ///Enable clean URL routing. When enabled, '/about' will attempt to serve '/about.html' or '/about/index.html' automatically.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -372,37 +372,37 @@ pub mod labels_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Labels;
         type Seq;
+        type Labels;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Labels = Unset;
         type Seq = Unset;
-    }
-    ///State transition - sets the `labels` field to Set
-    pub struct SetLabels<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabels<S> {}
-    impl<S: State> State for SetLabels<S> {
-        type Labels = Set<members::labels>;
-        type Seq = S::Seq;
+        type Labels = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeq<S> {}
     impl<S: State> State for SetSeq<S> {
-        type Labels = S::Labels;
         type Seq = Set<members::seq>;
+        type Labels = S::Labels;
+    }
+    ///State transition - sets the `labels` field to Set
+    pub struct SetLabels<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabels<S> {}
+    impl<S: State> State for SetLabels<S> {
+        type Seq = S::Seq;
+        type Labels = Set<members::labels>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `labels` field
-        pub struct labels(());
         ///Marker type for the `seq` field
         pub struct seq(());
+        ///Marker type for the `labels` field
+        pub struct labels(());
     }
 }
 
@@ -472,8 +472,8 @@ where
 impl<'a, S> LabelsBuilder<'a, S>
 where
     S: labels_state::State,
-    S::Labels: labels_state::IsSet,
     S::Seq: labels_state::IsSet,
+    S::Labels: labels_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Labels<'a> {

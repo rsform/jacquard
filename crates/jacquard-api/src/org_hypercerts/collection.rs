@@ -49,7 +49,7 @@ pub struct Item<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "org.hypercerts.collection", tag = "$type")]
 pub struct Collection<'a> {
     ///The collection's avatar/profile image as a URI or image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -89,8 +89,7 @@ pub struct Collection<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum CollectionAvatar<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -101,8 +100,7 @@ pub enum CollectionAvatar<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum CollectionBanner<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),

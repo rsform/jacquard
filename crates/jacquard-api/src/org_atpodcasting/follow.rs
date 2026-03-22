@@ -30,7 +30,7 @@ use crate::org_atpodcasting::PodcastRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "org.atpodcasting.follow", tag = "$type")]
 pub struct Follow<'a> {
     ///When the follow was created.
     pub created_at: Datetime,

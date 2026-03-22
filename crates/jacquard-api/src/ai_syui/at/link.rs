@@ -138,7 +138,7 @@ impl jacquard_common::IntoStatic for LinkItemService<'_> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "ai.syui.at.link", tag = "$type")]
 pub struct Link<'a> {
     ///Client-declared timestamp when this record was created.
     pub created_at: Datetime,

@@ -35,7 +35,7 @@ use crate::sh_weaver::notebook::Title;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.weaver.notebook.entry", tag = "$type")]
 pub struct Entry<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -361,67 +361,67 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Title;
-        type Path;
         type CreatedAt;
+        type Content;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Title = Unset;
-        type Path = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Title = S::Title;
-        type Path = S::Path;
-        type CreatedAt = S::CreatedAt;
+        type Content = Unset;
+        type Path = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
         type Title = Set<members::title>;
-        type Path = S::Path;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
         type Content = S::Content;
-        type Title = S::Title;
-        type Path = Set<members::path>;
-        type CreatedAt = S::CreatedAt;
+        type Path = S::Path;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
         type Title = S::Title;
-        type Path = S::Path;
         type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
@@ -621,10 +621,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Content: entry_state::IsSet,
     S::Title: entry_state::IsSet,
-    S::Path: entry_state::IsSet,
     S::CreatedAt: entry_state::IsSet,
+    S::Content: entry_state::IsSet,
+    S::Path: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {

@@ -29,7 +29,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.kich.recipe.save", tag = "$type")]
 pub struct Save<'a> {
     pub created_at: Datetime,
     ///Reference to the saved recipe (io.kich.recipe.recipe).

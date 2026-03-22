@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.stormlightlabs.malfestio.thread.comment",
+    tag = "$type"
+)]
 pub struct Comment<'a> {
     ///The comment text.
     #[serde(borrow)]
@@ -130,51 +134,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Body;
         type CreatedAt;
         type SubjectRef;
-        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Body = Unset;
         type CreatedAt = Unset;
         type SubjectRef = Unset;
-        type Body = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type SubjectRef = S::SubjectRef;
-        type Body = S::Body;
-    }
-    ///State transition - sets the `subject_ref` field to Set
-    pub struct SetSubjectRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjectRef<S> {}
-    impl<S: State> State for SetSubjectRef<S> {
-        type CreatedAt = S::CreatedAt;
-        type SubjectRef = Set<members::subject_ref>;
-        type Body = S::Body;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
+        type Body = Set<members::body>;
         type CreatedAt = S::CreatedAt;
         type SubjectRef = S::SubjectRef;
-        type Body = Set<members::body>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Body = S::Body;
+        type CreatedAt = Set<members::created_at>;
+        type SubjectRef = S::SubjectRef;
+    }
+    ///State transition - sets the `subject_ref` field to Set
+    pub struct SetSubjectRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjectRef<S> {}
+    impl<S: State> State for SetSubjectRef<S> {
+        type Body = S::Body;
+        type CreatedAt = S::CreatedAt;
+        type SubjectRef = Set<members::subject_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `body` field
+        pub struct body(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subject_ref` field
         pub struct subject_ref(());
-        ///Marker type for the `body` field
-        pub struct body(());
     }
 }
 
@@ -281,9 +285,9 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
+    S::Body: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
     S::SubjectRef: comment_state::IsSet,
-    S::Body: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {

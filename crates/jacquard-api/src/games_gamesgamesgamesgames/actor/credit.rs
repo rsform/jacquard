@@ -31,7 +31,11 @@ use crate::games_gamesgamesgamesgames::CreditEntry;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "games.gamesgamesgamesgames.actor.credit",
+    tag = "$type"
+)]
 pub struct Credit<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -133,37 +137,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Game;
         type Credits;
+        type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Game = Unset;
         type Credits = Unset;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Game = Set<members::game>;
-        type Credits = S::Credits;
+        type Game = Unset;
     }
     ///State transition - sets the `credits` field to Set
     pub struct SetCredits<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCredits<S> {}
     impl<S: State> State for SetCredits<S> {
-        type Game = S::Game;
         type Credits = Set<members::credits>;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Credits = S::Credits;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `credits` field
         pub struct credits(());
+        ///Marker type for the `game` field
+        pub struct game(());
     }
 }
 
@@ -264,8 +268,8 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Game: credit_state::IsSet,
     S::Credits: credit_state::IsSet,
+    S::Game: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {

@@ -38,7 +38,7 @@ use crate::net_anisota::feed::draft;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "net.anisota.feed.draft", tag = "$type")]
 pub struct Draft<'a> {
     ///Client-declared timestamp when this draft was originally created.
     pub created_at: Datetime,
@@ -74,8 +74,7 @@ pub struct Draft<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum DraftEmbed<'a> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<Images<'a>>),

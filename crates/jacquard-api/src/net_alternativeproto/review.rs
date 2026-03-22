@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "net.alternativeproto.review", tag = "$type")]
 pub struct Review<'a> {
     ///Timestamp when the review was created
     pub created_at: Datetime,
@@ -162,8 +162,8 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ProjectId;
         type Rating;
+        type ProjectId;
         type Text;
         type CreatedAt;
     }
@@ -171,26 +171,26 @@ pub mod review_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ProjectId = Unset;
         type Rating = Unset;
+        type ProjectId = Unset;
         type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `project_id` field to Set
-    pub struct SetProjectId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProjectId<S> {}
-    impl<S: State> State for SetProjectId<S> {
-        type ProjectId = Set<members::project_id>;
-        type Rating = S::Rating;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
-        type ProjectId = S::ProjectId;
         type Rating = Set<members::rating>;
+        type ProjectId = S::ProjectId;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `project_id` field to Set
+    pub struct SetProjectId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProjectId<S> {}
+    impl<S: State> State for SetProjectId<S> {
+        type Rating = S::Rating;
+        type ProjectId = Set<members::project_id>;
         type Text = S::Text;
         type CreatedAt = S::CreatedAt;
     }
@@ -198,8 +198,8 @@ pub mod review_state {
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type ProjectId = S::ProjectId;
         type Rating = S::Rating;
+        type ProjectId = S::ProjectId;
         type Text = Set<members::text>;
         type CreatedAt = S::CreatedAt;
     }
@@ -207,18 +207,18 @@ pub mod review_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ProjectId = S::ProjectId;
         type Rating = S::Rating;
+        type ProjectId = S::ProjectId;
         type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `project_id` field
-        pub struct project_id(());
         ///Marker type for the `rating` field
         pub struct rating(());
+        ///Marker type for the `project_id` field
+        pub struct project_id(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `created_at` field
@@ -330,8 +330,8 @@ where
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::ProjectId: review_state::IsSet,
     S::Rating: review_state::IsSet,
+    S::ProjectId: review_state::IsSet,
     S::Text: review_state::IsSet,
     S::CreatedAt: review_state::IsSet,
 {

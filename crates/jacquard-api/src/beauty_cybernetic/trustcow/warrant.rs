@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "beauty.cybernetic.trustcow.warrant",
+    tag = "$type"
+)]
 pub struct Warrant<'a> {
     ///When the warrant was created
     pub created_at: Datetime,

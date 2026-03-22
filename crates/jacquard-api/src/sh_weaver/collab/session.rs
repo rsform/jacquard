@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.weaver.collab.session", tag = "$type")]
 pub struct Session<'a> {
     pub created_at: Datetime,
     ///Session TTL. Should be refreshed periodically while active.
@@ -123,51 +123,51 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Resource;
         type NodeId;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Resource = Unset;
         type NodeId = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Resource = Set<members::resource>;
-        type NodeId = S::NodeId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `node_id` field to Set
-    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNodeId<S> {}
-    impl<S: State> State for SetNodeId<S> {
-        type Resource = S::Resource;
-        type NodeId = Set<members::node_id>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Resource = S::Resource;
         type NodeId = S::NodeId;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type CreatedAt = S::CreatedAt;
+        type Resource = Set<members::resource>;
+        type NodeId = S::NodeId;
+    }
+    ///State transition - sets the `node_id` field to Set
+    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNodeId<S> {}
+    impl<S: State> State for SetNodeId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Resource = S::Resource;
+        type NodeId = Set<members::node_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `resource` field
         pub struct resource(());
         ///Marker type for the `node_id` field
         pub struct node_id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -288,9 +288,9 @@ where
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
+    S::CreatedAt: session_state::IsSet,
     S::Resource: session_state::IsSet,
     S::NodeId: session_state::IsSet,
-    S::CreatedAt: session_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Session<'a> {

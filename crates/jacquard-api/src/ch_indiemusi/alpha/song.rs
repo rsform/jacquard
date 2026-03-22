@@ -64,7 +64,7 @@ pub struct InterestedParty<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "ch.indiemusi.alpha.song", tag = "$type")]
 pub struct Song<'a> {
     ///List of interested parties (authors, composers, publishers) associated with this song
     #[serde(borrow)]

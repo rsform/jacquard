@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.gainforest.evaluator.subscription",
+    tag = "$type"
+)]
 pub struct Subscription<'a> {
     ///Which of the user's record collections should be evaluated (NSIDs). Must be a subset of the evaluator's subjectCollections. If omitted, all supported collections are evaluated.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -141,37 +145,37 @@ pub mod subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Evaluator;
         type CreatedAt;
+        type Evaluator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Evaluator = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `evaluator` field to Set
-    pub struct SetEvaluator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluator<S> {}
-    impl<S: State> State for SetEvaluator<S> {
-        type Evaluator = Set<members::evaluator>;
-        type CreatedAt = S::CreatedAt;
+        type Evaluator = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Evaluator = S::Evaluator;
         type CreatedAt = Set<members::created_at>;
+        type Evaluator = S::Evaluator;
+    }
+    ///State transition - sets the `evaluator` field to Set
+    pub struct SetEvaluator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvaluator<S> {}
+    impl<S: State> State for SetEvaluator<S> {
+        type CreatedAt = S::CreatedAt;
+        type Evaluator = Set<members::evaluator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `evaluator` field
-        pub struct evaluator(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `evaluator` field
+        pub struct evaluator(());
     }
 }
 
@@ -275,8 +279,8 @@ where
 impl<'a, S> SubscriptionBuilder<'a, S>
 where
     S: subscription_state::State,
-    S::Evaluator: subscription_state::IsSet,
     S::CreatedAt: subscription_state::IsSet,
+    S::Evaluator: subscription_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subscription<'a> {

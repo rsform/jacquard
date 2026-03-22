@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.beaconbits.profile", tag = "$type")]
 pub struct Profile<'a> {
     ///Who can tag this user in beacons
     #[serde(skip_serializing_if = "Option::is_none")]

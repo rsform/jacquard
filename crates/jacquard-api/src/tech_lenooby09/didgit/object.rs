@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "tech.lenooby09.didgit.object",
+    tag = "$type"
+)]
 pub struct Object<'a> {
     ///The git object content, stored as an AT Protocol blob.
     #[serde(borrow)]
@@ -266,37 +270,37 @@ pub mod object_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type ObjectType;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type ObjectType = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type ObjectType = S::ObjectType;
+        type Content = Unset;
     }
     ///State transition - sets the `object_type` field to Set
     pub struct SetObjectType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObjectType<S> {}
     impl<S: State> State for SetObjectType<S> {
-        type Content = S::Content;
         type ObjectType = Set<members::object_type>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type ObjectType = S::ObjectType;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `object_type` field
         pub struct object_type(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -366,8 +370,8 @@ where
 impl<'a, S> ObjectBuilder<'a, S>
 where
     S: object_state::State,
-    S::Content: object_state::IsSet,
     S::ObjectType: object_state::IsSet,
+    S::Content: object_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Object<'a> {

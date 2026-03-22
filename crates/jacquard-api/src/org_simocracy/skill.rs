@@ -31,7 +31,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "org.simocracy.skill", tag = "$type")]
 pub struct Skill<'a> {
     ///Timestamp when the skill was created
     pub created_at: Datetime,

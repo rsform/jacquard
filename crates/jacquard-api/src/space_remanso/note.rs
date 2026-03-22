@@ -44,7 +44,7 @@ pub struct Image<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "space.remanso.note", tag = "$type")]
 pub struct Note<'a> {
     ///Markdown content. Local image paths are replaced with blob CIDs at publish time.
     #[serde(borrow)]
@@ -970,37 +970,37 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Title;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Title = S::Title;
+        type Content = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
         type Title = Set<members::title>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Title = S::Title;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -1185,8 +1185,8 @@ where
 impl<'a, S> NoteBuilder<'a, S>
 where
     S: note_state::State,
-    S::Content: note_state::IsSet,
     S::Title: note_state::IsSet,
+    S::Content: note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Note<'a> {

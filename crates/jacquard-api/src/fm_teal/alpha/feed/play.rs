@@ -29,7 +29,7 @@ use crate::fm_teal::alpha::feed::Artist;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "fm.teal.alpha.feed.play", tag = "$type")]
 pub struct Play<'a> {
     ///Array of Musicbrainz artist IDs. Prefer using 'artists'.
     #[serde(skip_serializing_if = "Option::is_none")]

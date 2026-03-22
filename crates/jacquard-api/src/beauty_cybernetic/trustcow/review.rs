@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "beauty.cybernetic.trustcow.review",
+    tag = "$type"
+)]
 pub struct Review<'a> {
     ///When the review was created
     pub created_at: Datetime,
@@ -257,49 +261,49 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rating;
         type Transaction;
+        type Rating;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rating = Unset;
         type Transaction = Unset;
+        type Rating = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRating<S> {}
-    impl<S: State> State for SetRating<S> {
-        type Rating = Set<members::rating>;
-        type Transaction = S::Transaction;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `transaction` field to Set
     pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTransaction<S> {}
     impl<S: State> State for SetTransaction<S> {
-        type Rating = S::Rating;
         type Transaction = Set<members::transaction>;
+        type Rating = S::Rating;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRating<S> {}
+    impl<S: State> State for SetRating<S> {
+        type Transaction = S::Transaction;
+        type Rating = Set<members::rating>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Rating = S::Rating;
         type Transaction = S::Transaction;
+        type Rating = S::Rating;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rating` field
-        pub struct rating(());
         ///Marker type for the `transaction` field
         pub struct transaction(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -439,8 +443,8 @@ where
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::Rating: review_state::IsSet,
     S::Transaction: review_state::IsSet,
+    S::Rating: review_state::IsSet,
     S::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct

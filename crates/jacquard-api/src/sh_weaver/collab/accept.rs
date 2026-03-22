@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.weaver.collab.accept", tag = "$type")]
 pub struct Accept<'a> {
     pub created_at: Datetime,
     ///Reference to the invite record being accepted.

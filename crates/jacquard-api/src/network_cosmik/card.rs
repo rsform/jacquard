@@ -32,7 +32,7 @@ use crate::network_cosmik::card;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "network.cosmik.card", tag = "$type")]
 pub struct Card<'a> {
     ///The specific content of the card, determined by the card type.
     #[serde(borrow)]
@@ -64,8 +64,7 @@ pub struct Card<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum CardContent<'a> {
     #[serde(rename = "network.cosmik.card#urlContent")]
     UrlContent(Box<card::UrlContent<'a>>),

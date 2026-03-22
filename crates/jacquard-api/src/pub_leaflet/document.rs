@@ -36,7 +36,7 @@ use crate::pub_leaflet::publication::Theme;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "pub.leaflet.document", tag = "$type")]
 pub struct Document<'a> {
     #[serde(borrow)]
     pub author: AtIdentifier<'a>,
@@ -72,8 +72,7 @@ pub struct Document<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum DocumentPagesItem<'a> {
     #[serde(rename = "pub.leaflet.pages.linearDocument")]
     LinearDocument(Box<LinearDocument<'a>>),

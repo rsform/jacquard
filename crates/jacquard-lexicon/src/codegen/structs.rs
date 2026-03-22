@@ -129,7 +129,7 @@ impl<'c> CodeGenerator<'c> {
                     #doc
                     #lexicon_attr
                     #derive_attr
-                    #[serde(rename_all = "camelCase")]
+                    #[serde(rename_all = "camelCase", rename = #nsid, tag = "$type")]
                     pub struct #ident<'a> {
                         #fields
                     }
@@ -185,8 +185,8 @@ impl<'c> CodeGenerator<'c> {
                     resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
                 let xrpc_resp_path =
                     resolved.external_type_tokens(&super::prettify::ExternalImport::XrpcResp);
-                let record_error_type =
-                    resolved.type_tokens_with_lifetime(&super::prettify::CommonType::RecordError, "de");
+                let record_error_type = resolved
+                    .type_tokens_with_lifetime(&super::prettify::CommonType::RecordError, "de");
                 let record_marker = quote! {
                     /// Marker type for deserializing records from this collection.
                     #[derive(Debug, #ser_path, #de_path)]
@@ -753,8 +753,7 @@ impl<'c> CodeGenerator<'c> {
                 #doc
                 #open_union_attr
                 #derive_attr
-                #[serde(tag = "$type")]
-                #[serde(bound(deserialize = "'de: 'a"))]
+                #[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
                 pub enum #enum_ident<'a> {
                     #(#variants,)*
                 }

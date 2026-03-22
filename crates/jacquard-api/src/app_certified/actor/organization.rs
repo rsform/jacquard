@@ -31,7 +31,11 @@ use crate::app_certified::actor::organization;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.certified.actor.organization",
+    tag = "$type"
+)]
 pub struct Organization<'a> {
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,

@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.stream.server.settings",
+    tag = "$type"
+)]
 pub struct Settings<'a> {
     ///Whether this node may archive your livestream for improving the service
     #[serde(skip_serializing_if = "Option::is_none")]

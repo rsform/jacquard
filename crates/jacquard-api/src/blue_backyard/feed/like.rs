@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.backyard.feed.like", tag = "$type")]
 pub struct Like<'a> {
     pub created_at: Datetime,
     ///The record being liked (post, reblog, or comment).

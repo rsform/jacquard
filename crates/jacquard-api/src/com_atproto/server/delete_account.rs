@@ -110,51 +110,51 @@ pub mod delete_account_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Did;
         type Password;
         type Token;
-        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Did = Unset;
         type Password = Unset;
         type Token = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPassword<S> {}
-    impl<S: State> State for SetPassword<S> {
-        type Password = Set<members::password>;
-        type Token = S::Token;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetToken<S> {}
-    impl<S: State> State for SetToken<S> {
-        type Password = S::Password;
-        type Token = Set<members::token>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
         type Password = S::Password;
         type Token = S::Token;
-        type Did = Set<members::did>;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPassword<S> {}
+    impl<S: State> State for SetPassword<S> {
+        type Did = S::Did;
+        type Password = Set<members::password>;
+        type Token = S::Token;
+    }
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetToken<S> {}
+    impl<S: State> State for SetToken<S> {
+        type Did = S::Did;
+        type Password = S::Password;
+        type Token = Set<members::token>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `password` field
         pub struct password(());
         ///Marker type for the `token` field
         pub struct token(());
-        ///Marker type for the `did` field
-        pub struct did(());
     }
 }
 
@@ -243,9 +243,9 @@ where
 impl<'a, S> DeleteAccountBuilder<'a, S>
 where
     S: delete_account_state::State,
+    S::Did: delete_account_state::IsSet,
     S::Password: delete_account_state::IsSet,
     S::Token: delete_account_state::IsSet,
-    S::Did: delete_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteAccount<'a> {

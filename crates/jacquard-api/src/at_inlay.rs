@@ -155,8 +155,7 @@ impl jacquard_common::IntoStatic for CachePolicyLife<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum CachePolicyTagsItem<'a> {
     #[serde(rename = "at.inlay.defs#tagRecord")]
     TagRecord(Box<at_inlay::TagRecord<'a>>),
@@ -718,37 +717,37 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cache;
         type Node;
+        type Cache;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cache = Unset;
         type Node = Unset;
-    }
-    ///State transition - sets the `cache` field to Set
-    pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCache<S> {}
-    impl<S: State> State for SetCache<S> {
-        type Cache = Set<members::cache>;
-        type Node = S::Node;
+        type Cache = Unset;
     }
     ///State transition - sets the `node` field to Set
     pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNode<S> {}
     impl<S: State> State for SetNode<S> {
-        type Cache = S::Cache;
         type Node = Set<members::node>;
+        type Cache = S::Cache;
+    }
+    ///State transition - sets the `cache` field to Set
+    pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCache<S> {}
+    impl<S: State> State for SetCache<S> {
+        type Node = S::Node;
+        type Cache = Set<members::cache>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cache` field
-        pub struct cache(());
         ///Marker type for the `node` field
         pub struct node(());
+        ///Marker type for the `cache` field
+        pub struct cache(());
     }
 }
 
@@ -818,8 +817,8 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Cache: response_state::IsSet,
     S::Node: response_state::IsSet,
+    S::Cache: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {

@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "coop.hypha.spores.site.section",
+    tag = "$type"
+)]
 pub struct Section<'a> {
     ///Collection NSID to display (for type=collection)
     #[serde(skip_serializing_if = "Option::is_none")]

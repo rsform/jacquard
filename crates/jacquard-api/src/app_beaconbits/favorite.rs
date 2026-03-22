@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.beaconbits.favorite", tag = "$type")]
 pub struct Favorite<'a> {
     ///Timestamp when the favorite was created
     pub created_at: Datetime,

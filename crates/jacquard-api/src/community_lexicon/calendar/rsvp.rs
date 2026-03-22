@@ -50,7 +50,11 @@ impl core::fmt::Display for Interested {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "community.lexicon.calendar.rsvp",
+    tag = "$type"
+)]
 pub struct Rsvp<'a> {
     #[serde(borrow)]
     pub status: RsvpStatus<'a>,

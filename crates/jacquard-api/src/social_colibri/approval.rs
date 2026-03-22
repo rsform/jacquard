@@ -28,7 +28,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "social.colibri.approval", tag = "$type")]
 pub struct Approval<'a> {
     ///AT-URI of the social.colibri.community record
     #[serde(borrow)]
@@ -114,51 +114,51 @@ pub mod approval_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Membership;
         type Community;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Membership = Unset;
         type Community = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Membership = S::Membership;
-        type Community = S::Community;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `membership` field to Set
     pub struct SetMembership<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembership<S> {}
     impl<S: State> State for SetMembership<S> {
-        type CreatedAt = S::CreatedAt;
         type Membership = Set<members::membership>;
         type Community = S::Community;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `community` field to Set
     pub struct SetCommunity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunity<S> {}
     impl<S: State> State for SetCommunity<S> {
-        type CreatedAt = S::CreatedAt;
         type Membership = S::Membership;
         type Community = Set<members::community>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Membership = S::Membership;
+        type Community = S::Community;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `membership` field
         pub struct membership(());
         ///Marker type for the `community` field
         pub struct community(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -247,9 +247,9 @@ where
 impl<'a, S> ApprovalBuilder<'a, S>
 where
     S: approval_state::State,
-    S::CreatedAt: approval_state::IsSet,
     S::Membership: approval_state::IsSet,
     S::Community: approval_state::IsSet,
+    S::CreatedAt: approval_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Approval<'a> {

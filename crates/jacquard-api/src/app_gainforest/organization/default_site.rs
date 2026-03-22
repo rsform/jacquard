@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.gainforest.organization.defaultSite",
+    tag = "$type"
+)]
 pub struct DefaultSite<'a> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,

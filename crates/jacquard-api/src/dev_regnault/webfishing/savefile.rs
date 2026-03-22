@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "dev.regnault.webfishing.savefile",
+    tag = "$type"
+)]
 pub struct Savefile<'a> {
     #[serde(borrow)]
     pub name: CowStr<'a>,

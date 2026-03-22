@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "games.gamesgamesgamesgames.feed.generator",
+    tag = "$type"
+)]
 pub struct Generator<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepts_interactions: Option<bool>,

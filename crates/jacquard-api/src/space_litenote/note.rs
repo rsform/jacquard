@@ -44,7 +44,7 @@ pub struct Image<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "space.litenote.note", tag = "$type")]
 pub struct Note<'a> {
     ///Markdown content. Local image paths are replaced with blob CIDs at publish time.
     #[serde(borrow)]

@@ -35,8 +35,7 @@ pub struct Content<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ContentPagesItem<'a> {
     #[serde(rename = "pub.leaflet.pages.linearDocument")]
     LinearDocument(Box<LinearDocument<'a>>),

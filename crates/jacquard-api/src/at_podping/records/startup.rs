@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "at.podping.records.startup", tag = "$type")]
 pub struct Startup<'a> {
     ///Optional, e.g. 1,078
     #[serde(skip_serializing_if = "Option::is_none")]

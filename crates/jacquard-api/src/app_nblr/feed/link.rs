@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.nblr.feed.link", tag = "$type")]
 pub struct Link<'a> {
     ///The AT URI of the collection being linked to
     #[serde(borrow)]
@@ -115,51 +115,51 @@ pub mod link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Collection;
         type Uri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Collection = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Collection = S::Collection;
-        type Uri = S::Uri;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type CreatedAt = S::CreatedAt;
         type Collection = Set<members::collection>;
         type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
         type Collection = S::Collection;
         type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Collection = S::Collection;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -248,9 +248,9 @@ where
 impl<'a, S> LinkBuilder<'a, S>
 where
     S: link_state::State,
-    S::CreatedAt: link_state::IsSet,
     S::Collection: link_state::IsSet,
     S::Uri: link_state::IsSet,
+    S::CreatedAt: link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Link<'a> {

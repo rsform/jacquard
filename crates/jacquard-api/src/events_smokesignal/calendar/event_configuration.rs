@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "events.smokesignal.calendar.eventConfiguration",
+    tag = "$type"
+)]
 pub struct EventConfiguration<'a> {
     ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "site.standard.graph.subscription",
+    tag = "$type"
+)]
 pub struct Subscription<'a> {
     #[serde(borrow)]
     pub publication: AtUri<'a>,

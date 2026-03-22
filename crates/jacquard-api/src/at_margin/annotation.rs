@@ -105,7 +105,7 @@ pub struct Generator<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "at.margin.annotation", tag = "$type")]
 pub struct Annotation<'a> {
     ///The annotation content (text or reference)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -303,8 +303,7 @@ pub struct RangeSelector<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum RangeSelectorEndSelector<'a> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
@@ -319,8 +318,7 @@ pub enum RangeSelectorEndSelector<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum RangeSelectorStartSelector<'a> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
@@ -362,8 +360,7 @@ pub struct Target<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum TargetSelector<'a> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
@@ -1960,37 +1957,37 @@ pub mod text_position_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type End;
         type Start;
+        type End;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type End = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type End = Set<members::end>;
-        type Start = S::Start;
+        type End = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type End = S::End;
         type Start = Set<members::start>;
+        type End = S::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Start = S::Start;
+        type End = Set<members::end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end` field
-        pub struct end(());
         ///Marker type for the `start` field
         pub struct start(());
+        ///Marker type for the `end` field
+        pub struct end(());
     }
 }
 
@@ -2076,8 +2073,8 @@ impl<'a, S: text_position_selector_state::State> TextPositionSelectorBuilder<'a,
 impl<'a, S> TextPositionSelectorBuilder<'a, S>
 where
     S: text_position_selector_state::State,
-    S::End: text_position_selector_state::IsSet,
     S::Start: text_position_selector_state::IsSet,
+    S::End: text_position_selector_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TextPositionSelector<'a> {

@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "garden.lexicon.example", tag = "$type")]
 pub struct Example<'a> {
     ///The user-supplied date and time the example was created.
     pub created_at: Datetime,
@@ -121,49 +121,49 @@ pub mod example_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Lexicon;
+        type Value;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Lexicon = Unset;
+        type Value = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Lexicon = S::Lexicon;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `lexicon` field to Set
     pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLexicon<S> {}
     impl<S: State> State for SetLexicon<S> {
-        type Value = S::Value;
         type Lexicon = Set<members::lexicon>;
+        type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Lexicon = S::Lexicon;
+        type Value = Set<members::value>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Value = S::Value;
         type Lexicon = S::Lexicon;
+        type Value = S::Value;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `lexicon` field
         pub struct lexicon(());
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -267,8 +267,8 @@ where
 impl<'a, S> ExampleBuilder<'a, S>
 where
     S: example_state::State,
-    S::Value: example_state::IsSet,
     S::Lexicon: example_state::IsSet,
+    S::Value: example_state::IsSet,
     S::CreatedAt: example_state::IsSet,
 {
     /// Build the final struct

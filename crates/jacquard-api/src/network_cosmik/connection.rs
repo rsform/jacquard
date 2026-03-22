@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "network.cosmik.connection", tag = "$type")]
 pub struct Connection<'a> {
     ///Optional type of connection
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -138,37 +138,37 @@ pub mod connection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Source;
         type Target;
+        type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Source = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Source = Set<members::source>;
-        type Target = S::Target;
+        type Source = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type Source = S::Source;
         type Target = Set<members::target>;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Target = S::Target;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `source` field
+        pub struct source(());
     }
 }
 
@@ -297,8 +297,8 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 impl<'a, S> ConnectionBuilder<'a, S>
 where
     S: connection_state::State,
-    S::Source: connection_state::IsSet,
     S::Target: connection_state::IsSet,
+    S::Source: connection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Connection<'a> {

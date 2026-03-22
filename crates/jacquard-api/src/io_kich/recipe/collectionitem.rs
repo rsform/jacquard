@@ -29,7 +29,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.kich.recipe.collectionitem",
+    tag = "$type"
+)]
 pub struct Collectionitem<'a> {
     ///Reference (AT-URI) to the collection record (io.kich.recipe.collection)
     #[serde(borrow)]

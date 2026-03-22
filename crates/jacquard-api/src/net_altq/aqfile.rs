@@ -161,7 +161,7 @@ pub struct File<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "net.altq.aqfile", tag = "$type")]
 pub struct Aqfile<'a> {
     ///Handle or DID of the account to attribute this upload to.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -737,51 +737,51 @@ pub mod aqfile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type File;
         type Blob;
         type CreatedAt;
+        type File;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type File = Unset;
         type Blob = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `file` field to Set
-    pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFile<S> {}
-    impl<S: State> State for SetFile<S> {
-        type File = Set<members::file>;
-        type Blob = S::Blob;
-        type CreatedAt = S::CreatedAt;
+        type File = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
-        type File = S::File;
         type Blob = Set<members::blob>;
         type CreatedAt = S::CreatedAt;
+        type File = S::File;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type File = S::File;
         type Blob = S::Blob;
         type CreatedAt = Set<members::created_at>;
+        type File = S::File;
+    }
+    ///State transition - sets the `file` field to Set
+    pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFile<S> {}
+    impl<S: State> State for SetFile<S> {
+        type Blob = S::Blob;
+        type CreatedAt = S::CreatedAt;
+        type File = Set<members::file>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `file` field
-        pub struct file(());
         ///Marker type for the `blob` field
         pub struct blob(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `file` field
+        pub struct file(());
     }
 }
 
@@ -902,9 +902,9 @@ where
 impl<'a, S> AqfileBuilder<'a, S>
 where
     S: aqfile_state::State,
-    S::File: aqfile_state::IsSet,
     S::Blob: aqfile_state::IsSet,
     S::CreatedAt: aqfile_state::IsSet,
+    S::File: aqfile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Aqfile<'a> {

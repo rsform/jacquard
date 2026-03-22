@@ -48,8 +48,7 @@ pub struct Builtin<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum BuiltinType<'a> {
     #[serde(rename = "my.skylights.listItem#inProgress")]
     InProgress(Box<list_item::InProgress>),
@@ -94,8 +93,7 @@ pub struct ListItem<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ListItemList<'a> {
     #[serde(rename = "my.skylights.list")]
     List(Box<List<'a>>),
@@ -282,51 +280,51 @@ pub mod list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Position;
         type List;
         type AddedAt;
-        type Position;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Position = Unset;
         type List = Unset;
         type AddedAt = Unset;
-        type Position = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type List = Set<members::list>;
-        type AddedAt = S::AddedAt;
-        type Position = S::Position;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type List = S::List;
-        type AddedAt = Set<members::added_at>;
-        type Position = S::Position;
     }
     ///State transition - sets the `position` field to Set
     pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPosition<S> {}
     impl<S: State> State for SetPosition<S> {
+        type Position = Set<members::position>;
         type List = S::List;
         type AddedAt = S::AddedAt;
-        type Position = Set<members::position>;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Position = S::Position;
+        type List = Set<members::list>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Position = S::Position;
+        type List = S::List;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `position` field
+        pub struct position(());
         ///Marker type for the `list` field
         pub struct list(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
-        ///Marker type for the `position` field
-        pub struct position(());
     }
 }
 
@@ -447,9 +445,9 @@ where
 impl<'a, S> ListItemBuilder<'a, S>
 where
     S: list_item_state::State,
+    S::Position: list_item_state::IsSet,
     S::List: list_item_state::IsSet,
     S::AddedAt: list_item_state::IsSet,
-    S::Position: list_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListItem<'a> {

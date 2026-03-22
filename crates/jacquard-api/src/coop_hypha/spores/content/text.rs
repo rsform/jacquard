@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "coop.hypha.spores.content.text",
+    tag = "$type"
+)]
 pub struct Text<'a> {
     ///Block content
     #[serde(borrow)]

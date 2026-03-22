@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.gainforest.organization.observations.measuredTreesCluster",
+    tag = "$type"
+)]
 pub struct MeasuredTreesCluster<'a> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
@@ -114,37 +118,37 @@ pub mod measured_trees_cluster_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Shapefile;
         type CreatedAt;
+        type Shapefile;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Shapefile = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `shapefile` field to Set
-    pub struct SetShapefile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShapefile<S> {}
-    impl<S: State> State for SetShapefile<S> {
-        type Shapefile = Set<members::shapefile>;
-        type CreatedAt = S::CreatedAt;
+        type Shapefile = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Shapefile = S::Shapefile;
         type CreatedAt = Set<members::created_at>;
+        type Shapefile = S::Shapefile;
+    }
+    ///State transition - sets the `shapefile` field to Set
+    pub struct SetShapefile<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShapefile<S> {}
+    impl<S: State> State for SetShapefile<S> {
+        type CreatedAt = S::CreatedAt;
+        type Shapefile = Set<members::shapefile>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `shapefile` field
-        pub struct shapefile(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `shapefile` field
+        pub struct shapefile(());
     }
 }
 
@@ -217,8 +221,8 @@ where
 impl<'a, S> MeasuredTreesClusterBuilder<'a, S>
 where
     S: measured_trees_cluster_state::State,
-    S::Shapefile: measured_trees_cluster_state::IsSet,
     S::CreatedAt: measured_trees_cluster_state::IsSet,
+    S::Shapefile: measured_trees_cluster_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MeasuredTreesCluster<'a> {

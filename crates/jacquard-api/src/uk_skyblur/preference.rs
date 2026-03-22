@@ -30,7 +30,7 @@ use crate::uk_skyblur::preference;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "uk.skyblur.preference", tag = "$type")]
 pub struct Preference<'a> {
     #[serde(borrow)]
     pub my_page: preference::MyPage<'a>,

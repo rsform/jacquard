@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "at.dropb.file", tag = "$type")]
 pub struct File<'a> {
     #[serde(borrow)]
     pub blob: BlobRef<'a>,

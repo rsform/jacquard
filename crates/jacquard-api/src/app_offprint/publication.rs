@@ -28,7 +28,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.offprint.publication", tag = "$type")]
 pub struct Publication<'a> {
     ///Required AT-URI to a `site.standard.publication` compatible record.
     #[serde(borrow)]

@@ -30,7 +30,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.graph.followAccept",
+    tag = "$type"
+)]
 pub struct FollowAccept<'a> {
     pub created_at: Datetime,
     ///Reference to the follow record being accepted.

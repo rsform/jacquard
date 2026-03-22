@@ -43,7 +43,7 @@ pub struct Export<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "at.inlay.pack", tag = "$type")]
 pub struct Pack<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -156,37 +156,37 @@ pub mod export_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Component;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Component = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Component = S::Component;
+        type Type = Unset;
     }
     ///State transition - sets the `component` field to Set
     pub struct SetComponent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComponent<S> {}
     impl<S: State> State for SetComponent<S> {
-        type Type = S::Type;
         type Component = Set<members::component>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Component = S::Component;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `component` field
         pub struct component(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -256,8 +256,8 @@ where
 impl<'a, S> ExportBuilder<'a, S>
 where
     S: export_state::State,
-    S::Type: export_state::IsSet,
     S::Component: export_state::IsSet,
+    S::Type: export_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Export<'a> {
@@ -400,37 +400,37 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Exports;
         type Name;
+        type Exports;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Exports = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `exports` field to Set
-    pub struct SetExports<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExports<S> {}
-    impl<S: State> State for SetExports<S> {
-        type Exports = Set<members::exports>;
-        type Name = S::Name;
+        type Exports = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Exports = S::Exports;
         type Name = Set<members::name>;
+        type Exports = S::Exports;
+    }
+    ///State transition - sets the `exports` field to Set
+    pub struct SetExports<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExports<S> {}
+    impl<S: State> State for SetExports<S> {
+        type Name = S::Name;
+        type Exports = Set<members::exports>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `exports` field
-        pub struct exports(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `exports` field
+        pub struct exports(());
     }
 }
 
@@ -513,8 +513,8 @@ where
 impl<'a, S> PackBuilder<'a, S>
 where
     S: pack_state::State,
-    S::Exports: pack_state::IsSet,
     S::Name: pack_state::IsSet,
+    S::Exports: pack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pack<'a> {

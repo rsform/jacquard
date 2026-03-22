@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "top.launchpadx.agent.journal",
+    tag = "$type"
+)]
 pub struct Journal<'a> {
     ///Timestamp when the journal entry was created.
     pub created_at: Datetime,

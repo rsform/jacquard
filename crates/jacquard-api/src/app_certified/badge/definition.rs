@@ -31,7 +31,11 @@ use crate::app_certified::Did;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.certified.badge.definition",
+    tag = "$type"
+)]
 pub struct Definition<'a> {
     ///Optional allowlist of DIDs allowed to issue this badge. If omitted, anyone may issue it.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -231,67 +235,67 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Icon;
         type BadgeType;
         type Title;
+        type CreatedAt;
+        type Icon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Icon = Unset;
         type BadgeType = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Icon = S::Icon;
-        type BadgeType = S::BadgeType;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIcon<S> {}
-    impl<S: State> State for SetIcon<S> {
-        type CreatedAt = S::CreatedAt;
-        type Icon = Set<members::icon>;
-        type BadgeType = S::BadgeType;
-        type Title = S::Title;
+        type CreatedAt = Unset;
+        type Icon = Unset;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeType<S> {}
     impl<S: State> State for SetBadgeType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Icon = S::Icon;
         type BadgeType = Set<members::badge_type>;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Icon = S::Icon;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Icon = S::Icon;
         type BadgeType = S::BadgeType;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type BadgeType = S::BadgeType;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIcon<S> {}
+    impl<S: State> State for SetIcon<S> {
+        type BadgeType = S::BadgeType;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Icon = Set<members::icon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `icon` field
-        pub struct icon(());
         ///Marker type for the `badge_type` field
         pub struct badge_type(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `icon` field
+        pub struct icon(());
     }
 }
 
@@ -432,10 +436,10 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::CreatedAt: definition_state::IsSet,
-    S::Icon: definition_state::IsSet,
     S::BadgeType: definition_state::IsSet,
     S::Title: definition_state::IsSet,
+    S::CreatedAt: definition_state::IsSet,
+    S::Icon: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {

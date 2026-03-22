@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "coop.hypha.spores.social.flower",
+    tag = "$type"
+)]
 pub struct Flower<'a> {
     ///Client-declared timestamp when the flower was planted.
     pub created_at: Datetime,

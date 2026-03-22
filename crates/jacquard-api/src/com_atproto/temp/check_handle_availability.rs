@@ -51,8 +51,7 @@ pub struct CheckHandleAvailabilityOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum CheckHandleAvailabilityOutputResult<'a> {
     #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultAvailable")]
     ResultAvailable(Box<check_handle_availability::ResultAvailable<'a>>),

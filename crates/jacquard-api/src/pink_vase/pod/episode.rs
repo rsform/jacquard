@@ -31,7 +31,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "pink.vase.pod.episode", tag = "$type")]
 pub struct Episode<'a> {
     ///URL to the audio file. Can be any host the creator controls.
     #[serde(borrow)]
@@ -296,67 +296,67 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Show;
-        type Title;
         type AudioUrl;
         type CreatedAt;
+        type Title;
+        type Show;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Show = Unset;
-        type Title = Unset;
         type AudioUrl = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `show` field to Set
-    pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShow<S> {}
-    impl<S: State> State for SetShow<S> {
-        type Show = Set<members::show>;
-        type Title = S::Title;
-        type AudioUrl = S::AudioUrl;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Show = S::Show;
-        type Title = Set<members::title>;
-        type AudioUrl = S::AudioUrl;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
+        type Show = Unset;
     }
     ///State transition - sets the `audio_url` field to Set
     pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAudioUrl<S> {}
     impl<S: State> State for SetAudioUrl<S> {
-        type Show = S::Show;
-        type Title = S::Title;
         type AudioUrl = Set<members::audio_url>;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Show = S::Show;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Show = S::Show;
-        type Title = S::Title;
         type AudioUrl = S::AudioUrl;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type Show = S::Show;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type AudioUrl = S::AudioUrl;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
+        type Show = S::Show;
+    }
+    ///State transition - sets the `show` field to Set
+    pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShow<S> {}
+    impl<S: State> State for SetShow<S> {
+        type AudioUrl = S::AudioUrl;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Show = Set<members::show>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show` field
-        pub struct show(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `audio_url` field
         pub struct audio_url(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `show` field
+        pub struct show(());
     }
 }
 
@@ -570,10 +570,10 @@ where
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
-    S::Show: episode_state::IsSet,
-    S::Title: episode_state::IsSet,
     S::AudioUrl: episode_state::IsSet,
     S::CreatedAt: episode_state::IsSet,
+    S::Title: episode_state::IsSet,
+    S::Show: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {

@@ -31,7 +31,7 @@ use crate::social_psky::richtext::facet::Facet;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "social.psky.chat.message", tag = "$type")]
 pub struct Message<'a> {
     ///Text content.
     #[serde(borrow)]

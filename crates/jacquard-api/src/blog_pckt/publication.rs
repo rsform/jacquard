@@ -29,7 +29,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blog.pckt.publication", tag = "$type")]
 pub struct Publication<'a> {
     #[serde(borrow)]
     pub publication: StrongRef<'a>,

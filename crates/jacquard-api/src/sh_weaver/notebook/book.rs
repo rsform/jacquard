@@ -36,7 +36,7 @@ use crate::sh_weaver::notebook::Title;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.weaver.notebook.book", tag = "$type")]
 pub struct Book<'a> {
     #[serde(borrow)]
     pub authors: Vec<Author<'a>>,

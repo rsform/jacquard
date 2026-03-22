@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "ch.indiemusi.alpha.track", tag = "$type")]
 pub struct Track<'a> {
     ///The encrypted audio file
     #[serde(borrow)]
@@ -191,67 +191,67 @@ pub mod track_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EncryptedContentIv;
-        type CreatedAt;
         type Title;
         type AudioBlob;
+        type EncryptedContentIv;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EncryptedContentIv = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
         type AudioBlob = Unset;
-    }
-    ///State transition - sets the `encrypted_content_iv` field to Set
-    pub struct SetEncryptedContentIv<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEncryptedContentIv<S> {}
-    impl<S: State> State for SetEncryptedContentIv<S> {
-        type EncryptedContentIv = Set<members::encrypted_content_iv>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type AudioBlob = S::AudioBlob;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type EncryptedContentIv = S::EncryptedContentIv;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type AudioBlob = S::AudioBlob;
+        type EncryptedContentIv = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type EncryptedContentIv = S::EncryptedContentIv;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
         type AudioBlob = S::AudioBlob;
+        type EncryptedContentIv = S::EncryptedContentIv;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `audio_blob` field to Set
     pub struct SetAudioBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAudioBlob<S> {}
     impl<S: State> State for SetAudioBlob<S> {
-        type EncryptedContentIv = S::EncryptedContentIv;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type AudioBlob = Set<members::audio_blob>;
+        type EncryptedContentIv = S::EncryptedContentIv;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `encrypted_content_iv` field to Set
+    pub struct SetEncryptedContentIv<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEncryptedContentIv<S> {}
+    impl<S: State> State for SetEncryptedContentIv<S> {
+        type Title = S::Title;
+        type AudioBlob = S::AudioBlob;
+        type EncryptedContentIv = Set<members::encrypted_content_iv>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type AudioBlob = S::AudioBlob;
+        type EncryptedContentIv = S::EncryptedContentIv;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `encrypted_content_iv` field
-        pub struct encrypted_content_iv(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `audio_blob` field
         pub struct audio_blob(());
+        ///Marker type for the `encrypted_content_iv` field
+        pub struct encrypted_content_iv(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -378,10 +378,10 @@ where
 impl<'a, S> TrackBuilder<'a, S>
 where
     S: track_state::State,
-    S::EncryptedContentIv: track_state::IsSet,
-    S::CreatedAt: track_state::IsSet,
     S::Title: track_state::IsSet,
     S::AudioBlob: track_state::IsSet,
+    S::EncryptedContentIv: track_state::IsSet,
+    S::CreatedAt: track_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Track<'a> {

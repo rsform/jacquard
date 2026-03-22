@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.beaconbits.beacon.like", tag = "$type")]
 pub struct Like<'a> {
     ///Associated Bluesky like URI (if beacon has a post)
     #[serde(skip_serializing_if = "Option::is_none")]

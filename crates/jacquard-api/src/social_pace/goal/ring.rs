@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "social.pace.goal.ring", tag = "$type")]
 pub struct Ring<'a> {
     pub created_at: Datetime,
     ///The total minutes of exercise completed.
@@ -121,127 +121,127 @@ pub mod ring_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StandHours;
+        type CreatedAt;
         type ExerciseGoal;
-        type Exercise;
-        type Move;
         type MoveGoal;
         type StandGoal;
-        type CreatedAt;
+        type Exercise;
+        type StandHours;
+        type Move;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StandHours = Unset;
+        type CreatedAt = Unset;
         type ExerciseGoal = Unset;
-        type Exercise = Unset;
-        type Move = Unset;
         type MoveGoal = Unset;
         type StandGoal = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `stand_hours` field to Set
-    pub struct SetStandHours<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStandHours<S> {}
-    impl<S: State> State for SetStandHours<S> {
-        type StandHours = Set<members::stand_hours>;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-        type Move = S::Move;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `exercise_goal` field to Set
-    pub struct SetExerciseGoal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExerciseGoal<S> {}
-    impl<S: State> State for SetExerciseGoal<S> {
-        type StandHours = S::StandHours;
-        type ExerciseGoal = Set<members::exercise_goal>;
-        type Exercise = S::Exercise;
-        type Move = S::Move;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `exercise` field to Set
-    pub struct SetExercise<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExercise<S> {}
-    impl<S: State> State for SetExercise<S> {
-        type StandHours = S::StandHours;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = Set<members::exercise>;
-        type Move = S::Move;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `move` field to Set
-    pub struct SetMove<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMove<S> {}
-    impl<S: State> State for SetMove<S> {
-        type StandHours = S::StandHours;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-        type Move = Set<members::r#move>;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `move_goal` field to Set
-    pub struct SetMoveGoal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMoveGoal<S> {}
-    impl<S: State> State for SetMoveGoal<S> {
-        type StandHours = S::StandHours;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-        type Move = S::Move;
-        type MoveGoal = Set<members::move_goal>;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `stand_goal` field to Set
-    pub struct SetStandGoal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStandGoal<S> {}
-    impl<S: State> State for SetStandGoal<S> {
-        type StandHours = S::StandHours;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-        type Move = S::Move;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = Set<members::stand_goal>;
-        type CreatedAt = S::CreatedAt;
+        type Exercise = Unset;
+        type StandHours = Unset;
+        type Move = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type StandHours = S::StandHours;
+        type CreatedAt = Set<members::created_at>;
         type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-        type Move = S::Move;
         type MoveGoal = S::MoveGoal;
         type StandGoal = S::StandGoal;
-        type CreatedAt = Set<members::created_at>;
+        type Exercise = S::Exercise;
+        type StandHours = S::StandHours;
+        type Move = S::Move;
+    }
+    ///State transition - sets the `exercise_goal` field to Set
+    pub struct SetExerciseGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExerciseGoal<S> {}
+    impl<S: State> State for SetExerciseGoal<S> {
+        type CreatedAt = S::CreatedAt;
+        type ExerciseGoal = Set<members::exercise_goal>;
+        type MoveGoal = S::MoveGoal;
+        type StandGoal = S::StandGoal;
+        type Exercise = S::Exercise;
+        type StandHours = S::StandHours;
+        type Move = S::Move;
+    }
+    ///State transition - sets the `move_goal` field to Set
+    pub struct SetMoveGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoveGoal<S> {}
+    impl<S: State> State for SetMoveGoal<S> {
+        type CreatedAt = S::CreatedAt;
+        type ExerciseGoal = S::ExerciseGoal;
+        type MoveGoal = Set<members::move_goal>;
+        type StandGoal = S::StandGoal;
+        type Exercise = S::Exercise;
+        type StandHours = S::StandHours;
+        type Move = S::Move;
+    }
+    ///State transition - sets the `stand_goal` field to Set
+    pub struct SetStandGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStandGoal<S> {}
+    impl<S: State> State for SetStandGoal<S> {
+        type CreatedAt = S::CreatedAt;
+        type ExerciseGoal = S::ExerciseGoal;
+        type MoveGoal = S::MoveGoal;
+        type StandGoal = Set<members::stand_goal>;
+        type Exercise = S::Exercise;
+        type StandHours = S::StandHours;
+        type Move = S::Move;
+    }
+    ///State transition - sets the `exercise` field to Set
+    pub struct SetExercise<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExercise<S> {}
+    impl<S: State> State for SetExercise<S> {
+        type CreatedAt = S::CreatedAt;
+        type ExerciseGoal = S::ExerciseGoal;
+        type MoveGoal = S::MoveGoal;
+        type StandGoal = S::StandGoal;
+        type Exercise = Set<members::exercise>;
+        type StandHours = S::StandHours;
+        type Move = S::Move;
+    }
+    ///State transition - sets the `stand_hours` field to Set
+    pub struct SetStandHours<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStandHours<S> {}
+    impl<S: State> State for SetStandHours<S> {
+        type CreatedAt = S::CreatedAt;
+        type ExerciseGoal = S::ExerciseGoal;
+        type MoveGoal = S::MoveGoal;
+        type StandGoal = S::StandGoal;
+        type Exercise = S::Exercise;
+        type StandHours = Set<members::stand_hours>;
+        type Move = S::Move;
+    }
+    ///State transition - sets the `move` field to Set
+    pub struct SetMove<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMove<S> {}
+    impl<S: State> State for SetMove<S> {
+        type CreatedAt = S::CreatedAt;
+        type ExerciseGoal = S::ExerciseGoal;
+        type MoveGoal = S::MoveGoal;
+        type StandGoal = S::StandGoal;
+        type Exercise = S::Exercise;
+        type StandHours = S::StandHours;
+        type Move = Set<members::r#move>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `stand_hours` field
-        pub struct stand_hours(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `exercise_goal` field
         pub struct exercise_goal(());
-        ///Marker type for the `exercise` field
-        pub struct exercise(());
-        ///Marker type for the `move` field
-        pub struct r#move(());
         ///Marker type for the `move_goal` field
         pub struct move_goal(());
         ///Marker type for the `stand_goal` field
         pub struct stand_goal(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `exercise` field
+        pub struct exercise(());
+        ///Marker type for the `stand_hours` field
+        pub struct stand_hours(());
+        ///Marker type for the `move` field
+        pub struct r#move(());
     }
 }
 
@@ -414,13 +414,13 @@ where
 impl<'a, S> RingBuilder<'a, S>
 where
     S: ring_state::State,
-    S::StandHours: ring_state::IsSet,
+    S::CreatedAt: ring_state::IsSet,
     S::ExerciseGoal: ring_state::IsSet,
-    S::Exercise: ring_state::IsSet,
-    S::Move: ring_state::IsSet,
     S::MoveGoal: ring_state::IsSet,
     S::StandGoal: ring_state::IsSet,
-    S::CreatedAt: ring_state::IsSet,
+    S::Exercise: ring_state::IsSet,
+    S::StandHours: ring_state::IsSet,
+    S::Move: ring_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ring<'a> {

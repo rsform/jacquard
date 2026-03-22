@@ -28,7 +28,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.tangled.feed.star", tag = "$type")]
 pub struct Star<'a> {
     pub created_at: Datetime,
     #[serde(borrow)]

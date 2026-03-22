@@ -32,7 +32,7 @@ use crate::community_lexicon::location::hthree::Hthree;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "place.atwork.listing", tag = "$type")]
 pub struct Listing<'a> {
     ///URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -212,67 +212,67 @@ pub mod listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NotAfter;
+        type Description;
         type NotBefore;
         type Title;
-        type Description;
+        type NotAfter;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NotAfter = Unset;
+        type Description = Unset;
         type NotBefore = Unset;
         type Title = Unset;
-        type Description = Unset;
-    }
-    ///State transition - sets the `not_after` field to Set
-    pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotAfter<S> {}
-    impl<S: State> State for SetNotAfter<S> {
-        type NotAfter = Set<members::not_after>;
-        type NotBefore = S::NotBefore;
-        type Title = S::Title;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `not_before` field to Set
-    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
-    impl<S: State> State for SetNotBefore<S> {
-        type NotAfter = S::NotAfter;
-        type NotBefore = Set<members::not_before>;
-        type Title = S::Title;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type NotAfter = S::NotAfter;
-        type NotBefore = S::NotBefore;
-        type Title = Set<members::title>;
-        type Description = S::Description;
+        type NotAfter = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type NotAfter = S::NotAfter;
+        type Description = Set<members::description>;
         type NotBefore = S::NotBefore;
         type Title = S::Title;
-        type Description = Set<members::description>;
+        type NotAfter = S::NotAfter;
+    }
+    ///State transition - sets the `not_before` field to Set
+    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
+    impl<S: State> State for SetNotBefore<S> {
+        type Description = S::Description;
+        type NotBefore = Set<members::not_before>;
+        type Title = S::Title;
+        type NotAfter = S::NotAfter;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Description = S::Description;
+        type NotBefore = S::NotBefore;
+        type Title = Set<members::title>;
+        type NotAfter = S::NotAfter;
+    }
+    ///State transition - sets the `not_after` field to Set
+    pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotAfter<S> {}
+    impl<S: State> State for SetNotAfter<S> {
+        type Description = S::Description;
+        type NotBefore = S::NotBefore;
+        type Title = S::Title;
+        type NotAfter = Set<members::not_after>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `not_after` field
-        pub struct not_after(());
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `not_before` field
         pub struct not_before(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `description` field
-        pub struct description(());
+        ///Marker type for the `not_after` field
+        pub struct not_after(());
     }
 }
 
@@ -441,10 +441,10 @@ where
 impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
-    S::NotAfter: listing_state::IsSet,
+    S::Description: listing_state::IsSet,
     S::NotBefore: listing_state::IsSet,
     S::Title: listing_state::IsSet,
-    S::Description: listing_state::IsSet,
+    S::NotAfter: listing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Listing<'a> {

@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "pub.quizzy.team", tag = "$type")]
 pub struct Team<'a> {
     ///Small image to be displayed near the team name
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -230,37 +230,37 @@ pub mod team_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Members;
         type Name;
+        type Members;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Members = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `members` field to Set
-    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMembers<S> {}
-    impl<S: State> State for SetMembers<S> {
-        type Members = Set<members::members>;
-        type Name = S::Name;
+        type Members = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Members = S::Members;
         type Name = Set<members::name>;
+        type Members = S::Members;
+    }
+    ///State transition - sets the `members` field to Set
+    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMembers<S> {}
+    impl<S: State> State for SetMembers<S> {
+        type Name = S::Name;
+        type Members = Set<members::members>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `members` field
-        pub struct members(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `members` field
+        pub struct members(());
     }
 }
 
@@ -361,8 +361,8 @@ where
 impl<'a, S> TeamBuilder<'a, S>
 where
     S: team_state::State,
-    S::Members: team_state::IsSet,
     S::Name: team_state::IsSet,
+    S::Members: team_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Team<'a> {

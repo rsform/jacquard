@@ -29,7 +29,11 @@ use crate::app_bsky::richtext::facet::Facet;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "network.slices.tools.bug.response",
+    tag = "$type"
+)]
 pub struct Response<'a> {
     ///Reference to the bug report
     #[serde(borrow)]

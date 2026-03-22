@@ -33,7 +33,7 @@ use crate::com_atproto::moderation::SubjectType;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.bsky.labeler.service", tag = "$type")]
 pub struct Service<'a> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]

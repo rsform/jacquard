@@ -69,50 +69,50 @@ pub mod cancel_pipeline_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Workflow;
         type Pipeline;
+        type Workflow;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Workflow = Unset;
         type Pipeline = Unset;
+        type Workflow = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type Repo = Set<members::repo>;
+        type Pipeline = S::Pipeline;
         type Workflow = S::Workflow;
-        type Pipeline = S::Pipeline;
-    }
-    ///State transition - sets the `workflow` field to Set
-    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
-    impl<S: State> State for SetWorkflow<S> {
-        type Repo = S::Repo;
-        type Workflow = Set<members::workflow>;
-        type Pipeline = S::Pipeline;
     }
     ///State transition - sets the `pipeline` field to Set
     pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPipeline<S> {}
     impl<S: State> State for SetPipeline<S> {
         type Repo = S::Repo;
-        type Workflow = S::Workflow;
         type Pipeline = Set<members::pipeline>;
+        type Workflow = S::Workflow;
+    }
+    ///State transition - sets the `workflow` field to Set
+    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
+    impl<S: State> State for SetWorkflow<S> {
+        type Repo = S::Repo;
+        type Pipeline = S::Pipeline;
+        type Workflow = Set<members::workflow>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `workflow` field
-        pub struct workflow(());
         ///Marker type for the `pipeline` field
         pub struct pipeline(());
+        ///Marker type for the `workflow` field
+        pub struct workflow(());
     }
 }
 
@@ -202,8 +202,8 @@ impl<'a, S> CancelPipelineBuilder<'a, S>
 where
     S: cancel_pipeline_state::State,
     S::Repo: cancel_pipeline_state::IsSet,
-    S::Workflow: cancel_pipeline_state::IsSet,
     S::Pipeline: cancel_pipeline_state::IsSet,
+    S::Workflow: cancel_pipeline_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CancelPipeline<'a> {

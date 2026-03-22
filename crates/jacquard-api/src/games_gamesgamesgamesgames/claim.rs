@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "games.gamesgamesgamesgames.claim",
+    tag = "$type"
+)]
 pub struct Claim<'a> {
     ///Contact information for the claimant (filtered from responses unless caller is admin)
     #[serde(skip_serializing_if = "Option::is_none")]

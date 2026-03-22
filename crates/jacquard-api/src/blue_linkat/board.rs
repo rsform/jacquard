@@ -49,7 +49,7 @@ pub struct Card<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.linkat.board", tag = "$type")]
 pub struct Board<'a> {
     ///List of cards in the board.
     #[serde(borrow)]

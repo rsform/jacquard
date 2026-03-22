@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.backyard.graph.follow", tag = "$type")]
 pub struct Follow<'a> {
     pub created_at: Datetime,
     ///DID of the account being followed.

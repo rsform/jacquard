@@ -30,7 +30,7 @@ use crate::blue__2048::key::Key;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.2048.key.game", tag = "$type")]
 pub struct Game<'a> {
     pub created_at: Datetime,
     ///A did:key that is used to verify an at://2048 authority has verified this game to a certain degree
@@ -113,37 +113,37 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Key;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Key = S::Key;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type CreatedAt = S::CreatedAt;
         type Key = Set<members::key>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Key = S::Key;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -213,8 +213,8 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::CreatedAt: game_state::IsSet,
     S::Key: game_state::IsSet,
+    S::CreatedAt: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {

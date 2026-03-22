@@ -165,7 +165,7 @@ pub struct ItemUsageData<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "net.anisota.beta.game.log", tag = "$type")]
 pub struct Log<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]

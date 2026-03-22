@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "ch.indiemusi.social.join", tag = "$type")]
 pub struct Join<'a> {
     ///Link to the song that the user wants to listen to together with others
     #[serde(borrow)]

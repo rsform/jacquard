@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.bsky.notification.declaration",
+    tag = "$type"
+)]
 pub struct Declaration<'a> {
     ///A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
     #[serde(borrow)]

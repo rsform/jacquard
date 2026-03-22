@@ -34,8 +34,7 @@ pub struct UpdateSubjectStatus<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum UpdateSubjectStatusSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<'a>>),
@@ -60,8 +59,7 @@ pub struct UpdateSubjectStatusOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum UpdateSubjectStatusOutputSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<'a>>),

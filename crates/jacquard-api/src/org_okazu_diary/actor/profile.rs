@@ -31,7 +31,11 @@ use crate::com_atproto::label::SelfLabels;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.okazu-diary.actor.profile",
+    tag = "$type"
+)]
 pub struct Profile<'a> {
     ///Small image to be displayed on the profile. AKA, 'profile picture'.
     #[serde(skip_serializing_if = "Option::is_none")]

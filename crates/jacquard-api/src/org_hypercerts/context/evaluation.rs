@@ -34,7 +34,11 @@ use crate::org_hypercerts::context::evaluation;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.context.evaluation",
+    tag = "$type"
+)]
 pub struct Evaluation<'a> {
     ///Evaluation data (URIs or blobs) containing detailed reports or methodology
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,8 +73,7 @@ pub struct Evaluation<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EvaluationContentItem<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),

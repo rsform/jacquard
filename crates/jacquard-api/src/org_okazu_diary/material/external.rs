@@ -33,7 +33,11 @@ use crate::org_okazu_diary::material::external;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.okazu-diary.material.external",
+    tag = "$type"
+)]
 pub struct External<'a> {
     ///Description of the material, typically taken from the material's HTML metadata.
     #[serde(skip_serializing_if = "Option::is_none")]

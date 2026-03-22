@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "chat.bsky.actor.declaration", tag = "$type")]
 pub struct Declaration<'a> {
     #[serde(borrow)]
     pub allow_incoming: DeclarationAllowIncoming<'a>,

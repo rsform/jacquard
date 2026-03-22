@@ -187,8 +187,7 @@ pub struct SearchResultsView<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum SearchResultsViewHitsItem<'a> {
     #[serde(rename = "app.rocksky.song.defs#songViewBasic")]
     SongViewBasic(Box<SongViewBasic<'a>>),

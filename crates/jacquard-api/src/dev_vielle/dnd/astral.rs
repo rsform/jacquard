@@ -29,7 +29,7 @@ use crate::dev_vielle::dnd::astral;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "dev.vielle.dnd.astral", tag = "$type")]
 pub struct Astral<'a> {
     /// Defaults to `0`.
     #[serde(default = "_default_astral_points")]
@@ -307,37 +307,37 @@ pub mod astral_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Powers;
         type Points;
+        type Powers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Powers = Unset;
         type Points = Unset;
-    }
-    ///State transition - sets the `powers` field to Set
-    pub struct SetPowers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPowers<S> {}
-    impl<S: State> State for SetPowers<S> {
-        type Powers = Set<members::powers>;
-        type Points = S::Points;
+        type Powers = Unset;
     }
     ///State transition - sets the `points` field to Set
     pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoints<S> {}
     impl<S: State> State for SetPoints<S> {
-        type Powers = S::Powers;
         type Points = Set<members::points>;
+        type Powers = S::Powers;
+    }
+    ///State transition - sets the `powers` field to Set
+    pub struct SetPowers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPowers<S> {}
+    impl<S: State> State for SetPowers<S> {
+        type Points = S::Points;
+        type Powers = Set<members::powers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `powers` field
-        pub struct powers(());
         ///Marker type for the `points` field
         pub struct points(());
+        ///Marker type for the `powers` field
+        pub struct powers(());
     }
 }
 
@@ -407,8 +407,8 @@ where
 impl<'a, S> AstralBuilder<'a, S>
 where
     S: astral_state::State,
-    S::Powers: astral_state::IsSet,
     S::Points: astral_state::IsSet,
+    S::Powers: astral_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Astral<'a> {

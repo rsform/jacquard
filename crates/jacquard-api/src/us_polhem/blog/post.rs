@@ -30,7 +30,7 @@ use crate::app_bsky::embed::images::Image;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "us.polhem.blog.post", tag = "$type")]
 pub struct Post<'a> {
     #[serde(borrow)]
     pub content: CowStr<'a>,
@@ -180,67 +180,67 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type Slug;
         type Content;
         type Title;
-        type Slug;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type Slug = Unset;
         type Content = Unset;
         type Title = Unset;
-        type Slug = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Title = S::Title;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Title = S::Title;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Title = Set<members::title>;
-        type Slug = S::Slug;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type CreatedAt = S::CreatedAt;
+        type Slug = Set<members::slug>;
         type Content = S::Content;
         type Title = S::Title;
-        type Slug = Set<members::slug>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Slug = S::Slug;
+        type Content = Set<members::content>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -423,10 +423,10 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::CreatedAt: post_state::IsSet,
+    S::Slug: post_state::IsSet,
     S::Content: post_state::IsSet,
     S::Title: post_state::IsSet,
-    S::Slug: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {

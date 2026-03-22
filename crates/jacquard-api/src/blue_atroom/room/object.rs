@@ -42,7 +42,7 @@ pub struct LocalizedName<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.atroom.room.object", tag = "$type")]
 pub struct Object<'a> {
     pub created_at: Datetime,
     #[serde(borrow)]
@@ -343,67 +343,67 @@ pub mod object_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scale;
-        type Name;
-        type CreatedAt;
         type Model;
+        type CreatedAt;
+        type Name;
+        type Scale;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scale = Unset;
-        type Name = Unset;
-        type CreatedAt = Unset;
         type Model = Unset;
-    }
-    ///State transition - sets the `scale` field to Set
-    pub struct SetScale<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScale<S> {}
-    impl<S: State> State for SetScale<S> {
-        type Scale = Set<members::scale>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type Model = S::Model;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Scale = S::Scale;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Model = S::Model;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Scale = S::Scale;
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type Model = S::Model;
+        type CreatedAt = Unset;
+        type Name = Unset;
+        type Scale = Unset;
     }
     ///State transition - sets the `model` field to Set
     pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModel<S> {}
     impl<S: State> State for SetModel<S> {
-        type Scale = S::Scale;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type Model = Set<members::model>;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Scale = S::Scale;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Model = S::Model;
+        type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type Scale = S::Scale;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Model = S::Model;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Scale = S::Scale;
+    }
+    ///State transition - sets the `scale` field to Set
+    pub struct SetScale<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScale<S> {}
+    impl<S: State> State for SetScale<S> {
+        type Model = S::Model;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Scale = Set<members::scale>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scale` field
-        pub struct scale(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `model` field
         pub struct model(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `scale` field
+        pub struct scale(());
     }
 }
 
@@ -536,10 +536,10 @@ where
 impl<'a, S> ObjectBuilder<'a, S>
 where
     S: object_state::State,
-    S::Scale: object_state::IsSet,
-    S::Name: object_state::IsSet,
-    S::CreatedAt: object_state::IsSet,
     S::Model: object_state::IsSet,
+    S::CreatedAt: object_state::IsSet,
+    S::Name: object_state::IsSet,
+    S::Scale: object_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Object<'a> {

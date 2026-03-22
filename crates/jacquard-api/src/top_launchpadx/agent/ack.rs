@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "top.launchpadx.agent.ack", tag = "$type")]
 pub struct Ack<'a> {
     ///Timestamp when the acknowledgment was created.
     pub created_at: Datetime,

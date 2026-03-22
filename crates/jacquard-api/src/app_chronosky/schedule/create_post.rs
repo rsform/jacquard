@@ -60,8 +60,7 @@ pub struct CreatePost<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum CreatePostThreadgateRulesItem<'a> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     ThreadgateMentionRule(Box<MentionRule<'a>>),
@@ -119,8 +118,7 @@ pub struct ThreadPostInput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ThreadPostInputEmbed<'a> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<Images<'a>>),
@@ -231,37 +229,37 @@ pub mod create_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Posts;
         type ScheduledAt;
+        type Posts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Posts = Unset;
         type ScheduledAt = Unset;
-    }
-    ///State transition - sets the `posts` field to Set
-    pub struct SetPosts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosts<S> {}
-    impl<S: State> State for SetPosts<S> {
-        type Posts = Set<members::posts>;
-        type ScheduledAt = S::ScheduledAt;
+        type Posts = Unset;
     }
     ///State transition - sets the `scheduled_at` field to Set
     pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
     impl<S: State> State for SetScheduledAt<S> {
-        type Posts = S::Posts;
         type ScheduledAt = Set<members::scheduled_at>;
+        type Posts = S::Posts;
+    }
+    ///State transition - sets the `posts` field to Set
+    pub struct SetPosts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosts<S> {}
+    impl<S: State> State for SetPosts<S> {
+        type ScheduledAt = S::ScheduledAt;
+        type Posts = Set<members::posts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `posts` field
-        pub struct posts(());
         ///Marker type for the `scheduled_at` field
         pub struct scheduled_at(());
+        ///Marker type for the `posts` field
+        pub struct posts(());
     }
 }
 
@@ -382,8 +380,8 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
 impl<'a, S> CreatePostBuilder<'a, S>
 where
     S: create_post_state::State,
-    S::Posts: create_post_state::IsSet,
     S::ScheduledAt: create_post_state::IsSet,
+    S::Posts: create_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreatePost<'a> {

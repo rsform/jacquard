@@ -83,67 +83,67 @@ pub mod decrypt_by_cid_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Repo;
-        type Pds;
         type Password;
+        type Pds;
+        type Repo;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Repo = Unset;
-        type Pds = Unset;
         type Password = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Repo = S::Repo;
-        type Pds = S::Pds;
-        type Password = S::Password;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Cid = S::Cid;
-        type Repo = Set<members::repo>;
-        type Pds = S::Pds;
-        type Password = S::Password;
-    }
-    ///State transition - sets the `pds` field to Set
-    pub struct SetPds<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPds<S> {}
-    impl<S: State> State for SetPds<S> {
-        type Cid = S::Cid;
-        type Repo = S::Repo;
-        type Pds = Set<members::pds>;
-        type Password = S::Password;
+        type Pds = Unset;
+        type Repo = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `password` field to Set
     pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPassword<S> {}
     impl<S: State> State for SetPassword<S> {
-        type Cid = S::Cid;
-        type Repo = S::Repo;
-        type Pds = S::Pds;
         type Password = Set<members::password>;
+        type Pds = S::Pds;
+        type Repo = S::Repo;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `pds` field to Set
+    pub struct SetPds<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPds<S> {}
+    impl<S: State> State for SetPds<S> {
+        type Password = S::Password;
+        type Pds = Set<members::pds>;
+        type Repo = S::Repo;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Password = S::Password;
+        type Pds = S::Pds;
+        type Repo = Set<members::repo>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Password = S::Password;
+        type Pds = S::Pds;
+        type Repo = S::Repo;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `pds` field
-        pub struct pds(());
         ///Marker type for the `password` field
         pub struct password(());
+        ///Marker type for the `pds` field
+        pub struct pds(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -256,10 +256,10 @@ where
 impl<'a, S> DecryptByCidBuilder<'a, S>
 where
     S: decrypt_by_cid_state::State,
-    S::Cid: decrypt_by_cid_state::IsSet,
-    S::Repo: decrypt_by_cid_state::IsSet,
-    S::Pds: decrypt_by_cid_state::IsSet,
     S::Password: decrypt_by_cid_state::IsSet,
+    S::Pds: decrypt_by_cid_state::IsSet,
+    S::Repo: decrypt_by_cid_state::IsSet,
+    S::Cid: decrypt_by_cid_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DecryptByCid<'a> {

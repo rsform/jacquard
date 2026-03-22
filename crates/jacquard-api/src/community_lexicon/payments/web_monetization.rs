@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "community.lexicon.payments.webMonetization",
+    tag = "$type"
+)]
 pub struct WebMonetization<'a> {
     ///Wallet address.
     #[serde(borrow)]

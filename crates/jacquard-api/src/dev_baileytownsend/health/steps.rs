@@ -28,7 +28,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "dev.baileytownsend.health.steps",
+    tag = "$type"
+)]
 pub struct Steps<'a> {
     pub created_at: Datetime,
     pub steps: i64,

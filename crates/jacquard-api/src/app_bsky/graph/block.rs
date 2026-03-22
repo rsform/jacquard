@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.bsky.graph.block", tag = "$type")]
 pub struct Block<'a> {
     pub created_at: Datetime,
     ///DID of the account to be blocked.

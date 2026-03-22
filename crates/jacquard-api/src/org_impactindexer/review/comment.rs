@@ -30,7 +30,11 @@ use crate::org_impactindexer::review::SubjectRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.impactindexer.review.comment",
+    tag = "$type"
+)]
 pub struct Comment<'a> {
     ///Timestamp when the comment was created.
     pub created_at: Datetime,
@@ -145,51 +149,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
+        type Text = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -296,9 +300,9 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Text: comment_state::IsSet,
-    S::CreatedAt: comment_state::IsSet,
     S::Subject: comment_state::IsSet,
+    S::CreatedAt: comment_state::IsSet,
+    S::Text: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {

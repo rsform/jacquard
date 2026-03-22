@@ -111,8 +111,7 @@ pub struct Facet<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum FacetFeaturesItem<'a> {
     #[serde(rename = "games.gamesgamesgamesgames.richtext.facet#mention")]
     Mention(Box<facet::Mention<'a>>),

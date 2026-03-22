@@ -54,7 +54,7 @@ pub struct ContentTypes<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "net.anisota.graph.mute", tag = "$type")]
 pub struct Mute<'a> {
     ///Types of content to mute from this account
     #[serde(skip_serializing_if = "Option::is_none")]

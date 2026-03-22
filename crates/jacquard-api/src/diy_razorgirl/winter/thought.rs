@@ -28,7 +28,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "diy.razorgirl.winter.thought",
+    tag = "$type"
+)]
 pub struct Thought<'a> {
     #[serde(borrow)]
     pub content: CowStr<'a>,

@@ -32,7 +32,7 @@ use crate::com_atproto::label::SelfLabels;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.bsky.feed.generator", tag = "$type")]
 pub struct Generator<'a> {
     ///Declaration that a feed accepts feedback interactions from a client through app.bsky.feed.sendInteractions
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -316,51 +316,51 @@ pub mod generator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type CreatedAt;
         type DisplayName;
+        type CreatedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type CreatedAt = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type CreatedAt = S::CreatedAt;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Did = S::Did;
-        type CreatedAt = Set<members::created_at>;
-        type DisplayName = S::DisplayName;
+        type CreatedAt = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
         type DisplayName = Set<members::display_name>;
+        type CreatedAt = S::CreatedAt;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type DisplayName = S::DisplayName;
+        type CreatedAt = Set<members::created_at>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -546,9 +546,9 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
 impl<'a, S> GeneratorBuilder<'a, S>
 where
     S: generator_state::State,
-    S::Did: generator_state::IsSet,
-    S::CreatedAt: generator_state::IsSet,
     S::DisplayName: generator_state::IsSet,
+    S::CreatedAt: generator_state::IsSet,
+    S::Did: generator_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Generator<'a> {

@@ -31,7 +31,7 @@ use crate::tech_tokimeki::takibi::log;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "tech.tokimeki.takibi.log", tag = "$type")]
 pub struct Log<'a> {
     pub created_at: Datetime,
     ///Sparks visible at the moment of adding wood, with elapsed time for decay scoring

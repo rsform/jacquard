@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.mathr.leaderboard.entry", tag = "$type")]
 pub struct Entry<'a> {
     ///Timestamp when the score was verified and added to the leaderboard
     pub created_at: Datetime,
@@ -187,9 +187,9 @@ pub mod entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Level;
-        type TotalSuccesses;
-        type TotalChallenges;
         type CreatedAt;
+        type TotalChallenges;
+        type TotalSuccesses;
         type PlayerDid;
     }
     /// Empty state - all required fields are unset
@@ -197,9 +197,9 @@ pub mod entry_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Level = Unset;
-        type TotalSuccesses = Unset;
-        type TotalChallenges = Unset;
         type CreatedAt = Unset;
+        type TotalChallenges = Unset;
+        type TotalSuccesses = Unset;
         type PlayerDid = Unset;
     }
     ///State transition - sets the `level` field to Set
@@ -207,29 +207,9 @@ pub mod entry_state {
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
         type Level = Set<members::level>;
-        type TotalSuccesses = S::TotalSuccesses;
+        type CreatedAt = S::CreatedAt;
         type TotalChallenges = S::TotalChallenges;
-        type CreatedAt = S::CreatedAt;
-        type PlayerDid = S::PlayerDid;
-    }
-    ///State transition - sets the `total_successes` field to Set
-    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
-    impl<S: State> State for SetTotalSuccesses<S> {
-        type Level = S::Level;
-        type TotalSuccesses = Set<members::total_successes>;
-        type TotalChallenges = S::TotalChallenges;
-        type CreatedAt = S::CreatedAt;
-        type PlayerDid = S::PlayerDid;
-    }
-    ///State transition - sets the `total_challenges` field to Set
-    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
-    impl<S: State> State for SetTotalChallenges<S> {
-        type Level = S::Level;
         type TotalSuccesses = S::TotalSuccesses;
-        type TotalChallenges = Set<members::total_challenges>;
-        type CreatedAt = S::CreatedAt;
         type PlayerDid = S::PlayerDid;
     }
     ///State transition - sets the `created_at` field to Set
@@ -237,9 +217,29 @@ pub mod entry_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Level = S::Level;
-        type TotalSuccesses = S::TotalSuccesses;
-        type TotalChallenges = S::TotalChallenges;
         type CreatedAt = Set<members::created_at>;
+        type TotalChallenges = S::TotalChallenges;
+        type TotalSuccesses = S::TotalSuccesses;
+        type PlayerDid = S::PlayerDid;
+    }
+    ///State transition - sets the `total_challenges` field to Set
+    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
+    impl<S: State> State for SetTotalChallenges<S> {
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalChallenges = Set<members::total_challenges>;
+        type TotalSuccesses = S::TotalSuccesses;
+        type PlayerDid = S::PlayerDid;
+    }
+    ///State transition - sets the `total_successes` field to Set
+    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
+    impl<S: State> State for SetTotalSuccesses<S> {
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalChallenges = S::TotalChallenges;
+        type TotalSuccesses = Set<members::total_successes>;
         type PlayerDid = S::PlayerDid;
     }
     ///State transition - sets the `player_did` field to Set
@@ -247,9 +247,9 @@ pub mod entry_state {
     impl<S: State> sealed::Sealed for SetPlayerDid<S> {}
     impl<S: State> State for SetPlayerDid<S> {
         type Level = S::Level;
-        type TotalSuccesses = S::TotalSuccesses;
-        type TotalChallenges = S::TotalChallenges;
         type CreatedAt = S::CreatedAt;
+        type TotalChallenges = S::TotalChallenges;
+        type TotalSuccesses = S::TotalSuccesses;
         type PlayerDid = Set<members::player_did>;
     }
     /// Marker types for field names
@@ -257,12 +257,12 @@ pub mod entry_state {
     pub mod members {
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `total_successes` field
-        pub struct total_successes(());
-        ///Marker type for the `total_challenges` field
-        pub struct total_challenges(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `total_challenges` field
+        pub struct total_challenges(());
+        ///Marker type for the `total_successes` field
+        pub struct total_successes(());
         ///Marker type for the `player_did` field
         pub struct player_did(());
     }
@@ -468,9 +468,9 @@ impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
     S::Level: entry_state::IsSet,
-    S::TotalSuccesses: entry_state::IsSet,
-    S::TotalChallenges: entry_state::IsSet,
     S::CreatedAt: entry_state::IsSet,
+    S::TotalChallenges: entry_state::IsSet,
+    S::TotalSuccesses: entry_state::IsSet,
     S::PlayerDid: entry_state::IsSet,
 {
     /// Build the final struct

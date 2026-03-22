@@ -14,7 +14,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Parse version from workspace Cargo.toml
-VERSION=$(grep '^version = ' Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+VERSION=$(grep '^version = ' ./crates/jacquard-lexgen/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
 echo "Packaging version: $VERSION"
 
 # Detect current system

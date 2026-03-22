@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "com.atproto.lexicon.schema", tag = "$type")]
 pub struct Schema<'a> {
     ///Indicates the 'version' of the Lexicon language. Must be '1' for the current atproto/Lexicon schema system.
     pub lexicon: i64,

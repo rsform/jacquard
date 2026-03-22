@@ -32,7 +32,11 @@ use crate::org_hypercerts::Uri;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.workscope.tag",
+    tag = "$type"
+)]
 pub struct Tag<'a> {
     ///Alternative human-readable names for this scope (e.g., translations, abbreviations, or common synonyms). Unlike sameAs, these are plain-text labels, not links to external ontologies.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -179,8 +183,7 @@ impl jacquard_common::IntoStatic for TagCategory<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum TagReferenceDocument<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -442,51 +445,51 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
         type Key;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Key = S::Key;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
         type Key = S::Key;
+        type Name = S::Name;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
         type Key = Set<members::key>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Key = S::Key;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -697,9 +700,9 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::Name: tag_state::IsSet,
     S::CreatedAt: tag_state::IsSet,
     S::Key: tag_state::IsSet,
+    S::Name: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {

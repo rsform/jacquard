@@ -47,7 +47,11 @@ use crate::games_gamesgamesgamesgames::richtext::facet::Facet;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "games.gamesgamesgamesgames.game",
+    tag = "$type"
+)]
 pub struct Game<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -208,51 +212,51 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ApplicationType;
         type CreatedAt;
         type Name;
+        type ApplicationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ApplicationType = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `application_type` field to Set
-    pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetApplicationType<S> {}
-    impl<S: State> State for SetApplicationType<S> {
-        type ApplicationType = Set<members::application_type>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+        type ApplicationType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ApplicationType = S::ApplicationType;
         type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
+        type ApplicationType = S::ApplicationType;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type ApplicationType = S::ApplicationType;
         type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type ApplicationType = S::ApplicationType;
+    }
+    ///State transition - sets the `application_type` field to Set
+    pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetApplicationType<S> {}
+    impl<S: State> State for SetApplicationType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type ApplicationType = Set<members::application_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `application_type` field
-        pub struct application_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `application_type` field
+        pub struct application_type(());
     }
 }
 
@@ -748,9 +752,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::ApplicationType: game_state::IsSet,
     S::CreatedAt: game_state::IsSet,
     S::Name: game_state::IsSet,
+    S::ApplicationType: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {

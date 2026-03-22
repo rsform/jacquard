@@ -49,8 +49,7 @@ pub struct CreateReport<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum CreateReportSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<'a>>),
@@ -79,8 +78,7 @@ pub struct CreateReportOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum CreateReportOutputSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<'a>>),

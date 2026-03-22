@@ -29,7 +29,7 @@ use crate::blog_pckt::block::image::ImageAttrs;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blog.pckt.gallery", tag = "$type")]
 pub struct Gallery<'a> {
     ///Optional caption for the entire gallery
     #[serde(skip_serializing_if = "Option::is_none")]

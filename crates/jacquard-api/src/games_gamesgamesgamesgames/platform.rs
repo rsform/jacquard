@@ -33,7 +33,11 @@ use crate::games_gamesgamesgamesgames::Website;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "games.gamesgamesgamesgames.platform",
+    tag = "$type"
+)]
 pub struct Platform<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -141,37 +145,37 @@ pub mod platform_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -373,8 +377,8 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S> PlatformBuilder<'a, S>
 where
     S: platform_state::State,
-    S::CreatedAt: platform_state::IsSet,
     S::Name: platform_state::IsSet,
+    S::CreatedAt: platform_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Platform<'a> {

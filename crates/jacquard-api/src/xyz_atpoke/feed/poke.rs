@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "xyz.atpoke.feed.poke", tag = "$type")]
 pub struct Poke<'a> {
     pub created_at: Datetime,
     #[serde(borrow)]

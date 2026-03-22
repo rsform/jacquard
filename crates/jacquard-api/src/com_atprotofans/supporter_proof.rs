@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.atprotofans.supporterProof",
+    tag = "$type"
+)]
 pub struct SupporterProof<'a> {
     ///CID of the proof record. Required for both inline and remote proofs.
     #[serde(borrow)]

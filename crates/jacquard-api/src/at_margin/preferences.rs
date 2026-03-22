@@ -153,7 +153,7 @@ pub struct LabelerSubscription<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "at.margin.preferences", tag = "$type")]
 pub struct Preferences<'a> {
     pub created_at: Datetime,
     ///If true, do not show the confirmation modal when opening external links.

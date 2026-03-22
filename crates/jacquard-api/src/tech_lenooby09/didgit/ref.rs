@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "tech.lenooby09.didgit.ref", tag = "$type")]
 pub struct Ref<'a> {
     ///The hex SHA-256 object ID this ref points to.
     #[serde(borrow)]
@@ -150,51 +150,51 @@ pub mod ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RefName;
         type Repo;
         type ObjectId;
+        type RefName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RefName = Unset;
         type Repo = Unset;
         type ObjectId = Unset;
-    }
-    ///State transition - sets the `ref_name` field to Set
-    pub struct SetRefName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRefName<S> {}
-    impl<S: State> State for SetRefName<S> {
-        type RefName = Set<members::ref_name>;
-        type Repo = S::Repo;
-        type ObjectId = S::ObjectId;
+        type RefName = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type RefName = S::RefName;
         type Repo = Set<members::repo>;
         type ObjectId = S::ObjectId;
+        type RefName = S::RefName;
     }
     ///State transition - sets the `object_id` field to Set
     pub struct SetObjectId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObjectId<S> {}
     impl<S: State> State for SetObjectId<S> {
-        type RefName = S::RefName;
         type Repo = S::Repo;
         type ObjectId = Set<members::object_id>;
+        type RefName = S::RefName;
+    }
+    ///State transition - sets the `ref_name` field to Set
+    pub struct SetRefName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRefName<S> {}
+    impl<S: State> State for SetRefName<S> {
+        type Repo = S::Repo;
+        type ObjectId = S::ObjectId;
+        type RefName = Set<members::ref_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref_name` field
-        pub struct ref_name(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `object_id` field
         pub struct object_id(());
+        ///Marker type for the `ref_name` field
+        pub struct ref_name(());
     }
 }
 
@@ -283,9 +283,9 @@ where
 impl<'a, S> RefBuilder<'a, S>
 where
     S: ref_state::State,
-    S::RefName: ref_state::IsSet,
     S::Repo: ref_state::IsSet,
     S::ObjectId: ref_state::IsSet,
+    S::RefName: ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ref<'a> {

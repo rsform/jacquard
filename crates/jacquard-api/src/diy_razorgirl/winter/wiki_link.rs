@@ -28,7 +28,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "diy.razorgirl.winter.wikiLink",
+    tag = "$type"
+)]
 pub struct WikiLink<'a> {
     ///Why this link exists
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -261,8 +265,8 @@ pub mod wiki_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Target;
         type LinkType;
+        type Target;
         type Source;
     }
     /// Empty state - all required fields are unset
@@ -270,8 +274,8 @@ pub mod wiki_link_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Target = Unset;
         type LinkType = Unset;
+        type Target = Unset;
         type Source = Unset;
     }
     ///State transition - sets the `created_at` field to Set
@@ -279,17 +283,8 @@ pub mod wiki_link_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type LinkType = S::LinkType;
         type Target = S::Target;
-        type LinkType = S::LinkType;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type CreatedAt = S::CreatedAt;
-        type Target = Set<members::target>;
-        type LinkType = S::LinkType;
         type Source = S::Source;
     }
     ///State transition - sets the `link_type` field to Set
@@ -297,8 +292,17 @@ pub mod wiki_link_state {
     impl<S: State> sealed::Sealed for SetLinkType<S> {}
     impl<S: State> State for SetLinkType<S> {
         type CreatedAt = S::CreatedAt;
-        type Target = S::Target;
         type LinkType = Set<members::link_type>;
+        type Target = S::Target;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type CreatedAt = S::CreatedAt;
+        type LinkType = S::LinkType;
+        type Target = Set<members::target>;
         type Source = S::Source;
     }
     ///State transition - sets the `source` field to Set
@@ -306,8 +310,8 @@ pub mod wiki_link_state {
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
         type CreatedAt = S::CreatedAt;
-        type Target = S::Target;
         type LinkType = S::LinkType;
+        type Target = S::Target;
         type Source = Set<members::source>;
     }
     /// Marker types for field names
@@ -315,10 +319,10 @@ pub mod wiki_link_state {
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `link_type` field
         pub struct link_type(());
+        ///Marker type for the `target` field
+        pub struct target(());
         ///Marker type for the `source` field
         pub struct source(());
     }
@@ -476,8 +480,8 @@ impl<'a, S> WikiLinkBuilder<'a, S>
 where
     S: wiki_link_state::State,
     S::CreatedAt: wiki_link_state::IsSet,
-    S::Target: wiki_link_state::IsSet,
     S::LinkType: wiki_link_state::IsSet,
+    S::Target: wiki_link_state::IsSet,
     S::Source: wiki_link_state::IsSet,
 {
     /// Build the final struct

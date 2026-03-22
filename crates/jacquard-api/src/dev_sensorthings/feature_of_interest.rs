@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "dev.sensorthings.featureOfInterest",
+    tag = "$type"
+)]
 pub struct FeatureOfInterest<'a> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -154,8 +158,8 @@ pub mod feature_of_interest_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type CreatedAt;
         type EncodingType;
+        type CreatedAt;
         type Feature;
     }
     /// Empty state - all required fields are unset
@@ -163,8 +167,8 @@ pub mod feature_of_interest_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type CreatedAt = Unset;
         type EncodingType = Unset;
+        type CreatedAt = Unset;
         type Feature = Unset;
     }
     ///State transition - sets the `name` field to Set
@@ -172,17 +176,8 @@ pub mod feature_of_interest_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type EncodingType = S::EncodingType;
         type CreatedAt = S::CreatedAt;
-        type EncodingType = S::EncodingType;
-        type Feature = S::Feature;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type EncodingType = S::EncodingType;
         type Feature = S::Feature;
     }
     ///State transition - sets the `encoding_type` field to Set
@@ -190,8 +185,17 @@ pub mod feature_of_interest_state {
     impl<S: State> sealed::Sealed for SetEncodingType<S> {}
     impl<S: State> State for SetEncodingType<S> {
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type EncodingType = Set<members::encoding_type>;
+        type CreatedAt = S::CreatedAt;
+        type Feature = S::Feature;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type EncodingType = S::EncodingType;
+        type CreatedAt = Set<members::created_at>;
         type Feature = S::Feature;
     }
     ///State transition - sets the `feature` field to Set
@@ -199,8 +203,8 @@ pub mod feature_of_interest_state {
     impl<S: State> sealed::Sealed for SetFeature<S> {}
     impl<S: State> State for SetFeature<S> {
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type EncodingType = S::EncodingType;
+        type CreatedAt = S::CreatedAt;
         type Feature = Set<members::feature>;
     }
     /// Marker types for field names
@@ -208,10 +212,10 @@ pub mod feature_of_interest_state {
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `encoding_type` field
         pub struct encoding_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `feature` field
         pub struct feature(());
     }
@@ -341,8 +345,8 @@ impl<'a, S> FeatureOfInterestBuilder<'a, S>
 where
     S: feature_of_interest_state::State,
     S::Name: feature_of_interest_state::IsSet,
-    S::CreatedAt: feature_of_interest_state::IsSet,
     S::EncodingType: feature_of_interest_state::IsSet,
+    S::CreatedAt: feature_of_interest_state::IsSet,
     S::Feature: feature_of_interest_state::IsSet,
 {
     /// Build the final struct

@@ -36,7 +36,11 @@ use crate::app_gainforest::evaluator::VerificationResult;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.gainforest.evaluator.evaluation",
+    tag = "$type"
+)]
 pub struct Evaluation<'a> {
     ///Overall confidence in this evaluation (0-1000, where 1000 = 100.0%).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -78,8 +82,7 @@ pub struct Evaluation<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EvaluationResult<'a> {
     #[serde(rename = "app.gainforest.evaluator.defs#speciesIdResult")]
     SpeciesIdResult(Box<SpeciesIdResult<'a>>),
@@ -221,37 +224,37 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type EvaluationType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type EvaluationType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type EvaluationType = S::EvaluationType;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `evaluation_type` field to Set
     pub struct SetEvaluationType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvaluationType<S> {}
     impl<S: State> State for SetEvaluationType<S> {
-        type CreatedAt = S::CreatedAt;
         type EvaluationType = Set<members::evaluation_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type EvaluationType = S::EvaluationType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `evaluation_type` field
         pub struct evaluation_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -436,8 +439,8 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::CreatedAt: evaluation_state::IsSet,
     S::EvaluationType: evaluation_state::IsSet,
+    S::CreatedAt: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {

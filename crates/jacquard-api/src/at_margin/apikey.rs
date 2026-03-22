@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "at.margin.apikey", tag = "$type")]
 pub struct Apikey<'a> {
     pub created_at: Datetime,
     ///SHA256 hash of the API key.
@@ -126,51 +126,51 @@ pub mod apikey_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type KeyHash;
         type CreatedAt;
         type Name;
-        type KeyHash;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type KeyHash = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-        type KeyHash = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type KeyHash = S::KeyHash;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type KeyHash = S::KeyHash;
     }
     ///State transition - sets the `key_hash` field to Set
     pub struct SetKeyHash<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKeyHash<S> {}
     impl<S: State> State for SetKeyHash<S> {
+        type KeyHash = Set<members::key_hash>;
         type CreatedAt = S::CreatedAt;
         type Name = S::Name;
-        type KeyHash = Set<members::key_hash>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type KeyHash = S::KeyHash;
+        type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type KeyHash = S::KeyHash;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `key_hash` field
+        pub struct key_hash(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `key_hash` field
-        pub struct key_hash(());
     }
 }
 
@@ -259,9 +259,9 @@ where
 impl<'a, S> ApikeyBuilder<'a, S>
 where
     S: apikey_state::State,
+    S::KeyHash: apikey_state::IsSet,
     S::CreatedAt: apikey_state::IsSet,
     S::Name: apikey_state::IsSet,
-    S::KeyHash: apikey_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Apikey<'a> {

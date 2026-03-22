@@ -35,8 +35,7 @@ pub struct GetReposOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum GetReposOutputReposItem<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewDetail")]
     RepoViewDetail(Box<RepoViewDetail<'a>>),

@@ -30,7 +30,11 @@ use crate::com_atproto::label::SelfLabels;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.okazu-diary.feed.collection",
+    tag = "$type"
+)]
 pub struct Collection<'a> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]

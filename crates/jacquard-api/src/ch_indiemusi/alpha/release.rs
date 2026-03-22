@@ -49,7 +49,7 @@ pub struct Artist<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "ch.indiemusi.alpha.release", tag = "$type")]
 pub struct Release<'a> {
     #[serde(borrow)]
     pub artists: Vec<release::Artist<'a>>,
@@ -353,49 +353,49 @@ pub mod release_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artists;
+        type Title;
         type Recordings;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artists = Unset;
+        type Title = Unset;
         type Recordings = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Artists = S::Artists;
-        type Recordings = S::Recordings;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtists<S> {}
     impl<S: State> State for SetArtists<S> {
-        type Title = S::Title;
         type Artists = Set<members::artists>;
+        type Title = S::Title;
+        type Recordings = S::Recordings;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Artists = S::Artists;
+        type Title = Set<members::title>;
         type Recordings = S::Recordings;
     }
     ///State transition - sets the `recordings` field to Set
     pub struct SetRecordings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordings<S> {}
     impl<S: State> State for SetRecordings<S> {
-        type Title = S::Title;
         type Artists = S::Artists;
+        type Title = S::Title;
         type Recordings = Set<members::recordings>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `recordings` field
         pub struct recordings(());
     }
@@ -532,8 +532,8 @@ where
 impl<'a, S> ReleaseBuilder<'a, S>
 where
     S: release_state::State,
-    S::Title: release_state::IsSet,
     S::Artists: release_state::IsSet,
+    S::Title: release_state::IsSet,
     S::Recordings: release_state::IsSet,
 {
     /// Build the final struct

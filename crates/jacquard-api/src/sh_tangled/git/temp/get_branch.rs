@@ -138,37 +138,37 @@ pub mod get_branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Repo;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Repo = S::Repo;
+        type Name = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Name = S::Name;
         type Repo = Set<members::repo>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Repo = S::Repo;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -238,8 +238,8 @@ where
 impl<'a, S> GetBranchBuilder<'a, S>
 where
     S: get_branch_state::State,
-    S::Name: get_branch_state::IsSet,
     S::Repo: get_branch_state::IsSet,
+    S::Name: get_branch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetBranch<'a> {

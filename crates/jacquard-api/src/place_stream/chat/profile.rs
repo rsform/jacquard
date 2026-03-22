@@ -41,7 +41,7 @@ pub struct Color<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "place.stream.chat.profile", tag = "$type")]
 pub struct Profile<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -199,50 +199,50 @@ pub mod color_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Blue;
-        type Red;
         type Green;
+        type Red;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Blue = Unset;
-        type Red = Unset;
         type Green = Unset;
+        type Red = Unset;
     }
     ///State transition - sets the `blue` field to Set
     pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlue<S> {}
     impl<S: State> State for SetBlue<S> {
         type Blue = Set<members::blue>;
+        type Green = S::Green;
         type Red = S::Red;
-        type Green = S::Green;
-    }
-    ///State transition - sets the `red` field to Set
-    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRed<S> {}
-    impl<S: State> State for SetRed<S> {
-        type Blue = S::Blue;
-        type Red = Set<members::red>;
-        type Green = S::Green;
     }
     ///State transition - sets the `green` field to Set
     pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGreen<S> {}
     impl<S: State> State for SetGreen<S> {
         type Blue = S::Blue;
-        type Red = S::Red;
         type Green = Set<members::green>;
+        type Red = S::Red;
+    }
+    ///State transition - sets the `red` field to Set
+    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRed<S> {}
+    impl<S: State> State for SetRed<S> {
+        type Blue = S::Blue;
+        type Green = S::Green;
+        type Red = Set<members::red>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `blue` field
         pub struct blue(());
-        ///Marker type for the `red` field
-        pub struct red(());
         ///Marker type for the `green` field
         pub struct green(());
+        ///Marker type for the `red` field
+        pub struct red(());
     }
 }
 
@@ -332,8 +332,8 @@ impl<'a, S> ColorBuilder<'a, S>
 where
     S: color_state::State,
     S::Blue: color_state::IsSet,
-    S::Red: color_state::IsSet,
     S::Green: color_state::IsSet,
+    S::Red: color_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Color<'a> {

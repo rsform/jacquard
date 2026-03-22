@@ -29,7 +29,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.offprint.document.article",
+    tag = "$type"
+)]
 pub struct Article<'a> {
     ///Strong reference to a `site.standard.document` compatible record.
     #[serde(borrow)]

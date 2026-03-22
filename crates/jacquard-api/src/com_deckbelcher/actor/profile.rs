@@ -30,7 +30,11 @@ use crate::com_deckbelcher::richtext::Document;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.deckbelcher.actor.profile",
+    tag = "$type"
+)]
 pub struct Profile<'a> {
     ///Profile bio/description as a rich text document.
     #[serde(skip_serializing_if = "Option::is_none")]

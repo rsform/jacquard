@@ -28,7 +28,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "uk.ewancroft.now", tag = "$type")]
 pub struct Now<'a> {
     ///The ISO 8601 date and time when the status was created.
     pub created_at: Datetime,

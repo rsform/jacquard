@@ -50,7 +50,11 @@ pub struct Artist<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "ch.indiemusi.alpha.recording",
+    tag = "$type"
+)]
 pub struct Recording<'a> {
     #[serde(borrow)]
     pub artists: Vec<recording::Artist<'a>>,

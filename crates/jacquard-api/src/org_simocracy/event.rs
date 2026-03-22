@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "org.simocracy.event", tag = "$type")]
 pub struct Event<'a> {
     ///DID of the user who triggered the event
     #[serde(borrow)]

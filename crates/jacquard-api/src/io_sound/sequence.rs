@@ -33,7 +33,7 @@ use crate::io_sound::sequence;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.sound.sequence", tag = "$type")]
 pub struct Sequence<'a> {
     ///Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -31,7 +31,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "org.simocracy.style", tag = "$type")]
 pub struct Style<'a> {
     pub created_at: Datetime,
     ///A description of the sim's speaking and reply style.
@@ -143,51 +143,51 @@ pub mod style_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Sim;
         type Description;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Sim = Unset;
         type Description = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
-        type Sim = Set<members::sim>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Sim = S::Sim;
-        type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Sim = S::Sim;
         type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSim<S> {}
+    impl<S: State> State for SetSim<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sim = Set<members::sim>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sim = S::Sim;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `sim` field
         pub struct sim(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -297,9 +297,9 @@ where
 impl<'a, S> StyleBuilder<'a, S>
 where
     S: style_state::State,
+    S::CreatedAt: style_state::IsSet,
     S::Sim: style_state::IsSet,
     S::Description: style_state::IsSet,
-    S::CreatedAt: style_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Style<'a> {

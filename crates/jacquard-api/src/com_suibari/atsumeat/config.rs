@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "com.suibari.atsumeat.config", tag = "$type")]
 pub struct Config<'a> {
     #[serde(borrow)]
     pub hub_ref: UriValue<'a>,

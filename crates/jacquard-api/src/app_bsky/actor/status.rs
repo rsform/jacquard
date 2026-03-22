@@ -40,7 +40,7 @@ impl core::fmt::Display for Live {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.bsky.actor.status", tag = "$type")]
 pub struct Status<'a> {
     pub created_at: Datetime,
     ///The duration of the status in minutes. Applications can choose to impose minimum and maximum limits.

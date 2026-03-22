@@ -335,37 +335,37 @@ pub mod suggested_notebook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
         type Reason;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
         type Reason = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type Reason = S::Reason;
+        type Notebook = Unset;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
-        type Notebook = S::Notebook;
         type Reason = Set<members::reason>;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Reason = S::Reason;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `reason` field
         pub struct reason(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
@@ -452,8 +452,8 @@ impl<'a, S: suggested_notebook_state::State> SuggestedNotebookBuilder<'a, S> {
 impl<'a, S> SuggestedNotebookBuilder<'a, S>
 where
     S: suggested_notebook_state::State,
-    S::Notebook: suggested_notebook_state::IsSet,
     S::Reason: suggested_notebook_state::IsSet,
+    S::Notebook: suggested_notebook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SuggestedNotebook<'a> {

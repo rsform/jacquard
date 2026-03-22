@@ -73,7 +73,7 @@ pub struct ImageBlock<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.backyard.feed.post", tag = "$type")]
 pub struct Post<'a> {
     ///Ordered array of content blocks. Each block is a text block, image block, or embed block.
     #[serde(borrow)]
@@ -91,8 +91,7 @@ pub struct Post<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum PostContentItem<'a> {
     #[serde(rename = "blue.backyard.feed.post#textBlock")]
     TextBlock(Box<post::TextBlock<'a>>),
@@ -424,37 +423,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Width;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Width = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Height = Set<members::height>;
-        type Width = S::Width;
+        type Height = Unset;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidth<S> {}
     impl<S: State> State for SetWidth<S> {
-        type Height = S::Height;
         type Width = Set<members::width>;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Width = S::Width;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
@@ -524,8 +523,8 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Height: aspect_ratio_state::IsSet,
     S::Width: aspect_ratio_state::IsSet,
+    S::Height: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
@@ -915,37 +914,37 @@ pub mod image_block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MimeType;
         type Blob;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MimeType = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMimeType<S> {}
-    impl<S: State> State for SetMimeType<S> {
-        type MimeType = Set<members::mime_type>;
-        type Blob = S::Blob;
+        type MimeType = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
-        type MimeType = S::MimeType;
         type Blob = Set<members::blob>;
+        type MimeType = S::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMimeType<S> {}
+    impl<S: State> State for SetMimeType<S> {
+        type Blob = S::Blob;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
@@ -1049,8 +1048,8 @@ where
 impl<'a, S> ImageBlockBuilder<'a, S>
 where
     S: image_block_state::State,
-    S::MimeType: image_block_state::IsSet,
     S::Blob: image_block_state::IsSet,
+    S::MimeType: image_block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ImageBlock<'a> {
@@ -1090,37 +1089,37 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1221,8 +1220,8 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::CreatedAt: post_state::IsSet,
     S::Content: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {

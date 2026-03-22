@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "za.co.ciaran.cumulus.bet", tag = "$type")]
 pub struct Bet<'a> {
     pub created_at: Datetime,
     ///The record containing the Cumulus Market for this Bet
@@ -137,51 +137,51 @@ pub mod bet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Market;
         type Position;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Market = Unset;
         type Position = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `market` field to Set
-    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMarket<S> {}
-    impl<S: State> State for SetMarket<S> {
-        type Market = Set<members::market>;
-        type Position = S::Position;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Market = S::Market;
-        type Position = Set<members::position>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Market = S::Market;
         type Position = S::Position;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `market` field to Set
+    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMarket<S> {}
+    impl<S: State> State for SetMarket<S> {
+        type CreatedAt = S::CreatedAt;
+        type Market = Set<members::market>;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosition<S> {}
+    impl<S: State> State for SetPosition<S> {
+        type CreatedAt = S::CreatedAt;
+        type Market = S::Market;
+        type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `market` field
         pub struct market(());
         ///Marker type for the `position` field
         pub struct position(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -270,9 +270,9 @@ where
 impl<'a, S> BetBuilder<'a, S>
 where
     S: bet_state::State,
+    S::CreatedAt: bet_state::IsSet,
     S::Market: bet_state::IsSet,
     S::Position: bet_state::IsSet,
-    S::CreatedAt: bet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bet<'a> {

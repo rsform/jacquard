@@ -30,7 +30,7 @@ use crate::app_ocho::plugin::Db;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.ocho.plugin.service", tag = "$type")]
 pub struct Service<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]

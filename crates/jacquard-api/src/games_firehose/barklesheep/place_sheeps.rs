@@ -243,51 +243,51 @@ pub mod sheep_placement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Type;
         type Start;
         type Horizontal;
-        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Type = Unset;
         type Start = Unset;
         type Horizontal = Unset;
-        type Type = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStart<S> {}
-    impl<S: State> State for SetStart<S> {
-        type Start = Set<members::start>;
-        type Horizontal = S::Horizontal;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `horizontal` field to Set
-    pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHorizontal<S> {}
-    impl<S: State> State for SetHorizontal<S> {
-        type Start = S::Start;
-        type Horizontal = Set<members::horizontal>;
-        type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
+        type Type = Set<members::r#type>;
         type Start = S::Start;
         type Horizontal = S::Horizontal;
-        type Type = Set<members::r#type>;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStart<S> {}
+    impl<S: State> State for SetStart<S> {
+        type Type = S::Type;
+        type Start = Set<members::start>;
+        type Horizontal = S::Horizontal;
+    }
+    ///State transition - sets the `horizontal` field to Set
+    pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHorizontal<S> {}
+    impl<S: State> State for SetHorizontal<S> {
+        type Type = S::Type;
+        type Start = S::Start;
+        type Horizontal = Set<members::horizontal>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `start` field
         pub struct start(());
         ///Marker type for the `horizontal` field
         pub struct horizontal(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
     }
 }
 
@@ -376,9 +376,9 @@ where
 impl<'a, S> SheepPlacementBuilder<'a, S>
 where
     S: sheep_placement_state::State,
+    S::Type: sheep_placement_state::IsSet,
     S::Start: sheep_placement_state::IsSet,
     S::Horizontal: sheep_placement_state::IsSet,
-    S::Type: sheep_placement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SheepPlacement<'a> {

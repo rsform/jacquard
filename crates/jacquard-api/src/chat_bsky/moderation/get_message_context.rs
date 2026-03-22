@@ -46,8 +46,7 @@ pub struct GetMessageContextOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum GetMessageContextOutputMessagesItem<'a> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<MessageView<'a>>),

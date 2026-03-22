@@ -33,7 +33,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.tangled.repo.pull.status", tag = "$type")]
 pub struct Status<'a> {
     #[serde(borrow)]
     pub pull: AtUri<'a>,

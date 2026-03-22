@@ -15,7 +15,7 @@ use jacquard_common::CowStr;
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -29,14 +29,17 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.atcr.sailor.profile", tag = "$type")]
 pub struct Profile<'a> {
+    ///Automatically delete manifest records that become untagged after a tag overwrite. Layers are cleaned up by hold garbage collection.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_remove_untagged: Option<bool>,
     ///Profile creation timestamp
     pub created_at: Datetime,
-    ///Default hold endpoint for blob storage. If null, user has opted out of defaults.
+    ///Default hold DID for blob storage. If null, user has opted out of defaults.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub default_hold: Option<UriValue<'a>>,
+    pub default_hold: Option<Did<'a>>,
     ///Profile last updated timestamp
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
@@ -142,7 +145,7 @@ pub mod profile_state {
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<UriValue<'a>>, Option<Datetime>),
+    _fields: (Option<bool>, Option<Datetime>, Option<Did<'a>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -158,9 +161,22 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _lifetime: PhantomData,
         }
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `autoRemoveUntagged` field (optional)
+    pub fn auto_remove_untagged(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `autoRemoveUntagged` field to an Option value (optional)
+    pub fn maybe_auto_remove_untagged(mut self, value: Option<bool>) -> Self {
+        self._fields.0 = value;
+        self
     }
 }
 
@@ -174,7 +190,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ProfileBuilder<'a, profile_state::SetCreatedAt<S>> {
-        self._fields.0 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -185,13 +201,13 @@ where
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `defaultHold` field (optional)
-    pub fn default_hold(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self._fields.1 = value.into();
+    pub fn default_hold(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+        self._fields.2 = value.into();
         self
     }
     /// Set the `defaultHold` field to an Option value (optional)
-    pub fn maybe_default_hold(mut self, value: Option<UriValue<'a>>) -> Self {
-        self._fields.1 = value;
+    pub fn maybe_default_hold(mut self, value: Option<Did<'a>>) -> Self {
+        self._fields.2 = value;
         self
     }
 }
@@ -199,12 +215,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.2 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -217,9 +233,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            created_at: self._fields.0.unwrap(),
-            default_hold: self._fields.1,
-            updated_at: self._fields.2,
+            auto_remove_untagged: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            default_hold: self._fields.2,
+            updated_at: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -232,9 +249,10 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            created_at: self._fields.0.unwrap(),
-            default_hold: self._fields.1,
-            updated_at: self._fields.2,
+            auto_remove_untagged: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            default_hold: self._fields.2,
+            updated_at: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -265,6 +283,12 @@ fn lexicon_doc_io_atcr_sailor_profile() -> LexiconDoc<'static> {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
+                                SmolStr::new_static("autoRemoveUntagged"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
@@ -279,10 +303,10 @@ fn lexicon_doc_io_atcr_sailor_profile() -> LexiconDoc<'static> {
                                 LexObjectProperty::String(LexString {
                                     description: Some(
                                         CowStr::new_static(
-                                            "Default hold endpoint for blob storage. If null, user has opted out of defaults.",
+                                            "Default hold DID for blob storage. If null, user has opted out of defaults.",
                                         ),
                                     ),
-                                    format: Some(LexStringFormat::Uri),
+                                    format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
                             );

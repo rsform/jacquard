@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "ch.indiemusi.social.song", tag = "$type")]
 pub struct Song<'a> {
     ///Number of joiners needed to start the full listening experience
     pub joiners_needed: i64,

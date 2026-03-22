@@ -12,6 +12,10 @@
           "createdAt"
         ],
         "properties": {
+          "autoRemoveUntagged": {
+            "type": "boolean",
+            "description": "Automatically delete manifest records that become untagged after a tag overwrite. Layers are cleaned up by hold garbage collection."
+          },
           "createdAt": {
             "type": "string",
             "description": "Profile creation timestamp",
@@ -19,8 +23,8 @@
           },
           "defaultHold": {
             "type": "string",
-            "description": "Default hold endpoint for blob storage. If null, user has opted out of defaults.",
-            "format": "uri"
+            "description": "Default hold DID for blob storage. If null, user has opted out of defaults.",
+            "format": "did"
           },
           "updatedAt": {
             "type": "string",

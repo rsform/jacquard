@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "ch.indiemusi.alpha.grant", tag = "$type")]
 pub struct Grant<'a> {
     ///When the grant was created
     pub created_at: Datetime,
@@ -174,51 +174,51 @@ pub mod grant_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type WrappedMasterKey;
         type ServiceDid;
         type CreatedAt;
-        type WrappedMasterKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type WrappedMasterKey = Unset;
         type ServiceDid = Unset;
         type CreatedAt = Unset;
-        type WrappedMasterKey = Unset;
-    }
-    ///State transition - sets the `service_did` field to Set
-    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
-    impl<S: State> State for SetServiceDid<S> {
-        type ServiceDid = Set<members::service_did>;
-        type CreatedAt = S::CreatedAt;
-        type WrappedMasterKey = S::WrappedMasterKey;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ServiceDid = S::ServiceDid;
-        type CreatedAt = Set<members::created_at>;
-        type WrappedMasterKey = S::WrappedMasterKey;
     }
     ///State transition - sets the `wrapped_master_key` field to Set
     pub struct SetWrappedMasterKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWrappedMasterKey<S> {}
     impl<S: State> State for SetWrappedMasterKey<S> {
+        type WrappedMasterKey = Set<members::wrapped_master_key>;
         type ServiceDid = S::ServiceDid;
         type CreatedAt = S::CreatedAt;
-        type WrappedMasterKey = Set<members::wrapped_master_key>;
+    }
+    ///State transition - sets the `service_did` field to Set
+    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
+    impl<S: State> State for SetServiceDid<S> {
+        type WrappedMasterKey = S::WrappedMasterKey;
+        type ServiceDid = Set<members::service_did>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type WrappedMasterKey = S::WrappedMasterKey;
+        type ServiceDid = S::ServiceDid;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `wrapped_master_key` field
+        pub struct wrapped_master_key(());
         ///Marker type for the `service_did` field
         pub struct service_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `wrapped_master_key` field
-        pub struct wrapped_master_key(());
     }
 }
 
@@ -356,9 +356,9 @@ impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
 impl<'a, S> GrantBuilder<'a, S>
 where
     S: grant_state::State,
+    S::WrappedMasterKey: grant_state::IsSet,
     S::ServiceDid: grant_state::IsSet,
     S::CreatedAt: grant_state::IsSet,
-    S::WrappedMasterKey: grant_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Grant<'a> {

@@ -31,7 +31,11 @@ use crate::org_hypercerts::Uri;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.context.acknowledgement",
+    tag = "$type"
+)]
 pub struct Acknowledgement<'a> {
     ///Whether the relationship is acknowledged (true) or rejected (false).
     pub acknowledged: bool,
@@ -53,8 +57,7 @@ pub struct Acknowledgement<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum AcknowledgementContext<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -159,51 +162,51 @@ pub mod acknowledgement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Acknowledged;
         type CreatedAt;
         type Subject;
+        type Acknowledged;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Acknowledged = Unset;
         type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `acknowledged` field to Set
-    pub struct SetAcknowledged<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAcknowledged<S> {}
-    impl<S: State> State for SetAcknowledged<S> {
-        type Acknowledged = Set<members::acknowledged>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
+        type Acknowledged = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Acknowledged = S::Acknowledged;
         type CreatedAt = Set<members::created_at>;
         type Subject = S::Subject;
+        type Acknowledged = S::Acknowledged;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Acknowledged = S::Acknowledged;
         type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type Acknowledged = S::Acknowledged;
+    }
+    ///State transition - sets the `acknowledged` field to Set
+    pub struct SetAcknowledged<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAcknowledged<S> {}
+    impl<S: State> State for SetAcknowledged<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+        type Acknowledged = Set<members::acknowledged>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `acknowledged` field
-        pub struct acknowledged(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `acknowledged` field
+        pub struct acknowledged(());
     }
 }
 
@@ -327,9 +330,9 @@ where
 impl<'a, S> AcknowledgementBuilder<'a, S>
 where
     S: acknowledgement_state::State,
-    S::Acknowledged: acknowledgement_state::IsSet,
     S::CreatedAt: acknowledgement_state::IsSet,
     S::Subject: acknowledgement_state::IsSet,
+    S::Acknowledged: acknowledgement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Acknowledgement<'a> {

@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.skytalk.talk.thread", tag = "$type")]
 pub struct Thread<'a> {
     ///Optional attached media (image or audio)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -181,51 +181,51 @@ pub mod thread_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type ChannelId;
         type Title;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type ChannelId = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `channel_id` field to Set
-    pub struct SetChannelId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannelId<S> {}
-    impl<S: State> State for SetChannelId<S> {
-        type ChannelId = Set<members::channel_id>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type ChannelId = S::ChannelId;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type ChannelId = S::ChannelId;
         type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `channel_id` field to Set
+    pub struct SetChannelId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannelId<S> {}
+    impl<S: State> State for SetChannelId<S> {
+        type CreatedAt = S::CreatedAt;
+        type ChannelId = Set<members::channel_id>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type ChannelId = S::ChannelId;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `channel_id` field
         pub struct channel_id(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -346,9 +346,9 @@ where
 impl<'a, S> ThreadBuilder<'a, S>
 where
     S: thread_state::State,
+    S::CreatedAt: thread_state::IsSet,
     S::ChannelId: thread_state::IsSet,
     S::Title: thread_state::IsSet,
-    S::CreatedAt: thread_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Thread<'a> {

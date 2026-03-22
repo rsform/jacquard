@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.atcr.tag", tag = "$type")]
 pub struct Tag<'a> {
     ///AT-URI of the manifest this tag points to (e.g., 'at://did:plc:xyz/io.atcr.manifest/abc123'). Preferred over manifestDigest for new records.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -157,37 +157,37 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type Repository;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type Repository = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type Repository = S::Repository;
+        type Tag = Unset;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
-        type Tag = S::Tag;
         type Repository = Set<members::repository>;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Repository = S::Repository;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
@@ -302,8 +302,8 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::Tag: tag_state::IsSet,
     S::Repository: tag_state::IsSet,
+    S::Tag: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {

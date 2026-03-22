@@ -31,7 +31,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.backyard.feed.comment", tag = "$type")]
 pub struct Comment<'a> {
     pub created_at: Datetime,
     ///Annotations of text (mentions, URLs, hashtags).
@@ -153,8 +153,8 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type Root;
         type Subject;
+        type Root;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -162,8 +162,8 @@ pub mod comment_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type Root = Unset;
         type Subject = Unset;
+        type Root = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
@@ -171,17 +171,8 @@ pub mod comment_state {
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
         type Text = Set<members::text>;
+        type Subject = S::Subject;
         type Root = S::Root;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type Text = S::Text;
-        type Root = Set<members::root>;
-        type Subject = S::Subject;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `subject` field to Set
@@ -189,8 +180,17 @@ pub mod comment_state {
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
         type Text = S::Text;
-        type Root = S::Root;
         type Subject = Set<members::subject>;
+        type Root = S::Root;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Text = S::Text;
+        type Subject = S::Subject;
+        type Root = Set<members::root>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -198,8 +198,8 @@ pub mod comment_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Text = S::Text;
-        type Root = S::Root;
         type Subject = S::Subject;
+        type Root = S::Root;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -207,10 +207,10 @@ pub mod comment_state {
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `root` field
+        pub struct root(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -354,8 +354,8 @@ impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
     S::Text: comment_state::IsSet,
-    S::Root: comment_state::IsSet,
     S::Subject: comment_state::IsSet,
+    S::Root: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct

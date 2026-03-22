@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "tech.tokimeki.kaku.roomGate", tag = "$type")]
 pub struct RoomGate<'a> {
     ///Timestamp when the gate was created
     pub created_at: Datetime,

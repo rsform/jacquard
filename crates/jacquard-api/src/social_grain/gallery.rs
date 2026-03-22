@@ -36,7 +36,7 @@ use crate::social_grain::photo::PhotoView;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "social.grain.gallery", tag = "$type")]
 pub struct Gallery<'a> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -425,84 +425,84 @@ pub mod gallery_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Cid;
-        type Record;
         type Creator;
         type IndexedAt;
         type Uri;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Cid = Unset;
-        type Record = Unset;
         type Creator = Unset;
         type IndexedAt = Unset;
         type Uri = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type Cid = Set<members::cid>;
+        type Creator = S::Creator;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
         type Record = S::Record;
-        type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Cid = S::Cid;
-        type Record = Set<members::record>;
-        type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
         type Cid = S::Cid;
-        type Record = S::Record;
         type Creator = Set<members::creator>;
         type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
+        type Record = S::Record;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
         type Cid = S::Cid;
-        type Record = S::Record;
         type Creator = S::Creator;
         type IndexedAt = Set<members::indexed_at>;
         type Uri = S::Uri;
+        type Record = S::Record;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Cid = S::Cid;
-        type Record = S::Record;
         type Creator = S::Creator;
         type IndexedAt = S::IndexedAt;
         type Uri = Set<members::uri>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `creator` field
         pub struct creator(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -664,10 +664,10 @@ impl<'a, S> GalleryViewBuilder<'a, S>
 where
     S: gallery_view_state::State,
     S::Cid: gallery_view_state::IsSet,
-    S::Record: gallery_view_state::IsSet,
     S::Creator: gallery_view_state::IsSet,
     S::IndexedAt: gallery_view_state::IsSet,
     S::Uri: gallery_view_state::IsSet,
+    S::Record: gallery_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GalleryView<'a> {

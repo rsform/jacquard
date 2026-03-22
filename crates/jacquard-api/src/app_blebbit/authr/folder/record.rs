@@ -28,7 +28,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.blebbit.authr.folder.record",
+    tag = "$type"
+)]
 pub struct Record<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]

@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.gainforest.organization.layer",
+    tag = "$type"
+)]
 pub struct Layer<'a> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
@@ -123,65 +127,65 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Type;
         type CreatedAt;
+        type Type;
+        type Name;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Type = Unset;
         type CreatedAt = Unset;
+        type Type = Unset;
+        type Name = Unset;
         type Uri = Unset;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
         type Uri = S::Uri;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Name = S::Name;
-        type Type = Set<members::r#type>;
         type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
+        type Name = S::Name;
         type Uri = S::Uri;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
         type Type = S::Type;
-        type CreatedAt = Set<members::created_at>;
+        type Name = Set<members::name>;
         type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
-        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Name = S::Name;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -310,9 +314,9 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::Name: layer_state::IsSet,
-    S::Type: layer_state::IsSet,
     S::CreatedAt: layer_state::IsSet,
+    S::Type: layer_state::IsSet,
+    S::Name: layer_state::IsSet,
     S::Uri: layer_state::IsSet,
 {
     /// Build the final struct

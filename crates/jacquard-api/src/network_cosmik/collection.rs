@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "network.cosmik.collection", tag = "$type")]
 pub struct Collection<'a> {
     ///Access control for the collection
     #[serde(borrow)]
@@ -241,37 +241,37 @@ pub mod collection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type AccessType;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type AccessType = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type AccessType = S::AccessType;
+        type Name = Unset;
     }
     ///State transition - sets the `access_type` field to Set
     pub struct SetAccessType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccessType<S> {}
     impl<S: State> State for SetAccessType<S> {
-        type Name = S::Name;
         type AccessType = Set<members::access_type>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type AccessType = S::AccessType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `access_type` field
         pub struct access_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -400,8 +400,8 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S> CollectionBuilder<'a, S>
 where
     S: collection_state::State,
-    S::Name: collection_state::IsSet,
     S::AccessType: collection_state::IsSet,
+    S::Name: collection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collection<'a> {

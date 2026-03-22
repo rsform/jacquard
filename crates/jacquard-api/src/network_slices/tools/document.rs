@@ -72,7 +72,11 @@ pub struct ImageEmbed<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "network.slices.tools.document",
+    tag = "$type"
+)]
 pub struct Document<'a> {
     ///Document content as array of blocks
     #[serde(borrow)]
@@ -91,8 +95,7 @@ pub struct Document<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum DocumentBlocksItem<'a> {
     #[serde(rename = "network.slices.tools.document#paragraph")]
     Paragraph(Box<document::Paragraph<'a>>),
@@ -1054,8 +1057,8 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Blocks;
+        type Slug;
         type CreatedAt;
         type Title;
     }
@@ -1063,26 +1066,26 @@ pub mod document_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Blocks = Unset;
+        type Slug = Unset;
         type CreatedAt = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Blocks = S::Blocks;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
     }
     ///State transition - sets the `blocks` field to Set
     pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocks<S> {}
     impl<S: State> State for SetBlocks<S> {
-        type Slug = S::Slug;
         type Blocks = Set<members::blocks>;
+        type Slug = S::Slug;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Blocks = S::Blocks;
+        type Slug = Set<members::slug>;
         type CreatedAt = S::CreatedAt;
         type Title = S::Title;
     }
@@ -1090,8 +1093,8 @@ pub mod document_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Slug = S::Slug;
         type Blocks = S::Blocks;
+        type Slug = S::Slug;
         type CreatedAt = Set<members::created_at>;
         type Title = S::Title;
     }
@@ -1099,18 +1102,18 @@ pub mod document_state {
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Slug = S::Slug;
         type Blocks = S::Blocks;
+        type Slug = S::Slug;
         type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `blocks` field
         pub struct blocks(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `title` field
@@ -1241,8 +1244,8 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Slug: document_state::IsSet,
     S::Blocks: document_state::IsSet,
+    S::Slug: document_state::IsSet,
     S::CreatedAt: document_state::IsSet,
     S::Title: document_state::IsSet,
 {

@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "fm.teal.alpha.actor.profileStatus",
+    tag = "$type"
+)]
 pub struct ProfileStatus<'a> {
     ///The onboarding completion status
     #[serde(borrow)]

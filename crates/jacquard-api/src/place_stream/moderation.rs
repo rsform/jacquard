@@ -75,67 +75,67 @@ pub mod permission_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
-        type Cid;
-        type Uri;
         type Author;
+        type Cid;
+        type Record;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
-        type Cid = Unset;
-        type Uri = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
+        type Cid = Unset;
+        type Record = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Record = S::Record;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Author = Set<members::author>;
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type Cid = Set<members::cid>;
+        type Record = S::Record;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Author = S::Author;
+        type Cid = S::Cid;
+        type Record = Set<members::record>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Author = S::Author;
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -248,10 +248,10 @@ where
 impl<'a, S> PermissionViewBuilder<'a, S>
 where
     S: permission_view_state::State,
-    S::Record: permission_view_state::IsSet,
-    S::Cid: permission_view_state::IsSet,
-    S::Uri: permission_view_state::IsSet,
     S::Author: permission_view_state::IsSet,
+    S::Cid: permission_view_state::IsSet,
+    S::Record: permission_view_state::IsSet,
+    S::Uri: permission_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PermissionView<'a> {

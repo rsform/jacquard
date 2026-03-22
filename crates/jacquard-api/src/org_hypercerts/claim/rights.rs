@@ -31,7 +31,7 @@ use crate::org_hypercerts::Uri;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "org.hypercerts.claim.rights", tag = "$type")]
 pub struct Rights<'a> {
     ///An attachment to define the rights further, e.g. a legal document.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,8 +53,7 @@ pub struct Rights<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum RightsAttachment<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -183,8 +182,8 @@ pub mod rights_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RightsDescription;
         type RightsName;
+        type RightsDescription;
         type RightsType;
         type CreatedAt;
     }
@@ -192,26 +191,26 @@ pub mod rights_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RightsDescription = Unset;
         type RightsName = Unset;
+        type RightsDescription = Unset;
         type RightsType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `rights_description` field to Set
-    pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
-    impl<S: State> State for SetRightsDescription<S> {
-        type RightsDescription = Set<members::rights_description>;
-        type RightsName = S::RightsName;
-        type RightsType = S::RightsType;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `rights_name` field to Set
     pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsName<S> {}
     impl<S: State> State for SetRightsName<S> {
-        type RightsDescription = S::RightsDescription;
         type RightsName = Set<members::rights_name>;
+        type RightsDescription = S::RightsDescription;
+        type RightsType = S::RightsType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `rights_description` field to Set
+    pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
+    impl<S: State> State for SetRightsDescription<S> {
+        type RightsName = S::RightsName;
+        type RightsDescription = Set<members::rights_description>;
         type RightsType = S::RightsType;
         type CreatedAt = S::CreatedAt;
     }
@@ -219,8 +218,8 @@ pub mod rights_state {
     pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsType<S> {}
     impl<S: State> State for SetRightsType<S> {
-        type RightsDescription = S::RightsDescription;
         type RightsName = S::RightsName;
+        type RightsDescription = S::RightsDescription;
         type RightsType = Set<members::rights_type>;
         type CreatedAt = S::CreatedAt;
     }
@@ -228,18 +227,18 @@ pub mod rights_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type RightsDescription = S::RightsDescription;
         type RightsName = S::RightsName;
+        type RightsDescription = S::RightsDescription;
         type RightsType = S::RightsType;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rights_description` field
-        pub struct rights_description(());
         ///Marker type for the `rights_name` field
         pub struct rights_name(());
+        ///Marker type for the `rights_description` field
+        pub struct rights_description(());
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
         ///Marker type for the `created_at` field
@@ -370,8 +369,8 @@ where
 impl<'a, S> RightsBuilder<'a, S>
 where
     S: rights_state::State,
-    S::RightsDescription: rights_state::IsSet,
     S::RightsName: rights_state::IsSet,
+    S::RightsDescription: rights_state::IsSet,
     S::RightsType: rights_state::IsSet,
     S::CreatedAt: rights_state::IsSet,
 {

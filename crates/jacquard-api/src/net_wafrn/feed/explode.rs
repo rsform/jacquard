@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "net.wafrn.feed.explode", tag = "$type")]
 pub struct Explode<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,

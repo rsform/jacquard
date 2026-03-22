@@ -30,7 +30,11 @@ use crate::app_certified::Did;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.funding.receipt",
+    tag = "$type"
+)]
 pub struct Receipt<'a> {
     ///Amount of funding received as a numeric string (e.g. '1000.50').
     #[serde(borrow)]
@@ -221,8 +225,8 @@ pub mod receipt_state {
     pub trait State: sealed::Sealed {
         type From;
         type Amount;
-        type Currency;
         type To;
+        type Currency;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -231,8 +235,8 @@ pub mod receipt_state {
     impl State for Empty {
         type From = Unset;
         type Amount = Unset;
-        type Currency = Unset;
         type To = Unset;
+        type Currency = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `from` field to Set
@@ -241,8 +245,8 @@ pub mod receipt_state {
     impl<S: State> State for SetFrom<S> {
         type From = Set<members::from>;
         type Amount = S::Amount;
-        type Currency = S::Currency;
         type To = S::To;
+        type Currency = S::Currency;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `amount` field to Set
@@ -251,18 +255,8 @@ pub mod receipt_state {
     impl<S: State> State for SetAmount<S> {
         type From = S::From;
         type Amount = Set<members::amount>;
+        type To = S::To;
         type Currency = S::Currency;
-        type To = S::To;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `currency` field to Set
-    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrency<S> {}
-    impl<S: State> State for SetCurrency<S> {
-        type From = S::From;
-        type Amount = S::Amount;
-        type Currency = Set<members::currency>;
-        type To = S::To;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `to` field to Set
@@ -271,8 +265,18 @@ pub mod receipt_state {
     impl<S: State> State for SetTo<S> {
         type From = S::From;
         type Amount = S::Amount;
-        type Currency = S::Currency;
         type To = Set<members::to>;
+        type Currency = S::Currency;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `currency` field to Set
+    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrency<S> {}
+    impl<S: State> State for SetCurrency<S> {
+        type From = S::From;
+        type Amount = S::Amount;
+        type To = S::To;
+        type Currency = Set<members::currency>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -281,8 +285,8 @@ pub mod receipt_state {
     impl<S: State> State for SetCreatedAt<S> {
         type From = S::From;
         type Amount = S::Amount;
-        type Currency = S::Currency;
         type To = S::To;
+        type Currency = S::Currency;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -292,10 +296,10 @@ pub mod receipt_state {
         pub struct from(());
         ///Marker type for the `amount` field
         pub struct amount(());
-        ///Marker type for the `currency` field
-        pub struct currency(());
         ///Marker type for the `to` field
         pub struct to(());
+        ///Marker type for the `currency` field
+        pub struct currency(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -516,8 +520,8 @@ where
     S: receipt_state::State,
     S::From: receipt_state::IsSet,
     S::Amount: receipt_state::IsSet,
-    S::Currency: receipt_state::IsSet,
     S::To: receipt_state::IsSet,
+    S::Currency: receipt_state::IsSet,
     S::CreatedAt: receipt_state::IsSet,
 {
     /// Build the final struct

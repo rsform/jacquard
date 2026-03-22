@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.claim.contribution",
+    tag = "$type"
+)]
 pub struct Contribution<'a> {
     ///Description of what the contribution concretely involved.
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -54,7 +54,7 @@ pub struct BodyTemplate<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "at.inlay.component", tag = "$type")]
 pub struct Component<'a> {
     ///How this component is rendered. Omit for primitives rendered by the host.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -88,8 +88,7 @@ pub struct Component<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ComponentBody<'a> {
     #[serde(rename = "at.inlay.component#bodyExternal")]
     BodyExternal(Box<component::BodyExternal<'a>>),
@@ -128,8 +127,7 @@ pub struct View<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ViewAcceptsItem<'a> {
     #[serde(rename = "at.inlay.component#viewRecord")]
     ViewRecord(Box<component::ViewRecord<'a>>),

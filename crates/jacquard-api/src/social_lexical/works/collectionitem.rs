@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.lexical.works.collectionitem",
+    tag = "$type"
+)]
 pub struct Collectionitem<'a> {
     ///
     pub created_at: Datetime,

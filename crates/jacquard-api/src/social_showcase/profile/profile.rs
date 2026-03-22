@@ -31,7 +31,11 @@ use crate::social_showcase::ShowcaseItem;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.showcase.profile.profile",
+    tag = "$type"
+)]
 pub struct Profile<'a> {
     ///Custom accent color hex code (e.g. #2e4a6e)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -355,8 +359,8 @@ pub mod profile_state {
     pub trait State: sealed::Sealed {
         type Handle;
         type Did;
-        type CreatedAt;
         type Tags;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -364,8 +368,8 @@ pub mod profile_state {
     impl State for Empty {
         type Handle = Unset;
         type Did = Unset;
-        type CreatedAt = Unset;
         type Tags = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -373,8 +377,8 @@ pub mod profile_state {
     impl<S: State> State for SetHandle<S> {
         type Handle = Set<members::handle>;
         type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
         type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -382,17 +386,8 @@ pub mod profile_state {
     impl<S: State> State for SetDid<S> {
         type Handle = S::Handle;
         type Did = Set<members::did>;
+        type Tags = S::Tags;
         type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Handle = S::Handle;
-        type Did = S::Did;
-        type CreatedAt = Set<members::created_at>;
-        type Tags = S::Tags;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
@@ -400,8 +395,17 @@ pub mod profile_state {
     impl<S: State> State for SetTags<S> {
         type Handle = S::Handle;
         type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
         type Tags = Set<members::tags>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Handle = S::Handle;
+        type Did = S::Did;
+        type Tags = S::Tags;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -410,10 +414,10 @@ pub mod profile_state {
         pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `tags` field
         pub struct tags(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -713,8 +717,8 @@ where
     S: profile_state::State,
     S::Handle: profile_state::IsSet,
     S::Did: profile_state::IsSet,
-    S::CreatedAt: profile_state::IsSet,
     S::Tags: profile_state::IsSet,
+    S::CreatedAt: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {

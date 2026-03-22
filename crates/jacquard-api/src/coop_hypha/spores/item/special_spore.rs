@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "coop.hypha.spores.item.specialSpore",
+    tag = "$type"
+)]
 pub struct SpecialSpore<'a> {
     ///When this capture occurred.
     pub created_at: Datetime,
@@ -113,37 +117,37 @@ pub mod special_spore_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -213,8 +217,8 @@ where
 impl<'a, S> SpecialSporeBuilder<'a, S>
 where
     S: special_spore_state::State,
-    S::CreatedAt: special_spore_state::IsSet,
     S::Subject: special_spore_state::IsSet,
+    S::CreatedAt: special_spore_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SpecialSpore<'a> {

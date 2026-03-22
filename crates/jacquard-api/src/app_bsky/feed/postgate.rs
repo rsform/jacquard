@@ -36,7 +36,7 @@ pub struct DisableRule<'a> {}
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.bsky.feed.postgate", tag = "$type")]
 pub struct Postgate<'a> {
     pub created_at: Datetime,
     ///List of AT-URIs embedding this post that the author has detached from.

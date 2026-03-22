@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.fitsky.goal", tag = "$type")]
 pub struct Goal<'a> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -344,84 +344,84 @@ pub mod goal_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Metric;
+        type Period;
         type CreatedAt;
         type TargetValue;
         type StartDate;
-        type Period;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Metric = Unset;
+        type Period = Unset;
         type CreatedAt = Unset;
         type TargetValue = Unset;
         type StartDate = Unset;
-        type Period = Unset;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
         type Metric = Set<members::metric>;
+        type Period = S::Period;
         type CreatedAt = S::CreatedAt;
         type TargetValue = S::TargetValue;
         type StartDate = S::StartDate;
-        type Period = S::Period;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Metric = S::Metric;
-        type CreatedAt = Set<members::created_at>;
-        type TargetValue = S::TargetValue;
-        type StartDate = S::StartDate;
-        type Period = S::Period;
-    }
-    ///State transition - sets the `target_value` field to Set
-    pub struct SetTargetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetValue<S> {}
-    impl<S: State> State for SetTargetValue<S> {
-        type Metric = S::Metric;
-        type CreatedAt = S::CreatedAt;
-        type TargetValue = Set<members::target_value>;
-        type StartDate = S::StartDate;
-        type Period = S::Period;
-    }
-    ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartDate<S> {}
-    impl<S: State> State for SetStartDate<S> {
-        type Metric = S::Metric;
-        type CreatedAt = S::CreatedAt;
-        type TargetValue = S::TargetValue;
-        type StartDate = Set<members::start_date>;
-        type Period = S::Period;
     }
     ///State transition - sets the `period` field to Set
     pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPeriod<S> {}
     impl<S: State> State for SetPeriod<S> {
         type Metric = S::Metric;
+        type Period = Set<members::period>;
         type CreatedAt = S::CreatedAt;
         type TargetValue = S::TargetValue;
         type StartDate = S::StartDate;
-        type Period = Set<members::period>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type CreatedAt = Set<members::created_at>;
+        type TargetValue = S::TargetValue;
+        type StartDate = S::StartDate;
+    }
+    ///State transition - sets the `target_value` field to Set
+    pub struct SetTargetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetValue<S> {}
+    impl<S: State> State for SetTargetValue<S> {
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type CreatedAt = S::CreatedAt;
+        type TargetValue = Set<members::target_value>;
+        type StartDate = S::StartDate;
+    }
+    ///State transition - sets the `start_date` field to Set
+    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartDate<S> {}
+    impl<S: State> State for SetStartDate<S> {
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type CreatedAt = S::CreatedAt;
+        type TargetValue = S::TargetValue;
+        type StartDate = Set<members::start_date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `metric` field
         pub struct metric(());
+        ///Marker type for the `period` field
+        pub struct period(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `target_value` field
         pub struct target_value(());
         ///Marker type for the `start_date` field
         pub struct start_date(());
-        ///Marker type for the `period` field
-        pub struct period(());
     }
 }
 
@@ -569,10 +569,10 @@ impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
     S::Metric: goal_state::IsSet,
+    S::Period: goal_state::IsSet,
     S::CreatedAt: goal_state::IsSet,
     S::TargetValue: goal_state::IsSet,
     S::StartDate: goal_state::IsSet,
-    S::Period: goal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Goal<'a> {

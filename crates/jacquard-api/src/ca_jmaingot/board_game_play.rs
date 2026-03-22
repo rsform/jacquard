@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "ca.jmaingot.boardGamePlay", tag = "$type")]
 pub struct BoardGamePlay<'a> {
     ///corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game
     #[serde(borrow)]
@@ -116,50 +116,50 @@ pub mod board_game_play_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type PlayedAt;
         type BggId;
+        type PlayedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type PlayedAt = Unset;
         type BggId = Unset;
+        type PlayedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type BggId = S::BggId;
         type PlayedAt = S::PlayedAt;
-        type BggId = S::BggId;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type Name = S::Name;
-        type PlayedAt = Set<members::played_at>;
-        type BggId = S::BggId;
     }
     ///State transition - sets the `bgg_id` field to Set
     pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBggId<S> {}
     impl<S: State> State for SetBggId<S> {
         type Name = S::Name;
-        type PlayedAt = S::PlayedAt;
         type BggId = Set<members::bgg_id>;
+        type PlayedAt = S::PlayedAt;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
+    impl<S: State> State for SetPlayedAt<S> {
+        type Name = S::Name;
+        type BggId = S::BggId;
+        type PlayedAt = Set<members::played_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
         ///Marker type for the `bgg_id` field
         pub struct bgg_id(());
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
     }
 }
 
@@ -249,8 +249,8 @@ impl<'a, S> BoardGamePlayBuilder<'a, S>
 where
     S: board_game_play_state::State,
     S::Name: board_game_play_state::IsSet,
-    S::PlayedAt: board_game_play_state::IsSet,
     S::BggId: board_game_play_state::IsSet,
+    S::PlayedAt: board_game_play_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BoardGamePlay<'a> {

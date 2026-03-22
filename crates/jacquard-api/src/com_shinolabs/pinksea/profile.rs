@@ -31,7 +31,11 @@ use crate::com_shinolabs::pinksea::profile;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.shinolabs.pinksea.profile",
+    tag = "$type"
+)]
 pub struct Profile<'a> {
     ///The oekaki image that's the avatar of this profile.
     #[serde(skip_serializing_if = "Option::is_none")]

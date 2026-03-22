@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.rito.service.schema", tag = "$type")]
 pub struct Schema<'a> {
     ///The AppView URL for the NSID. For example, if the NSID is uk.skyblur.post, the URL should be https://skyblur.uk/post/{did}/{rkey}
     #[serde(borrow)]

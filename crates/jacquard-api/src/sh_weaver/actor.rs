@@ -76,8 +76,7 @@ pub struct ProfileDataView<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ProfileDataViewInner<'a> {
     #[serde(rename = "sh.weaver.actor.defs#profileView")]
     ProfileView(Box<actor::ProfileView<'a>>),
@@ -106,8 +105,7 @@ pub struct ProfileDataViewBasic<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ProfileDataViewBasicInner<'a> {
     #[serde(rename = "sh.weaver.actor.defs#profileViewBasic")]
     ProfileViewBasic(Box<crate::sh_weaver::actor::ProfileViewBasic<'a>>),
@@ -2612,51 +2610,51 @@ pub mod tangled_profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Bluesky;
         type Did;
         type Handle;
-        type Bluesky;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Bluesky = Unset;
         type Did = Unset;
         type Handle = Unset;
-        type Bluesky = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
-        type Bluesky = S::Bluesky;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
-        type Handle = Set<members::handle>;
-        type Bluesky = S::Bluesky;
     }
     ///State transition - sets the `bluesky` field to Set
     pub struct SetBluesky<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBluesky<S> {}
     impl<S: State> State for SetBluesky<S> {
+        type Bluesky = Set<members::bluesky>;
         type Did = S::Did;
         type Handle = S::Handle;
-        type Bluesky = Set<members::bluesky>;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Bluesky = S::Bluesky;
+        type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Bluesky = S::Bluesky;
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `bluesky` field
+        pub struct bluesky(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `bluesky` field
-        pub struct bluesky(());
     }
 }
 
@@ -2822,9 +2820,9 @@ impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> 
 impl<'a, S> TangledProfileViewBuilder<'a, S>
 where
     S: tangled_profile_view_state::State,
+    S::Bluesky: tangled_profile_view_state::IsSet,
     S::Did: tangled_profile_view_state::IsSet,
     S::Handle: tangled_profile_view_state::IsSet,
-    S::Bluesky: tangled_profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TangledProfileView<'a> {

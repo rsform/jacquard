@@ -34,7 +34,7 @@ use crate::pub_leaflet::publication;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "pub.leaflet.publication", tag = "$type")]
 pub struct Publication<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -136,8 +136,7 @@ pub struct Theme<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ThemeAccentBackground<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<Rgba<'a>>),
@@ -148,8 +147,7 @@ pub enum ThemeAccentBackground<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ThemeAccentText<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<Rgba<'a>>),
@@ -160,8 +158,7 @@ pub enum ThemeAccentText<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ThemeBackgroundColor<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<Rgba<'a>>),
@@ -172,8 +169,7 @@ pub enum ThemeBackgroundColor<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ThemePageBackground<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<Rgba<'a>>),
@@ -184,8 +180,7 @@ pub enum ThemePageBackground<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ThemePrimary<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<Rgba<'a>>),

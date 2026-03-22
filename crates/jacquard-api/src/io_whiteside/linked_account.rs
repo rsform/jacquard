@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.whiteside.linkedAccount", tag = "$type")]
 pub struct LinkedAccount<'a> {
     ///Icon identifier or URL for the linked account
     #[serde(borrow)]
@@ -120,51 +120,51 @@ pub mod linked_account_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Link;
         type Icon;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Link = Unset;
         type Icon = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type Link = Set<members::link>;
-        type Icon = S::Icon;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIcon<S> {}
-    impl<S: State> State for SetIcon<S> {
-        type Link = S::Link;
-        type Icon = Set<members::icon>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Link = S::Link;
         type Icon = S::Icon;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type Name = S::Name;
+        type Link = Set<members::link>;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIcon<S> {}
+    impl<S: State> State for SetIcon<S> {
+        type Name = S::Name;
+        type Link = S::Link;
+        type Icon = Set<members::icon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `link` field
         pub struct link(());
         ///Marker type for the `icon` field
         pub struct icon(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -266,9 +266,9 @@ impl<'a, S: linked_account_state::State> LinkedAccountBuilder<'a, S> {
 impl<'a, S> LinkedAccountBuilder<'a, S>
 where
     S: linked_account_state::State,
+    S::Name: linked_account_state::IsSet,
     S::Link: linked_account_state::IsSet,
     S::Icon: linked_account_state::IsSet,
-    S::Name: linked_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LinkedAccount<'a> {

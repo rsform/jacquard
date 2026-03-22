@@ -62,7 +62,11 @@ pub struct LocalizedString<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "garden.lexicon.documentation",
+    tag = "$type"
+)]
 pub struct Documentation<'a> {
     ///Timestamp when this documentation was created.
     pub created_at: Datetime,

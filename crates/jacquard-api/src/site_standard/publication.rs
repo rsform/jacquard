@@ -32,7 +32,7 @@ use crate::site_standard::publication;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "site.standard.publication", tag = "$type")]
 pub struct Publication<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]

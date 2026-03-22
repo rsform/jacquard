@@ -31,7 +31,7 @@ use crate::org_simocracy::SpriteSettings;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "org.simocracy.sim", tag = "$type")]
 pub struct Sim<'a> {
     ///Timestamp when the sim was created
     pub created_at: Datetime,
@@ -162,49 +162,49 @@ pub mod sim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Settings;
         type Name;
+        type Settings;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Settings = Unset;
         type Name = Unset;
+        type Settings = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `settings` field to Set
-    pub struct SetSettings<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSettings<S> {}
-    impl<S: State> State for SetSettings<S> {
-        type Settings = Set<members::settings>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Settings = S::Settings;
         type Name = Set<members::name>;
+        type Settings = S::Settings;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `settings` field to Set
+    pub struct SetSettings<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSettings<S> {}
+    impl<S: State> State for SetSettings<S> {
+        type Name = S::Name;
+        type Settings = Set<members::settings>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Settings = S::Settings;
         type Name = S::Name;
+        type Settings = S::Settings;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `settings` field
-        pub struct settings(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `settings` field
+        pub struct settings(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -313,8 +313,8 @@ where
 impl<'a, S> SimBuilder<'a, S>
 where
     S: sim_state::State,
-    S::Settings: sim_state::IsSet,
     S::Name: sim_state::IsSet,
+    S::Settings: sim_state::IsSet,
     S::CreatedAt: sim_state::IsSet,
 {
     /// Build the final struct

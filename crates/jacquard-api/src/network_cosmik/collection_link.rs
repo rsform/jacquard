@@ -31,7 +31,11 @@ use crate::network_cosmik::Provenance;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "network.cosmik.collectionLink",
+    tag = "$type"
+)]
 pub struct CollectionLink<'a> {
     ///Timestamp when the card was added to the collection.
     pub added_at: Datetime,
@@ -132,67 +136,67 @@ pub mod collection_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Card;
-        type Collection;
         type AddedAt;
         type AddedBy;
+        type Collection;
+        type Card;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Card = Unset;
-        type Collection = Unset;
         type AddedAt = Unset;
         type AddedBy = Unset;
-    }
-    ///State transition - sets the `card` field to Set
-    pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCard<S> {}
-    impl<S: State> State for SetCard<S> {
-        type Card = Set<members::card>;
-        type Collection = S::Collection;
-        type AddedAt = S::AddedAt;
-        type AddedBy = S::AddedBy;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Card = S::Card;
-        type Collection = Set<members::collection>;
-        type AddedAt = S::AddedAt;
-        type AddedBy = S::AddedBy;
+        type Collection = Unset;
+        type Card = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Card = S::Card;
-        type Collection = S::Collection;
         type AddedAt = Set<members::added_at>;
         type AddedBy = S::AddedBy;
+        type Collection = S::Collection;
+        type Card = S::Card;
     }
     ///State transition - sets the `added_by` field to Set
     pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedBy<S> {}
     impl<S: State> State for SetAddedBy<S> {
-        type Card = S::Card;
-        type Collection = S::Collection;
         type AddedAt = S::AddedAt;
         type AddedBy = Set<members::added_by>;
+        type Collection = S::Collection;
+        type Card = S::Card;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type AddedAt = S::AddedAt;
+        type AddedBy = S::AddedBy;
+        type Collection = Set<members::collection>;
+        type Card = S::Card;
+    }
+    ///State transition - sets the `card` field to Set
+    pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCard<S> {}
+    impl<S: State> State for SetCard<S> {
+        type AddedAt = S::AddedAt;
+        type AddedBy = S::AddedBy;
+        type Collection = S::Collection;
+        type Card = Set<members::card>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `card` field
-        pub struct card(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
         ///Marker type for the `added_by` field
         pub struct added_by(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `card` field
+        pub struct card(());
     }
 }
 
@@ -347,10 +351,10 @@ impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
 impl<'a, S> CollectionLinkBuilder<'a, S>
 where
     S: collection_link_state::State,
-    S::Card: collection_link_state::IsSet,
-    S::Collection: collection_link_state::IsSet,
     S::AddedAt: collection_link_state::IsSet,
     S::AddedBy: collection_link_state::IsSet,
+    S::Collection: collection_link_state::IsSet,
+    S::Card: collection_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLink<'a> {

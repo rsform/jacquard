@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "store.88x31.button", tag = "$type")]
 pub struct Button<'a> {
     ///Alt text description of the button, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]

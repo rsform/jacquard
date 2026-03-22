@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "coop.hypha.spores.site.profile",
+    tag = "$type"
+)]
 pub struct Profile<'a> {
     ///Avatar image blob
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.atcr.hold.crew", tag = "$type")]
 pub struct Crew<'a> {
     ///RFC3339 timestamp of when the member was added
     pub added_at: Datetime,
@@ -244,67 +244,67 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Permissions;
-        type AddedAt;
         type Role;
         type Member;
+        type Permissions;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Permissions = Unset;
-        type AddedAt = Unset;
         type Role = Unset;
         type Member = Unset;
-    }
-    ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
-        type Permissions = Set<members::permissions>;
-        type AddedAt = S::AddedAt;
-        type Role = S::Role;
-        type Member = S::Member;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Permissions = S::Permissions;
-        type AddedAt = Set<members::added_at>;
-        type Role = S::Role;
-        type Member = S::Member;
+        type Permissions = Unset;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Permissions = S::Permissions;
-        type AddedAt = S::AddedAt;
         type Role = Set<members::role>;
         type Member = S::Member;
+        type Permissions = S::Permissions;
+        type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `member` field to Set
     pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMember<S> {}
     impl<S: State> State for SetMember<S> {
-        type Permissions = S::Permissions;
-        type AddedAt = S::AddedAt;
         type Role = S::Role;
         type Member = Set<members::member>;
+        type Permissions = S::Permissions;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPermissions<S> {}
+    impl<S: State> State for SetPermissions<S> {
+        type Role = S::Role;
+        type Member = S::Member;
+        type Permissions = Set<members::permissions>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Role = S::Role;
+        type Member = S::Member;
+        type Permissions = S::Permissions;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `permissions` field
-        pub struct permissions(());
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `role` field
         pub struct role(());
         ///Marker type for the `member` field
         pub struct member(());
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
@@ -431,10 +431,10 @@ impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
-    S::Permissions: crew_state::IsSet,
-    S::AddedAt: crew_state::IsSet,
     S::Role: crew_state::IsSet,
     S::Member: crew_state::IsSet,
+    S::Permissions: crew_state::IsSet,
+    S::AddedAt: crew_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Crew<'a> {

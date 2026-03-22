@@ -34,7 +34,11 @@ use crate::pub_leaflet::pages::linear_document::LinearDocument;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.context.attachment",
+    tag = "$type"
+)]
 pub struct Attachment<'a> {
     ///The files, documents, or external references included in this attachment record.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,8 +78,7 @@ pub struct Attachment<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum AttachmentContentItem<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),

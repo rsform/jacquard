@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.suibari.atsumeat.sticker",
+    tag = "$type"
+)]
 pub struct Sticker<'a> {
     ///The image content, either a string URL (for CDN/Blob) or a BlobRef.
     #[serde(borrow)]
@@ -468,105 +472,105 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
-        type SignedPayload;
         type ObtainedAt;
+        type SignedPayload;
         type Model;
         type OriginalOwner;
         type Signature;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
-        type SignedPayload = Unset;
         type ObtainedAt = Unset;
+        type SignedPayload = Unset;
         type Model = Unset;
         type OriginalOwner = Unset;
         type Signature = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Image = Set<members::image>;
-        type SignedPayload = S::SignedPayload;
-        type ObtainedAt = S::ObtainedAt;
-        type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
-        type Signature = S::Signature;
-    }
-    ///State transition - sets the `signed_payload` field to Set
-    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
-    impl<S: State> State for SetSignedPayload<S> {
-        type Image = S::Image;
-        type SignedPayload = Set<members::signed_payload>;
-        type ObtainedAt = S::ObtainedAt;
-        type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
-        type Signature = S::Signature;
+        type Image = Unset;
     }
     ///State transition - sets the `obtained_at` field to Set
     pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
     impl<S: State> State for SetObtainedAt<S> {
-        type Image = S::Image;
-        type SignedPayload = S::SignedPayload;
         type ObtainedAt = Set<members::obtained_at>;
+        type SignedPayload = S::SignedPayload;
         type Model = S::Model;
         type OriginalOwner = S::OriginalOwner;
         type Signature = S::Signature;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `signed_payload` field to Set
+    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
+    impl<S: State> State for SetSignedPayload<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type SignedPayload = Set<members::signed_payload>;
+        type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
+        type Signature = S::Signature;
+        type Image = S::Image;
     }
     ///State transition - sets the `model` field to Set
     pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModel<S> {}
     impl<S: State> State for SetModel<S> {
-        type Image = S::Image;
-        type SignedPayload = S::SignedPayload;
         type ObtainedAt = S::ObtainedAt;
+        type SignedPayload = S::SignedPayload;
         type Model = Set<members::model>;
         type OriginalOwner = S::OriginalOwner;
         type Signature = S::Signature;
+        type Image = S::Image;
     }
     ///State transition - sets the `original_owner` field to Set
     pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
     impl<S: State> State for SetOriginalOwner<S> {
-        type Image = S::Image;
-        type SignedPayload = S::SignedPayload;
         type ObtainedAt = S::ObtainedAt;
+        type SignedPayload = S::SignedPayload;
         type Model = S::Model;
         type OriginalOwner = Set<members::original_owner>;
         type Signature = S::Signature;
+        type Image = S::Image;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignature<S> {}
     impl<S: State> State for SetSignature<S> {
-        type Image = S::Image;
-        type SignedPayload = S::SignedPayload;
         type ObtainedAt = S::ObtainedAt;
+        type SignedPayload = S::SignedPayload;
         type Model = S::Model;
         type OriginalOwner = S::OriginalOwner;
         type Signature = Set<members::signature>;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type SignedPayload = S::SignedPayload;
+        type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
+        type Signature = S::Signature;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
-        ///Marker type for the `signed_payload` field
-        pub struct signed_payload(());
         ///Marker type for the `obtained_at` field
         pub struct obtained_at(());
+        ///Marker type for the `signed_payload` field
+        pub struct signed_payload(());
         ///Marker type for the `model` field
         pub struct model(());
         ///Marker type for the `original_owner` field
         pub struct original_owner(());
         ///Marker type for the `signature` field
         pub struct signature(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
@@ -831,12 +835,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::Image: sticker_state::IsSet,
-    S::SignedPayload: sticker_state::IsSet,
     S::ObtainedAt: sticker_state::IsSet,
+    S::SignedPayload: sticker_state::IsSet,
     S::Model: sticker_state::IsSet,
     S::OriginalOwner: sticker_state::IsSet,
     S::Signature: sticker_state::IsSet,
+    S::Image: sticker_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sticker<'a> {

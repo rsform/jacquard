@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "tech.tokimeki.kaku.request", tag = "$type")]
 pub struct Request<'a> {
     pub created_at: Datetime,
     ///Whether still accepting responses  Defaults to `true`.

@@ -43,8 +43,7 @@ pub struct GetRelationshipsOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum GetRelationshipsOutputRelationshipsItem<'a> {
     #[serde(rename = "app.bsky.graph.defs#relationship")]
     Relationship(Box<Relationship<'a>>),

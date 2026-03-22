@@ -53,7 +53,7 @@ pub struct Entity<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.bsky.feed.post", tag = "$type")]
 pub struct Post<'a> {
     ///Client-declared timestamp when this post was originally created.
     pub created_at: Datetime,
@@ -90,8 +90,7 @@ pub struct Post<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum PostEmbed<'a> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<Images<'a>>),
@@ -310,51 +309,51 @@ pub mod entity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Index;
-        type Type;
         type Value;
+        type Type;
+        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Index = Unset;
-        type Type = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
-        type Index = Set<members::index>;
-        type Type = S::Type;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Index = S::Index;
-        type Type = Set<members::r#type>;
-        type Value = S::Value;
+        type Type = Unset;
+        type Index = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Index = S::Index;
-        type Type = S::Type;
         type Value = Set<members::value>;
+        type Type = S::Type;
+        type Index = S::Index;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Value = S::Value;
+        type Type = Set<members::r#type>;
+        type Index = S::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndex<S> {}
+    impl<S: State> State for SetIndex<S> {
+        type Value = S::Value;
+        type Type = S::Type;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `index` field
-        pub struct index(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `index` field
+        pub struct index(());
     }
 }
 
@@ -443,9 +442,9 @@ where
 impl<'a, S> EntityBuilder<'a, S>
 where
     S: entity_state::State,
-    S::Index: entity_state::IsSet,
-    S::Type: entity_state::IsSet,
     S::Value: entity_state::IsSet,
+    S::Type: entity_state::IsSet,
+    S::Index: entity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entity<'a> {

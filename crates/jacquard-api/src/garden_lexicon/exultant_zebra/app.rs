@@ -30,7 +30,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "garden.lexicon.exultant-zebra.app",
+    tag = "$type"
+)]
 pub struct App<'a> {
     ///An optional description of the application.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -119,37 +123,37 @@ pub mod app_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Distributions;
         type Name;
+        type Distributions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Distributions = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `distributions` field to Set
-    pub struct SetDistributions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDistributions<S> {}
-    impl<S: State> State for SetDistributions<S> {
-        type Distributions = Set<members::distributions>;
-        type Name = S::Name;
+        type Distributions = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Distributions = S::Distributions;
         type Name = Set<members::name>;
+        type Distributions = S::Distributions;
+    }
+    ///State transition - sets the `distributions` field to Set
+    pub struct SetDistributions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDistributions<S> {}
+    impl<S: State> State for SetDistributions<S> {
+        type Name = S::Name;
+        type Distributions = Set<members::distributions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `distributions` field
-        pub struct distributions(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `distributions` field
+        pub struct distributions(());
     }
 }
 
@@ -232,8 +236,8 @@ where
 impl<'a, S> AppBuilder<'a, S>
 where
     S: app_state::State,
-    S::Distributions: app_state::IsSet,
     S::Name: app_state::IsSet,
+    S::Distributions: app_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> App<'a> {

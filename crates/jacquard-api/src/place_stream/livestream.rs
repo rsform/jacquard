@@ -59,7 +59,7 @@ pub struct LivestreamView<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "place.stream.livestream", tag = "$type")]
 pub struct Livestream<'a> {
     ///The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -135,8 +135,7 @@ pub struct StreamplaceAnything<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum StreamplaceAnythingLivestream<'a> {
     #[serde(rename = "place.stream.livestream#livestreamView")]
     LivestreamView(Box<livestream::LivestreamView<'a>>),
@@ -411,85 +410,85 @@ pub mod livestream_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Uri;
+        type Record;
         type Cid;
-        type Author;
         type IndexedAt;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Uri = Unset;
+        type Record = Unset;
         type Cid = Unset;
-        type Author = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
+        type Author = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
         type Uri = Set<members::uri>;
+        type Record = S::Record;
         type Cid = S::Cid;
-        type Author = S::Author;
         type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
         type Uri = S::Uri;
+        type Record = S::Record;
         type Cid = Set<members::cid>;
+        type IndexedAt = S::IndexedAt;
         type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = Set<members::author>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Record = S::Record;
         type Uri = S::Uri;
+        type Record = S::Record;
         type Cid = S::Cid;
-        type Author = S::Author;
         type IndexedAt = Set<members::indexed_at>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
@@ -642,11 +641,11 @@ impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
 impl<'a, S> LivestreamViewBuilder<'a, S>
 where
     S: livestream_view_state::State,
-    S::Record: livestream_view_state::IsSet,
     S::Uri: livestream_view_state::IsSet,
+    S::Record: livestream_view_state::IsSet,
     S::Cid: livestream_view_state::IsSet,
-    S::Author: livestream_view_state::IsSet,
     S::IndexedAt: livestream_view_state::IsSet,
+    S::Author: livestream_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LivestreamView<'a> {
@@ -1448,67 +1447,67 @@ pub mod teleport_arrival_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ViewerCount;
         type Source;
-        type TeleportUri;
         type StartsAt;
+        type TeleportUri;
+        type ViewerCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ViewerCount = Unset;
         type Source = Unset;
-        type TeleportUri = Unset;
         type StartsAt = Unset;
-    }
-    ///State transition - sets the `viewer_count` field to Set
-    pub struct SetViewerCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetViewerCount<S> {}
-    impl<S: State> State for SetViewerCount<S> {
-        type ViewerCount = Set<members::viewer_count>;
-        type Source = S::Source;
-        type TeleportUri = S::TeleportUri;
-        type StartsAt = S::StartsAt;
+        type TeleportUri = Unset;
+        type ViewerCount = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type ViewerCount = S::ViewerCount;
         type Source = Set<members::source>;
+        type StartsAt = S::StartsAt;
         type TeleportUri = S::TeleportUri;
-        type StartsAt = S::StartsAt;
-    }
-    ///State transition - sets the `teleport_uri` field to Set
-    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
-    impl<S: State> State for SetTeleportUri<S> {
         type ViewerCount = S::ViewerCount;
-        type Source = S::Source;
-        type TeleportUri = Set<members::teleport_uri>;
-        type StartsAt = S::StartsAt;
     }
     ///State transition - sets the `starts_at` field to Set
     pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartsAt<S> {}
     impl<S: State> State for SetStartsAt<S> {
-        type ViewerCount = S::ViewerCount;
         type Source = S::Source;
-        type TeleportUri = S::TeleportUri;
         type StartsAt = Set<members::starts_at>;
+        type TeleportUri = S::TeleportUri;
+        type ViewerCount = S::ViewerCount;
+    }
+    ///State transition - sets the `teleport_uri` field to Set
+    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
+    impl<S: State> State for SetTeleportUri<S> {
+        type Source = S::Source;
+        type StartsAt = S::StartsAt;
+        type TeleportUri = Set<members::teleport_uri>;
+        type ViewerCount = S::ViewerCount;
+    }
+    ///State transition - sets the `viewer_count` field to Set
+    pub struct SetViewerCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetViewerCount<S> {}
+    impl<S: State> State for SetViewerCount<S> {
+        type Source = S::Source;
+        type StartsAt = S::StartsAt;
+        type TeleportUri = S::TeleportUri;
+        type ViewerCount = Set<members::viewer_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `viewer_count` field
-        pub struct viewer_count(());
         ///Marker type for the `source` field
         pub struct source(());
-        ///Marker type for the `teleport_uri` field
-        pub struct teleport_uri(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
+        ///Marker type for the `teleport_uri` field
+        pub struct teleport_uri(());
+        ///Marker type for the `viewer_count` field
+        pub struct viewer_count(());
     }
 }
 
@@ -1635,10 +1634,10 @@ where
 impl<'a, S> TeleportArrivalBuilder<'a, S>
 where
     S: teleport_arrival_state::State,
-    S::ViewerCount: teleport_arrival_state::IsSet,
     S::Source: teleport_arrival_state::IsSet,
-    S::TeleportUri: teleport_arrival_state::IsSet,
     S::StartsAt: teleport_arrival_state::IsSet,
+    S::TeleportUri: teleport_arrival_state::IsSet,
+    S::ViewerCount: teleport_arrival_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeleportArrival<'a> {
@@ -1677,37 +1676,37 @@ pub mod teleport_canceled_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reason;
         type TeleportUri;
+        type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reason = Unset;
         type TeleportUri = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type TeleportUri = S::TeleportUri;
+        type Reason = Unset;
     }
     ///State transition - sets the `teleport_uri` field to Set
     pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
     impl<S: State> State for SetTeleportUri<S> {
-        type Reason = S::Reason;
         type TeleportUri = Set<members::teleport_uri>;
+        type Reason = S::Reason;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type TeleportUri = S::TeleportUri;
+        type Reason = Set<members::reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `teleport_uri` field
         pub struct teleport_uri(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
     }
 }
 
@@ -1777,8 +1776,8 @@ where
 impl<'a, S> TeleportCanceledBuilder<'a, S>
 where
     S: teleport_canceled_state::State,
-    S::Reason: teleport_canceled_state::IsSet,
     S::TeleportUri: teleport_canceled_state::IsSet,
+    S::Reason: teleport_canceled_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeleportCanceled<'a> {

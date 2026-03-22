@@ -245,67 +245,67 @@ pub mod merge_check_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Patch;
-        type Branch;
+        type Did;
         type Name;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Patch = Unset;
-        type Branch = Unset;
+        type Did = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Patch = S::Patch;
-        type Branch = S::Branch;
-        type Name = S::Name;
+        type Branch = Unset;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPatch<S> {}
     impl<S: State> State for SetPatch<S> {
-        type Did = S::Did;
         type Patch = Set<members::patch>;
-        type Branch = S::Branch;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
         type Did = S::Did;
-        type Patch = S::Patch;
-        type Branch = Set<members::branch>;
         type Name = S::Name;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Patch = S::Patch;
+        type Did = Set<members::did>;
+        type Name = S::Name;
+        type Branch = S::Branch;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Did = S::Did;
         type Patch = S::Patch;
-        type Branch = S::Branch;
+        type Did = S::Did;
         type Name = Set<members::name>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Patch = S::Patch;
+        type Did = S::Did;
+        type Name = S::Name;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `patch` field
         pub struct patch(());
-        ///Marker type for the `branch` field
-        pub struct branch(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
@@ -418,10 +418,10 @@ where
 impl<'a, S> MergeCheckBuilder<'a, S>
 where
     S: merge_check_state::State,
-    S::Did: merge_check_state::IsSet,
     S::Patch: merge_check_state::IsSet,
-    S::Branch: merge_check_state::IsSet,
+    S::Did: merge_check_state::IsSet,
     S::Name: merge_check_state::IsSet,
+    S::Branch: merge_check_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MergeCheck<'a> {

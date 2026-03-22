@@ -30,7 +30,7 @@ use crate::app_protoimsg::chat::room;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.protoimsg.chat.room", tag = "$type")]
 pub struct Room<'a> {
     ///Broad category for room discovery (e.g., music, tech, gaming). Lowercased.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -428,66 +428,66 @@ pub mod room_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Purpose;
+        type Topic;
         type Name;
         type CreatedAt;
-        type Topic;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Purpose = Unset;
+        type Topic = Unset;
         type Name = Unset;
         type CreatedAt = Unset;
-        type Topic = Unset;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
         type Purpose = Set<members::purpose>;
+        type Topic = S::Topic;
         type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Topic = S::Topic;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Purpose = S::Purpose;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Topic = S::Topic;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Purpose = S::Purpose;
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type Topic = S::Topic;
     }
     ///State transition - sets the `topic` field to Set
     pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
         type Purpose = S::Purpose;
+        type Topic = Set<members::topic>;
         type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Topic = Set<members::topic>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Purpose = S::Purpose;
+        type Topic = S::Topic;
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Purpose = S::Purpose;
+        type Topic = S::Topic;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `purpose` field
         pub struct purpose(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
     }
 }
 
@@ -643,9 +643,9 @@ impl<'a, S> RoomBuilder<'a, S>
 where
     S: room_state::State,
     S::Purpose: room_state::IsSet,
+    S::Topic: room_state::IsSet,
     S::Name: room_state::IsSet,
     S::CreatedAt: room_state::IsSet,
-    S::Topic: room_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Room<'a> {

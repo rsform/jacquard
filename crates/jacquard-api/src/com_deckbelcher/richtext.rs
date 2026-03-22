@@ -67,8 +67,7 @@ pub struct Document<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum DocumentContentItem<'a> {
     #[serde(rename = "com.deckbelcher.richtext#paragraphBlock")]
     ParagraphBlock(Box<richtext::ParagraphBlock<'a>>),
@@ -131,8 +130,7 @@ pub struct ListItem<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ListItemSublist<'a> {
     #[serde(rename = "com.deckbelcher.richtext#bulletListBlock")]
     BulletListBlock(Box<richtext::BulletListBlock<'a>>),

@@ -42,6 +42,48 @@
         }
       }
     },
+    "enrollment": {
+      "type": "object",
+      "description": "An enrollment event indicating a user has enrolled or unenrolled from the service.",
+      "required": [
+        "did",
+        "action",
+        "time"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "The enrollment action.",
+          "maxLength": 32,
+          "knownValues": [
+            "enroll",
+            "unenroll"
+          ]
+        },
+        "boundaries": {
+          "type": "array",
+          "description": "The boundaries assigned to the user.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "did": {
+          "type": "string",
+          "description": "The DID of the user.",
+          "format": "did"
+        },
+        "service": {
+          "type": "string",
+          "description": "The Stratos service endpoint URL.",
+          "format": "uri"
+        },
+        "time": {
+          "type": "string",
+          "description": "Timestamp of the enrollment event.",
+          "format": "datetime"
+        }
+      }
+    },
     "info": {
       "type": "object",
       "description": "An informational message about the subscription state.",
@@ -66,12 +108,9 @@
     },
     "main": {
       "type": "subscription",
-      "description": "Subscribe to stratos record updates for a specific account. Requires service auth or owner authentication.",
+      "description": "Subscribe to stratos events. When 'did' is provided, subscribes to record updates for that account. When omitted, subscribes to service-level events (enrollments). AppViews must provide a signed service JWT via syncToken.",
       "parameters": {
         "type": "params",
-        "required": [
-          "did"
-        ],
         "properties": {
           "cursor": {
             "type": "integer",
@@ -79,13 +118,17 @@
           },
           "did": {
             "type": "string",
-            "description": "The DID of the account to subscribe to.",
+            "description": "The DID of the account to subscribe to. If omitted, subscribes to service-level enrollment events.",
             "format": "did"
           },
           "domain": {
             "type": "string",
             "description": "Optional domain filter. Only events for records with this domain in their boundary will be emitted.",
             "maxLength": 253
+          },
+          "syncToken": {
+            "type": "string",
+            "description": "Signed service JWT for AppView authentication. Must include iss, aud, exp, and lxm claims. Required for service callers; owner callers may use the Authorization header instead."
           }
         }
       },
@@ -94,6 +137,7 @@
           "type": "union",
           "refs": [
             "#commit",
+            "#enrollment",
             "#info"
           ]
         }

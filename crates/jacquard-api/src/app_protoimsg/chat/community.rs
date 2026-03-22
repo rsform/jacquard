@@ -61,7 +61,11 @@ pub struct CommunityMember<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.protoimsg.chat.community",
+    tag = "$type"
+)]
 pub struct Community<'a> {
     ///Named groups of community members, like AIM's buddy list categories.
     #[serde(borrow)]
@@ -210,37 +214,37 @@ pub mod community_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Members;
         type Name;
+        type Members;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Members = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `members` field to Set
-    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMembers<S> {}
-    impl<S: State> State for SetMembers<S> {
-        type Members = Set<members::members>;
-        type Name = S::Name;
+        type Members = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Members = S::Members;
         type Name = Set<members::name>;
+        type Members = S::Members;
+    }
+    ///State transition - sets the `members` field to Set
+    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMembers<S> {}
+    impl<S: State> State for SetMembers<S> {
+        type Name = S::Name;
+        type Members = Set<members::members>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `members` field
-        pub struct members(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `members` field
+        pub struct members(());
     }
 }
 
@@ -327,8 +331,8 @@ where
 impl<'a, S> CommunityGroupBuilder<'a, S>
 where
     S: community_group_state::State,
-    S::Members: community_group_state::IsSet,
     S::Name: community_group_state::IsSet,
+    S::Members: community_group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CommunityGroup<'a> {
@@ -499,37 +503,37 @@ pub mod community_member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
         type Did;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type AddedAt = Set<members::added_at>;
-        type Did = S::Did;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type AddedAt = S::AddedAt;
         type Did = Set<members::did>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Did = S::Did;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
@@ -599,8 +603,8 @@ where
 impl<'a, S> CommunityMemberBuilder<'a, S>
 where
     S: community_member_state::State,
-    S::AddedAt: community_member_state::IsSet,
     S::Did: community_member_state::IsSet,
+    S::AddedAt: community_member_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CommunityMember<'a> {

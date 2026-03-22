@@ -28,7 +28,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "diy.razorgirl.winter.note", tag = "$type")]
 pub struct Note<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -165,8 +165,8 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
+        type CreatedAt;
         type Title;
         type LastUpdated;
     }
@@ -174,26 +174,26 @@ pub mod note_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
         type Title = Unset;
         type LastUpdated = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Title = S::Title;
-        type LastUpdated = S::LastUpdated;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
         type Title = S::Title;
         type LastUpdated = S::LastUpdated;
     }
@@ -201,8 +201,8 @@ pub mod note_state {
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
         type LastUpdated = S::LastUpdated;
     }
@@ -210,18 +210,18 @@ pub mod note_state {
     pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
     impl<S: State> State for SetLastUpdated<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `last_updated` field
@@ -380,8 +380,8 @@ where
 impl<'a, S> NoteBuilder<'a, S>
 where
     S: note_state::State,
-    S::CreatedAt: note_state::IsSet,
     S::Content: note_state::IsSet,
+    S::CreatedAt: note_state::IsSet,
     S::Title: note_state::IsSet,
     S::LastUpdated: note_state::IsSet,
 {

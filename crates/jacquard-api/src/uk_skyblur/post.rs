@@ -37,7 +37,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "uk.skyblur.post", tag = "$type")]
 pub struct Post<'a> {
     ///The post additional contents.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -204,8 +204,8 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Visibility;
         type CreatedAt;
+        type Visibility;
         type Text;
         type Uri;
     }
@@ -213,26 +213,26 @@ pub mod post_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Visibility = Unset;
         type CreatedAt = Unset;
+        type Visibility = Unset;
         type Text = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type CreatedAt = S::CreatedAt;
-        type Text = S::Text;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Visibility = S::Visibility;
         type CreatedAt = Set<members::created_at>;
+        type Visibility = S::Visibility;
+        type Text = S::Text;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type CreatedAt = S::CreatedAt;
+        type Visibility = Set<members::visibility>;
         type Text = S::Text;
         type Uri = S::Uri;
     }
@@ -240,8 +240,8 @@ pub mod post_state {
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Visibility = S::Visibility;
         type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
         type Text = Set<members::text>;
         type Uri = S::Uri;
     }
@@ -249,18 +249,18 @@ pub mod post_state {
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Visibility = S::Visibility;
         type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
         type Text = S::Text;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `uri` field
@@ -405,8 +405,8 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Visibility: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
+    S::Visibility: post_state::IsSet,
     S::Text: post_state::IsSet,
     S::Uri: post_state::IsSet,
 {

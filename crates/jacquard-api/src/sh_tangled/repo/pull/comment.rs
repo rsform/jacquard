@@ -28,7 +28,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.repo.pull.comment",
+    tag = "$type"
+)]
 pub struct Comment<'a> {
     #[serde(borrow)]
     pub body: CowStr<'a>,
@@ -118,49 +122,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pull;
         type Body;
+        type Pull;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pull = Unset;
         type Body = Unset;
+        type Pull = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `pull` field to Set
-    pub struct SetPull<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPull<S> {}
-    impl<S: State> State for SetPull<S> {
-        type Pull = Set<members::pull>;
-        type Body = S::Body;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
-        type Pull = S::Pull;
         type Body = Set<members::body>;
+        type Pull = S::Pull;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `pull` field to Set
+    pub struct SetPull<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPull<S> {}
+    impl<S: State> State for SetPull<S> {
+        type Body = S::Body;
+        type Pull = Set<members::pull>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Pull = S::Pull;
         type Body = S::Body;
+        type Pull = S::Pull;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pull` field
-        pub struct pull(());
         ///Marker type for the `body` field
         pub struct body(());
+        ///Marker type for the `pull` field
+        pub struct pull(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -283,8 +287,8 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Pull: comment_state::IsSet,
     S::Body: comment_state::IsSet,
+    S::Pull: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct

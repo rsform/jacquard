@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "net.anisota.feed.like", tag = "$type")]
 pub struct Like<'a> {
     ///Client-declared timestamp when this like was created.
     pub created_at: Datetime,

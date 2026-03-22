@@ -23,16 +23,20 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A declaration of a Bluesky account profile.
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.bsky.actor.profile",
+    tag = "$type"
+)]
 pub struct Profile<'a> {
     ///Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -85,9 +89,7 @@ pub struct ProfileGetRecordOutput<'a> {
 }
 
 impl<'a> Profile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ProfileRecord>, UriError> {
+    pub fn uri(uri: impl Into<CowStr<'a>>) -> Result<RecordUri<'a, ProfileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
@@ -147,25 +149,20 @@ impl<'a> LexiconSchema for Profile<'a> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -187,25 +184,20 @@ impl<'a> LexiconSchema for Profile<'a> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -283,7 +275,7 @@ impl<'a> LexiconSchema for Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -403,18 +395,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `joinedViaStarterPack` field (optional)
-    pub fn joined_via_starter_pack(
-        mut self,
-        value: impl Into<Option<StrongRef<'a>>>,
-    ) -> Self {
+    pub fn joined_via_starter_pack(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `joinedViaStarterPack` field to an Option value (optional)
-    pub fn maybe_joined_via_starter_pack(
-        mut self,
-        value: Option<StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_joined_via_starter_pack(mut self, value: Option<StrongRef<'a>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -517,10 +503,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_actor_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.actor.profile"),

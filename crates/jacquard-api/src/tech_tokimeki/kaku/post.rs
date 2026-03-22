@@ -32,7 +32,7 @@ use crate::tech_tokimeki::kaku::AspectRatio;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "tech.tokimeki.kaku.post", tag = "$type")]
 pub struct Post<'a> {
     ///Aspect ratio of the image
     #[serde(borrow)]

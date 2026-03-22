@@ -31,7 +31,7 @@ use crate::buzz_bookhive::BookProgress;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "buzz.bookhive.book", tag = "$type")]
 pub struct Book<'a> {
     ///The authors of the book (tab separated)
     #[serde(borrow)]

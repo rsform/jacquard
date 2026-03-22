@@ -369,37 +369,37 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AspectRatio;
         type Image;
+        type AspectRatio;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AspectRatio = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `aspect_ratio` field to Set
-    pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
-    impl<S: State> State for SetAspectRatio<S> {
-        type AspectRatio = Set<members::aspect_ratio>;
-        type Image = S::Image;
+        type AspectRatio = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type AspectRatio = S::AspectRatio;
         type Image = Set<members::image>;
+        type AspectRatio = S::AspectRatio;
+    }
+    ///State transition - sets the `aspect_ratio` field to Set
+    pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
+    impl<S: State> State for SetAspectRatio<S> {
+        type Image = S::Image;
+        type AspectRatio = Set<members::aspect_ratio>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `aspect_ratio` field
-        pub struct aspect_ratio(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `aspect_ratio` field
+        pub struct aspect_ratio(());
     }
 }
 
@@ -482,8 +482,8 @@ where
 impl<'a, S> ImageBuilder<'a, S>
 where
     S: image_state::State,
-    S::AspectRatio: image_state::IsSet,
     S::Image: image_state::IsSet,
+    S::AspectRatio: image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Image<'a> {

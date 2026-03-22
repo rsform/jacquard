@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.stream.broadcast.origin",
+    tag = "$type"
+)]
 pub struct Origin<'a> {
     ///did of the broadcaster that operates the server syndicating the livestream
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -139,50 +143,50 @@ pub mod origin_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Streamer;
-        type UpdatedAt;
         type Server;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Streamer = Unset;
-        type UpdatedAt = Unset;
         type Server = Unset;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
         type Streamer = Set<members::streamer>;
+        type Server = S::Server;
         type UpdatedAt = S::UpdatedAt;
-        type Server = S::Server;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Streamer = S::Streamer;
-        type UpdatedAt = Set<members::updated_at>;
-        type Server = S::Server;
     }
     ///State transition - sets the `server` field to Set
     pub struct SetServer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServer<S> {}
     impl<S: State> State for SetServer<S> {
         type Streamer = S::Streamer;
-        type UpdatedAt = S::UpdatedAt;
         type Server = Set<members::server>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Streamer = S::Streamer;
+        type Server = S::Server;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `streamer` field
         pub struct streamer(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `server` field
         pub struct server(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -318,8 +322,8 @@ impl<'a, S> OriginBuilder<'a, S>
 where
     S: origin_state::State,
     S::Streamer: origin_state::IsSet,
-    S::UpdatedAt: origin_state::IsSet,
     S::Server: origin_state::IsSet,
+    S::UpdatedAt: origin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Origin<'a> {

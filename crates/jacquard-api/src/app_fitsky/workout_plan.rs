@@ -31,7 +31,7 @@ use crate::app_fitsky::workout_plan;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.fitsky.workoutPlan", tag = "$type")]
 pub struct WorkoutPlan<'a> {
     pub created_at: Datetime,
     #[serde(borrow)]
@@ -353,67 +353,67 @@ pub mod workout_plan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Type;
         type Exercises;
+        type Type;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Type = Unset;
         type Exercises = Unset;
+        type Type = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
-        type Exercises = S::Exercises;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Exercises = S::Exercises;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `exercises` field to Set
     pub struct SetExercises<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExercises<S> {}
     impl<S: State> State for SetExercises<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
         type Exercises = Set<members::exercises>;
+        type Type = S::Type;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Exercises = S::Exercises;
+        type Type = Set<members::r#type>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
         type Exercises = S::Exercises;
+        type Type = S::Type;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Exercises = S::Exercises;
+        type Type = S::Type;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `exercises` field
         pub struct exercises(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -540,10 +540,10 @@ where
 impl<'a, S> WorkoutPlanBuilder<'a, S>
 where
     S: workout_plan_state::State,
-    S::CreatedAt: workout_plan_state::IsSet,
-    S::Type: workout_plan_state::IsSet,
     S::Exercises: workout_plan_state::IsSet,
+    S::Type: workout_plan_state::IsSet,
     S::Name: workout_plan_state::IsSet,
+    S::CreatedAt: workout_plan_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WorkoutPlan<'a> {

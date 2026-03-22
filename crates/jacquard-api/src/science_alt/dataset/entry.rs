@@ -52,7 +52,7 @@ pub struct DatasetSize<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "science.alt.dataset.entry", tag = "$type")]
 pub struct Entry<'a> {
     ///Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -98,8 +98,7 @@ pub struct Entry<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EntryStorage<'a> {
     #[serde(rename = "science.alt.dataset.storageHttp")]
     StorageHttp(Box<StorageHttp<'a>>),
@@ -587,8 +586,8 @@ pub mod entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type SchemaRef;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
         type Storage;
     }
     /// Empty state - all required fields are unset
@@ -596,8 +595,8 @@ pub mod entry_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type SchemaRef = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
         type Storage = Unset;
     }
     ///State transition - sets the `schema_ref` field to Set
@@ -605,17 +604,8 @@ pub mod entry_state {
     impl<S: State> sealed::Sealed for SetSchemaRef<S> {}
     impl<S: State> State for SetSchemaRef<S> {
         type SchemaRef = Set<members::schema_ref>;
+        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Storage = S::Storage;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SchemaRef = S::SchemaRef;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
         type Storage = S::Storage;
     }
     ///State transition - sets the `name` field to Set
@@ -623,8 +613,17 @@ pub mod entry_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type SchemaRef = S::SchemaRef;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type Storage = S::Storage;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SchemaRef = S::SchemaRef;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
         type Storage = S::Storage;
     }
     ///State transition - sets the `storage` field to Set
@@ -632,8 +631,8 @@ pub mod entry_state {
     impl<S: State> sealed::Sealed for SetStorage<S> {}
     impl<S: State> State for SetStorage<S> {
         type SchemaRef = S::SchemaRef;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Storage = Set<members::storage>;
     }
     /// Marker types for field names
@@ -641,10 +640,10 @@ pub mod entry_state {
     pub mod members {
         ///Marker type for the `schema_ref` field
         pub struct schema_ref(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `storage` field
         pub struct storage(());
     }
@@ -858,8 +857,8 @@ impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
     S::SchemaRef: entry_state::IsSet,
-    S::CreatedAt: entry_state::IsSet,
     S::Name: entry_state::IsSet,
+    S::CreatedAt: entry_state::IsSet,
     S::Storage: entry_state::IsSet,
 {
     /// Build the final struct

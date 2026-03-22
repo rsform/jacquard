@@ -30,7 +30,7 @@ use crate::social_psky::chat::room;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "social.psky.chat.room", tag = "$type")]
 pub struct Room<'a> {
     ///List of users allowed to send messages in the room.
     #[serde(skip_serializing_if = "Option::is_none")]

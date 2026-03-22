@@ -56,7 +56,11 @@ pub struct ImageLink<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.shinolabs.pinksea.oekaki",
+    tag = "$type"
+)]
 pub struct Oekaki<'a> {
     ///The timestamp of creation.
     pub created_at: Datetime,
@@ -230,37 +234,37 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ImageLink;
         type Blob;
+        type ImageLink;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ImageLink = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `image_link` field to Set
-    pub struct SetImageLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImageLink<S> {}
-    impl<S: State> State for SetImageLink<S> {
-        type ImageLink = Set<members::image_link>;
-        type Blob = S::Blob;
+        type ImageLink = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
-        type ImageLink = S::ImageLink;
         type Blob = Set<members::blob>;
+        type ImageLink = S::ImageLink;
+    }
+    ///State transition - sets the `image_link` field to Set
+    pub struct SetImageLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImageLink<S> {}
+    impl<S: State> State for SetImageLink<S> {
+        type Blob = S::Blob;
+        type ImageLink = Set<members::image_link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image_link` field
-        pub struct image_link(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `image_link` field
+        pub struct image_link(());
     }
 }
 
@@ -330,8 +334,8 @@ where
 impl<'a, S> ImageBuilder<'a, S>
 where
     S: image_state::State,
-    S::ImageLink: image_state::IsSet,
     S::Blob: image_state::IsSet,
+    S::ImageLink: image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Image<'a> {

@@ -33,7 +33,11 @@ use crate::org_okazu_diary::feed::Tag;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.okazu-diary.feed.collectionItem",
+    tag = "$type"
+)]
 pub struct CollectionItem<'a> {
     ///Reference to the collection record (`org.okazu-diary.feed.collection`).
     #[serde(borrow)]
@@ -163,51 +167,51 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type CreatedAt;
         type Subjects;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type CreatedAt = Unset;
         type Subjects = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type CreatedAt = S::CreatedAt;
-        type Subjects = S::Subjects;
+        type Collection = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Collection = S::Collection;
         type CreatedAt = Set<members::created_at>;
         type Subjects = S::Subjects;
+        type Collection = S::Collection;
     }
     ///State transition - sets the `subjects` field to Set
     pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjects<S> {}
     impl<S: State> State for SetSubjects<S> {
-        type Collection = S::Collection;
         type CreatedAt = S::CreatedAt;
         type Subjects = Set<members::subjects>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subjects = S::Subjects;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subjects` field
         pub struct subjects(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -342,9 +346,9 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
-    S::Collection: collection_item_state::IsSet,
     S::CreatedAt: collection_item_state::IsSet,
     S::Subjects: collection_item_state::IsSet,
+    S::Collection: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {

@@ -31,7 +31,7 @@ use crate::app_greengale::blog::VoiceTheme;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.greengale.publication", tag = "$type")]
 pub struct Publication<'a> {
     ///Publication description
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -31,7 +31,7 @@ use crate::fyi_questionable::richtext::content::Content;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "fyi.questionable.answer", tag = "$type")]
 pub struct Answer<'a> {
     #[serde(borrow)]
     pub content: Content<'a>,
@@ -128,51 +128,51 @@ pub mod answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Question;
         type Content;
+        type Question;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Question = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Question = S::Question;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type CreatedAt = S::CreatedAt;
-        type Question = Set<members::question>;
-        type Content = S::Content;
+        type Question = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Question = S::Question;
         type Content = Set<members::content>;
+        type Question = S::Question;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type Content = S::Content;
+        type Question = Set<members::question>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type Question = S::Question;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `question` field
-        pub struct question(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `question` field
+        pub struct question(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -279,9 +279,9 @@ where
 impl<'a, S> AnswerBuilder<'a, S>
 where
     S: answer_state::State,
-    S::CreatedAt: answer_state::IsSet,
-    S::Question: answer_state::IsSet,
     S::Content: answer_state::IsSet,
+    S::Question: answer_state::IsSet,
+    S::CreatedAt: answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Answer<'a> {

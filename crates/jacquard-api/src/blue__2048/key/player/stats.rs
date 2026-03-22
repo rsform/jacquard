@@ -30,7 +30,7 @@ use crate::blue__2048::key::Key;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.2048.key.player.stats", tag = "$type")]
 pub struct Stats<'a> {
     pub created_at: Datetime,
     ///A did:key that is used to verify an at://2048 authority has verified this players stats to a certain degree

@@ -313,51 +313,51 @@ pub mod repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
         type Did;
         type Head;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
         type Did = Unset;
         type Head = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Rev = Set<members::rev>;
-        type Did = S::Did;
-        type Head = S::Head;
+        type Rev = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Rev = S::Rev;
         type Did = Set<members::did>;
         type Head = S::Head;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `head` field to Set
     pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHead<S> {}
     impl<S: State> State for SetHead<S> {
-        type Rev = S::Rev;
         type Did = S::Did;
         type Head = Set<members::head>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Did = S::Did;
+        type Head = S::Head;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `head` field
         pub struct head(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -478,9 +478,9 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 impl<'a, S> RepoBuilder<'a, S>
 where
     S: repo_state::State,
-    S::Rev: repo_state::IsSet,
     S::Did: repo_state::IsSet,
     S::Head: repo_state::IsSet,
+    S::Rev: repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Repo<'a> {

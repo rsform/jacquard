@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.stormlightlabs.malfestio.deck",
+    tag = "$type"
+)]
 pub struct Deck<'a> {
     ///Ordered list of references to cards in this deck.
     #[serde(skip_serializing_if = "Option::is_none")]

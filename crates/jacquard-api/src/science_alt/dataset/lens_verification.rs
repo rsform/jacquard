@@ -46,7 +46,11 @@ pub struct CodeHash<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "science.alt.dataset.lensVerification",
+    tag = "$type"
+)]
 pub struct LensVerification<'a> {
     ///Hash of the code at the referenced commit. Required for signedHash method.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -379,67 +383,67 @@ pub mod lens_verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type VerificationMethod;
-        type CreatedAt;
         type Lens;
         type LensCommit;
+        type VerificationMethod;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type VerificationMethod = Unset;
-        type CreatedAt = Unset;
         type Lens = Unset;
         type LensCommit = Unset;
-    }
-    ///State transition - sets the `verification_method` field to Set
-    pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
-    impl<S: State> State for SetVerificationMethod<S> {
-        type VerificationMethod = Set<members::verification_method>;
-        type CreatedAt = S::CreatedAt;
-        type Lens = S::Lens;
-        type LensCommit = S::LensCommit;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type VerificationMethod = S::VerificationMethod;
-        type CreatedAt = Set<members::created_at>;
-        type Lens = S::Lens;
-        type LensCommit = S::LensCommit;
+        type VerificationMethod = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `lens` field to Set
     pub struct SetLens<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLens<S> {}
     impl<S: State> State for SetLens<S> {
-        type VerificationMethod = S::VerificationMethod;
-        type CreatedAt = S::CreatedAt;
         type Lens = Set<members::lens>;
         type LensCommit = S::LensCommit;
+        type VerificationMethod = S::VerificationMethod;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `lens_commit` field to Set
     pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLensCommit<S> {}
     impl<S: State> State for SetLensCommit<S> {
-        type VerificationMethod = S::VerificationMethod;
-        type CreatedAt = S::CreatedAt;
         type Lens = S::Lens;
         type LensCommit = Set<members::lens_commit>;
+        type VerificationMethod = S::VerificationMethod;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `verification_method` field to Set
+    pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
+    impl<S: State> State for SetVerificationMethod<S> {
+        type Lens = S::Lens;
+        type LensCommit = S::LensCommit;
+        type VerificationMethod = Set<members::verification_method>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Lens = S::Lens;
+        type LensCommit = S::LensCommit;
+        type VerificationMethod = S::VerificationMethod;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `verification_method` field
-        pub struct verification_method(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `lens` field
         pub struct lens(());
         ///Marker type for the `lens_commit` field
         pub struct lens_commit(());
+        ///Marker type for the `verification_method` field
+        pub struct verification_method(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -600,10 +604,10 @@ where
 impl<'a, S> LensVerificationBuilder<'a, S>
 where
     S: lens_verification_state::State,
-    S::VerificationMethod: lens_verification_state::IsSet,
-    S::CreatedAt: lens_verification_state::IsSet,
     S::Lens: lens_verification_state::IsSet,
     S::LensCommit: lens_verification_state::IsSet,
+    S::VerificationMethod: lens_verification_state::IsSet,
+    S::CreatedAt: lens_verification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LensVerification<'a> {

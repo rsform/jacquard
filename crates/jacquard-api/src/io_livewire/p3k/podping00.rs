@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.livewire.p3k.podping00", tag = "$type")]
 pub struct Podping00<'a> {
     ///The timestamp of when the podping was created.
     pub created_at: Datetime,

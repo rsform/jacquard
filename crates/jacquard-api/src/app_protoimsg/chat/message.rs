@@ -146,7 +146,7 @@ pub struct Link<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.protoimsg.chat.message", tag = "$type")]
 pub struct Message<'a> {
     ///AT-URI of the channel record this message belongs to.
     #[serde(borrow)]
@@ -173,8 +173,7 @@ pub struct Message<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum MessageEmbed<'a> {
     #[serde(rename = "app.protoimsg.chat.message#imageEmbed")]
     ImageEmbed(Box<message::ImageEmbed<'a>>),
@@ -237,8 +236,7 @@ pub struct RichTextFacet<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum RichTextFacetFeaturesItem<'a> {
     #[serde(rename = "app.protoimsg.chat.message#mention")]
     Mention(Box<message::Mention<'a>>),
@@ -935,37 +933,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
         type Height = Set<members::height>;
+        type Width = S::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Height = S::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
@@ -1035,8 +1033,8 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
     S::Height: aspect_ratio_state::IsSet,
+    S::Width: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
@@ -1659,37 +1657,37 @@ pub mod byte_slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ByteStart;
         type ByteEnd;
+        type ByteStart;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ByteStart = Unset;
         type ByteEnd = Unset;
-    }
-    ///State transition - sets the `byte_start` field to Set
-    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteStart<S> {}
-    impl<S: State> State for SetByteStart<S> {
-        type ByteStart = Set<members::byte_start>;
-        type ByteEnd = S::ByteEnd;
+        type ByteStart = Unset;
     }
     ///State transition - sets the `byte_end` field to Set
     pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetByteEnd<S> {}
     impl<S: State> State for SetByteEnd<S> {
-        type ByteStart = S::ByteStart;
         type ByteEnd = Set<members::byte_end>;
+        type ByteStart = S::ByteStart;
+    }
+    ///State transition - sets the `byte_start` field to Set
+    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetByteStart<S> {}
+    impl<S: State> State for SetByteStart<S> {
+        type ByteEnd = S::ByteEnd;
+        type ByteStart = Set<members::byte_start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `byte_start` field
-        pub struct byte_start(());
         ///Marker type for the `byte_end` field
         pub struct byte_end(());
+        ///Marker type for the `byte_start` field
+        pub struct byte_start(());
     }
 }
 
@@ -1759,8 +1757,8 @@ where
 impl<'a, S> ByteSliceBuilder<'a, S>
 where
     S: byte_slice_state::State,
-    S::ByteStart: byte_slice_state::IsSet,
     S::ByteEnd: byte_slice_state::IsSet,
+    S::ByteStart: byte_slice_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ByteSlice<'a> {
@@ -2803,37 +2801,37 @@ pub mod rich_text_facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Features;
         type Index;
+        type Features;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Features = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Features = Set<members::features>;
-        type Index = S::Index;
+        type Features = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Features = S::Features;
         type Index = Set<members::index>;
+        type Features = S::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeatures<S> {}
+    impl<S: State> State for SetFeatures<S> {
+        type Index = S::Index;
+        type Features = Set<members::features>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `features` field
-        pub struct features(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `features` field
+        pub struct features(());
     }
 }
 
@@ -2906,8 +2904,8 @@ where
 impl<'a, S> RichTextFacetBuilder<'a, S>
 where
     S: rich_text_facet_state::State,
-    S::Features: rich_text_facet_state::IsSet,
     S::Index: rich_text_facet_state::IsSet,
+    S::Features: rich_text_facet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RichTextFacet<'a> {

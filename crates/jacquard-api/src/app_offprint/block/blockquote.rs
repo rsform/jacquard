@@ -35,8 +35,7 @@ pub struct Blockquote<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum BlockquoteContentItem<'a> {
     #[serde(rename = "app.offprint.block.text")]
     Text(Box<Text<'a>>),

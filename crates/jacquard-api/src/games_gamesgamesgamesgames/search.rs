@@ -83,8 +83,7 @@ pub struct SearchOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum SearchOutputResultsItem<'a> {
     #[serde(rename = "games.gamesgamesgamesgames.defs#gameSummaryView")]
     GameSummaryView(Box<GameSummaryView<'a>>),

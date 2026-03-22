@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "eu.atchef.recipe", tag = "$type")]
 pub struct Recipe<'a> {
     ///Recipe content in Cooklang format
     #[serde(borrow)]
@@ -287,49 +287,49 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Content;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Content = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Name = S::Name;
         type Content = Set<members::content>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Content = S::Content;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Content = S::Content;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -522,8 +522,8 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S> RecipeBuilder<'a, S>
 where
     S: recipe_state::State,
-    S::Name: recipe_state::IsSet,
     S::Content: recipe_state::IsSet,
+    S::Name: recipe_state::IsSet,
     S::CreatedAt: recipe_state::IsSet,
 {
     /// Build the final struct

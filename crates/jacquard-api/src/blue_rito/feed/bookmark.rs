@@ -47,7 +47,7 @@ pub struct Locale<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.rito.feed.bookmark", tag = "$type")]
 pub struct Bookmark<'a> {
     ///Title and comment in different languages.
     #[serde(borrow)]
@@ -395,51 +395,51 @@ pub mod bookmark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Comments;
         type Subject;
         type CreatedAt;
-        type Comments;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Comments = Unset;
         type Subject = Unset;
         type CreatedAt = Unset;
-        type Comments = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
-        type Comments = S::Comments;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type CreatedAt = Set<members::created_at>;
-        type Comments = S::Comments;
     }
     ///State transition - sets the `comments` field to Set
     pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComments<S> {}
     impl<S: State> State for SetComments<S> {
+        type Comments = Set<members::comments>;
         type Subject = S::Subject;
         type CreatedAt = S::CreatedAt;
-        type Comments = Set<members::comments>;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Comments = S::Comments;
+        type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Comments = S::Comments;
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `comments` field
+        pub struct comments(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `comments` field
-        pub struct comments(());
     }
 }
 
@@ -588,9 +588,9 @@ impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
 impl<'a, S> BookmarkBuilder<'a, S>
 where
     S: bookmark_state::State,
+    S::Comments: bookmark_state::IsSet,
     S::Subject: bookmark_state::IsSet,
     S::CreatedAt: bookmark_state::IsSet,
-    S::Comments: bookmark_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bookmark<'a> {

@@ -54,7 +54,11 @@ pub struct Interactions<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "garden.lexicon.exultant-zebra.tile",
+    tag = "$type"
+)]
 pub struct Tile<'a> {
     ///Declared aspect ratio for tile rendering.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -200,8 +204,7 @@ impl jacquard_common::IntoStatic for TileAspectRatio<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum TileContent<'a> {
     #[serde(rename = "garden.lexicon.exultant-zebra.masl#resource")]
     MaslResource(Box<Resource<'a>>),
@@ -806,37 +809,37 @@ pub mod tile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Content;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Content = S::Content;
+        type Name = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Name = S::Name;
         type Content = Set<members::content>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Content = S::Content;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1013,8 +1016,8 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 impl<'a, S> TileBuilder<'a, S>
 where
     S: tile_state::State,
-    S::Name: tile_state::IsSet,
     S::Content: tile_state::IsSet,
+    S::Name: tile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tile<'a> {

@@ -203,49 +203,49 @@ pub mod source_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Vary;
+        type Subject;
         type Service;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Vary = Unset;
+        type Subject = Unset;
         type Service = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Vary = S::Vary;
-        type Service = S::Service;
     }
     ///State transition - sets the `vary` field to Set
     pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVary<S> {}
     impl<S: State> State for SetVary<S> {
-        type Subject = S::Subject;
         type Vary = Set<members::vary>;
+        type Subject = S::Subject;
+        type Service = S::Service;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Vary = S::Vary;
+        type Subject = Set<members::subject>;
         type Service = S::Service;
     }
     ///State transition - sets the `service` field to Set
     pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetService<S> {}
     impl<S: State> State for SetService<S> {
-        type Subject = S::Subject;
         type Vary = S::Vary;
+        type Subject = S::Subject;
         type Service = Set<members::service>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `vary` field
         pub struct vary(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `service` field
         pub struct service(());
     }
@@ -340,8 +340,8 @@ where
 impl<'a, S> SourceBuilder<'a, S>
 where
     S: source_state::State,
-    S::Subject: source_state::IsSet,
     S::Vary: source_state::IsSet,
+    S::Subject: source_state::IsSet,
     S::Service: source_state::IsSet,
 {
     /// Build the final struct
@@ -492,37 +492,37 @@ pub mod subject_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -592,8 +592,8 @@ where
 impl<'a, S> SubjectRefBuilder<'a, S>
 where
     S: subject_ref_state::State,
-    S::Uri: subject_ref_state::IsSet,
     S::Cid: subject_ref_state::IsSet,
+    S::Uri: subject_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubjectRef<'a> {

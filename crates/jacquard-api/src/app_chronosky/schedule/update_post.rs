@@ -107,8 +107,7 @@ pub struct UpdatePost<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum UpdatePostEmbed<'a> {
     #[serde(rename = "app.chronosky.schedule.updatePost#imagesEmbed")]
     ImagesEmbed(Box<update_post::ImagesEmbed<'a>>),
@@ -127,8 +126,7 @@ pub enum UpdatePostEmbed<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum UpdatePostThreadgateRulesItem<'a> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     ThreadgateMentionRule(Box<MentionRule<'a>>),

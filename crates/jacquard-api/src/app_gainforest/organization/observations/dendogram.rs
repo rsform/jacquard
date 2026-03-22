@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.gainforest.organization.observations.dendogram",
+    tag = "$type"
+)]
 pub struct Dendogram<'a> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
@@ -114,37 +118,37 @@ pub mod dendogram_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Dendogram;
         type CreatedAt;
+        type Dendogram;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Dendogram = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `dendogram` field to Set
-    pub struct SetDendogram<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDendogram<S> {}
-    impl<S: State> State for SetDendogram<S> {
-        type Dendogram = Set<members::dendogram>;
-        type CreatedAt = S::CreatedAt;
+        type Dendogram = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Dendogram = S::Dendogram;
         type CreatedAt = Set<members::created_at>;
+        type Dendogram = S::Dendogram;
+    }
+    ///State transition - sets the `dendogram` field to Set
+    pub struct SetDendogram<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDendogram<S> {}
+    impl<S: State> State for SetDendogram<S> {
+        type CreatedAt = S::CreatedAt;
+        type Dendogram = Set<members::dendogram>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `dendogram` field
-        pub struct dendogram(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `dendogram` field
+        pub struct dendogram(());
     }
 }
 
@@ -214,8 +218,8 @@ where
 impl<'a, S> DendogramBuilder<'a, S>
 where
     S: dendogram_state::State,
-    S::Dendogram: dendogram_state::IsSet,
     S::CreatedAt: dendogram_state::IsSet,
+    S::Dendogram: dendogram_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Dendogram<'a> {

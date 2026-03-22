@@ -30,7 +30,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.okazu-diary.material.collectionItem",
+    tag = "$type"
+)]
 pub struct CollectionItem<'a> {
     ///Reference to the collection record (`org.okazu-diary.feed.collection`).
     #[serde(borrow)]

@@ -64,7 +64,11 @@ impl core::fmt::Display for Inperson {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "community.lexicon.calendar.event",
+    tag = "$type"
+)]
 pub struct Event<'a> {
     ///Client-declared timestamp when the event was created.
     pub created_at: Datetime,
@@ -102,8 +106,7 @@ pub struct Event<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum EventLocationsItem<'a> {
     #[serde(rename = "community.lexicon.calendar.event#uri")]
     Uri(Box<event::Uri<'a>>),

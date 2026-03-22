@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.juttu.articleLink", tag = "$type")]
 pub struct ArticleLink<'a> {
     ///The site-specific unique identifier for the article (e.g., slug).
     #[serde(borrow)]
@@ -132,49 +132,49 @@ pub mod article_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CommentsThread;
         type ArticleId;
+        type CommentsThread;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CommentsThread = Unset;
         type ArticleId = Unset;
+        type CommentsThread = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `comments_thread` field to Set
-    pub struct SetCommentsThread<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommentsThread<S> {}
-    impl<S: State> State for SetCommentsThread<S> {
-        type CommentsThread = Set<members::comments_thread>;
-        type ArticleId = S::ArticleId;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `article_id` field to Set
     pub struct SetArticleId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArticleId<S> {}
     impl<S: State> State for SetArticleId<S> {
-        type CommentsThread = S::CommentsThread;
         type ArticleId = Set<members::article_id>;
+        type CommentsThread = S::CommentsThread;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `comments_thread` field to Set
+    pub struct SetCommentsThread<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommentsThread<S> {}
+    impl<S: State> State for SetCommentsThread<S> {
+        type ArticleId = S::ArticleId;
+        type CommentsThread = Set<members::comments_thread>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type CommentsThread = S::CommentsThread;
         type ArticleId = S::ArticleId;
+        type CommentsThread = S::CommentsThread;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `comments_thread` field
-        pub struct comments_thread(());
         ///Marker type for the `article_id` field
         pub struct article_id(());
+        ///Marker type for the `comments_thread` field
+        pub struct comments_thread(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -283,8 +283,8 @@ where
 impl<'a, S> ArticleLinkBuilder<'a, S>
 where
     S: article_link_state::State,
-    S::CommentsThread: article_link_state::IsSet,
     S::ArticleId: article_link_state::IsSet,
+    S::CommentsThread: article_link_state::IsSet,
     S::CreatedAt: article_link_state::IsSet,
 {
     /// Build the final struct

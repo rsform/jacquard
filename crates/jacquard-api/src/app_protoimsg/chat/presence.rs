@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.protoimsg.chat.presence", tag = "$type")]
 pub struct Presence<'a> {
     ///Custom away message / status text.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -232,37 +232,37 @@ pub mod presence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type UpdatedAt;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type UpdatedAt = S::UpdatedAt;
+        type Status = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Status = S::Status;
         type UpdatedAt = Set<members::updated_at>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -345,8 +345,8 @@ where
 impl<'a, S> PresenceBuilder<'a, S>
 where
     S: presence_state::State,
-    S::Status: presence_state::IsSet,
     S::UpdatedAt: presence_state::IsSet,
+    S::Status: presence_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Presence<'a> {

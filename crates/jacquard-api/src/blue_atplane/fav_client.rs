@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.atplane.favClient", tag = "$type")]
 pub struct FavClient<'a> {
     ///Set to your favorite client.
     #[serde(borrow)]

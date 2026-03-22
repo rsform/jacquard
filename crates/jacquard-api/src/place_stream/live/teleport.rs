@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "place.stream.live.teleport", tag = "$type")]
 pub struct Teleport<'a> {
     ///The time limit in seconds for the teleport. If not set, the teleport is permanent. Must be at least 60 seconds, and no more than 32,400 seconds (9 hours).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -134,37 +134,37 @@ pub mod teleport_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type StartsAt;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type StartsAt = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type StartsAt = S::StartsAt;
+        type Streamer = Unset;
     }
     ///State transition - sets the `starts_at` field to Set
     pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartsAt<S> {}
     impl<S: State> State for SetStartsAt<S> {
-        type Streamer = S::Streamer;
         type StartsAt = Set<members::starts_at>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type StartsAt = S::StartsAt;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -247,8 +247,8 @@ where
 impl<'a, S> TeleportBuilder<'a, S>
 where
     S: teleport_state::State,
-    S::Streamer: teleport_state::IsSet,
     S::StartsAt: teleport_state::IsSet,
+    S::Streamer: teleport_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Teleport<'a> {

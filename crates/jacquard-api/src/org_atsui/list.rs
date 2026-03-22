@@ -130,37 +130,37 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Query;
         type Did;
+        type Query;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Query = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `query` field to Set
-    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuery<S> {}
-    impl<S: State> State for SetQuery<S> {
-        type Query = Set<members::query>;
-        type Did = S::Did;
+        type Query = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Query = S::Query;
         type Did = Set<members::did>;
+        type Query = S::Query;
+    }
+    ///State transition - sets the `query` field to Set
+    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuery<S> {}
+    impl<S: State> State for SetQuery<S> {
+        type Did = S::Did;
+        type Query = Set<members::query>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `query` field
-        pub struct query(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `query` field
+        pub struct query(());
     }
 }
 
@@ -243,8 +243,8 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Query: list_state::IsSet,
     S::Did: list_state::IsSet,
+    S::Query: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {

@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.weaver.graph.followGate", tag = "$type")]
 pub struct FollowGate<'a> {
     pub created_at: Datetime,
     ///If true, previously auto-accepted follows are invalidated when requireApproval is enabled. Appview should treat followAccept records created before this gate's createdAt as invalid.  Defaults to `false`.

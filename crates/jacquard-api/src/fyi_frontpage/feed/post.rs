@@ -30,7 +30,7 @@ use crate::fyi_frontpage::feed::post;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "fyi.frontpage.feed.post", tag = "$type")]
 pub struct Post<'a> {
     ///Client-declared timestamp when this post was originally created.
     pub created_at: Datetime,

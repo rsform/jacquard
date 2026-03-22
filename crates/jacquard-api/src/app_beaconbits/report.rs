@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.beaconbits.report", tag = "$type")]
 pub struct Report<'a> {
     ///AT URI of the beacon being reported
     #[serde(borrow)]
@@ -255,51 +255,51 @@ pub mod report_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type BeaconUri;
         type Reason;
         type CreatedAt;
-        type BeaconUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type BeaconUri = Unset;
         type Reason = Unset;
         type CreatedAt = Unset;
-        type BeaconUri = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type CreatedAt = S::CreatedAt;
-        type BeaconUri = S::BeaconUri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Reason = S::Reason;
-        type CreatedAt = Set<members::created_at>;
-        type BeaconUri = S::BeaconUri;
     }
     ///State transition - sets the `beacon_uri` field to Set
     pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
     impl<S: State> State for SetBeaconUri<S> {
+        type BeaconUri = Set<members::beacon_uri>;
         type Reason = S::Reason;
         type CreatedAt = S::CreatedAt;
-        type BeaconUri = Set<members::beacon_uri>;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type BeaconUri = S::BeaconUri;
+        type Reason = Set<members::reason>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type BeaconUri = S::BeaconUri;
+        type Reason = S::Reason;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `beacon_uri` field
+        pub struct beacon_uri(());
         ///Marker type for the `reason` field
         pub struct reason(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `beacon_uri` field
-        pub struct beacon_uri(());
     }
 }
 
@@ -406,9 +406,9 @@ where
 impl<'a, S> ReportBuilder<'a, S>
 where
     S: report_state::State,
+    S::BeaconUri: report_state::IsSet,
     S::Reason: report_state::IsSet,
     S::CreatedAt: report_state::IsSet,
-    S::BeaconUri: report_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Report<'a> {

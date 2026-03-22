@@ -32,7 +32,11 @@ use crate::place_stream::metadata::distribution_policy::DistributionPolicy;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.stream.metadata.configuration",
+    tag = "$type"
+)]
 pub struct Configuration<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]

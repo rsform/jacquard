@@ -47,8 +47,7 @@ pub struct Subject<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum SubjectValue<'a> {
     #[serde(rename = "org.okazu-diary.embed.external")]
     External(Box<External<'a>>),

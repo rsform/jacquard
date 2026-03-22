@@ -28,7 +28,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.tangled.pipeline.status", tag = "$type")]
 pub struct Status<'a> {
     ///time of creation of this status update
     pub created_at: Datetime,

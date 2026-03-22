@@ -30,7 +30,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.rocksky.radio", tag = "$type")]
 pub struct Radio<'a> {
     ///The date when the radio station was created.
     pub created_at: Datetime,
@@ -325,51 +325,51 @@ pub mod radio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
         type Url;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Url = S::Url;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
         type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
         type Url = Set<members::url>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Url = S::Url;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -518,9 +518,9 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
 impl<'a, S> RadioBuilder<'a, S>
 where
     S: radio_state::State,
-    S::CreatedAt: radio_state::IsSet,
     S::Name: radio_state::IsSet,
     S::Url: radio_state::IsSet,
+    S::CreatedAt: radio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Radio<'a> {

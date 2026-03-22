@@ -323,51 +323,51 @@ pub mod split_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Order;
-        type Duration;
         type Distance;
+        type Duration;
+        type Order;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Order = Unset;
-        type Duration = Unset;
         type Distance = Unset;
-    }
-    ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type Order = Set<members::order>;
-        type Duration = S::Duration;
-        type Distance = S::Distance;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Order = S::Order;
-        type Duration = Set<members::duration>;
-        type Distance = S::Distance;
+        type Duration = Unset;
+        type Order = Unset;
     }
     ///State transition - sets the `distance` field to Set
     pub struct SetDistance<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDistance<S> {}
     impl<S: State> State for SetDistance<S> {
-        type Order = S::Order;
-        type Duration = S::Duration;
         type Distance = Set<members::distance>;
+        type Duration = S::Duration;
+        type Order = S::Order;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Distance = S::Distance;
+        type Duration = Set<members::duration>;
+        type Order = S::Order;
+    }
+    ///State transition - sets the `order` field to Set
+    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrder<S> {}
+    impl<S: State> State for SetOrder<S> {
+        type Distance = S::Distance;
+        type Duration = S::Duration;
+        type Order = Set<members::order>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `order` field
-        pub struct order(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `distance` field
         pub struct distance(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `order` field
+        pub struct order(());
     }
 }
 
@@ -456,9 +456,9 @@ where
 impl<'a, S> SplitBuilder<'a, S>
 where
     S: split_state::State,
-    S::Order: split_state::IsSet,
-    S::Duration: split_state::IsSet,
     S::Distance: split_state::IsSet,
+    S::Duration: split_state::IsSet,
+    S::Order: split_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Split<'a> {

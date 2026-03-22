@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "io.kich.accomplishment", tag = "$type")]
 pub struct Accomplishment<'a> {
     pub created_at: Datetime,
     ///Optional free-form metadata for extra accomplishment context.
@@ -116,37 +116,37 @@ pub mod accomplishment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Type;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
         type Type = Set<members::r#type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Type = S::Type;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -229,8 +229,8 @@ where
 impl<'a, S> AccomplishmentBuilder<'a, S>
 where
     S: accomplishment_state::State,
-    S::CreatedAt: accomplishment_state::IsSet,
     S::Type: accomplishment_state::IsSet,
+    S::CreatedAt: accomplishment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Accomplishment<'a> {

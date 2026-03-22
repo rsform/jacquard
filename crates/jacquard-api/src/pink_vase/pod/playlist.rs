@@ -30,7 +30,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "pink.vase.pod.playlist", tag = "$type")]
 pub struct Playlist<'a> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -245,51 +245,51 @@ pub mod playlist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Items;
         type Name;
         type CreatedAt;
+        type Items;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Items = Unset;
         type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
-        type Items = Set<members::items>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
+        type Items = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Items = S::Items;
         type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
+        type Items = S::Items;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Items = S::Items;
         type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Items = S::Items;
+    }
+    ///State transition - sets the `items` field to Set
+    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItems<S> {}
+    impl<S: State> State for SetItems<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Items = Set<members::items>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `items` field
-        pub struct items(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `items` field
+        pub struct items(());
     }
 }
 
@@ -413,9 +413,9 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 impl<'a, S> PlaylistBuilder<'a, S>
 where
     S: playlist_state::State,
-    S::Items: playlist_state::IsSet,
     S::Name: playlist_state::IsSet,
     S::CreatedAt: playlist_state::IsSet,
+    S::Items: playlist_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Playlist<'a> {

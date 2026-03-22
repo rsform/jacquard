@@ -85,51 +85,51 @@ pub mod get_stripe_intent_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Id;
         type Amount;
         type Iss;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Id = Unset;
         type Amount = Unset;
         type Iss = Unset;
-        type Id = Unset;
-    }
-    ///State transition - sets the `amount` field to Set
-    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmount<S> {}
-    impl<S: State> State for SetAmount<S> {
-        type Amount = Set<members::amount>;
-        type Iss = S::Iss;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `iss` field to Set
-    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIss<S> {}
-    impl<S: State> State for SetIss<S> {
-        type Amount = S::Amount;
-        type Iss = Set<members::iss>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
         type Amount = S::Amount;
         type Iss = S::Iss;
-        type Id = Set<members::id>;
+    }
+    ///State transition - sets the `amount` field to Set
+    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmount<S> {}
+    impl<S: State> State for SetAmount<S> {
+        type Id = S::Id;
+        type Amount = Set<members::amount>;
+        type Iss = S::Iss;
+    }
+    ///State transition - sets the `iss` field to Set
+    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIss<S> {}
+    impl<S: State> State for SetIss<S> {
+        type Id = S::Id;
+        type Amount = S::Amount;
+        type Iss = Set<members::iss>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `amount` field
         pub struct amount(());
         ///Marker type for the `iss` field
         pub struct iss(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
@@ -231,9 +231,9 @@ impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
 impl<'a, S> GetStripeIntentBuilder<'a, S>
 where
     S: get_stripe_intent_state::State,
+    S::Id: get_stripe_intent_state::IsSet,
     S::Amount: get_stripe_intent_state::IsSet,
     S::Iss: get_stripe_intent_state::IsSet,
-    S::Id: get_stripe_intent_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetStripeIntent<'a> {

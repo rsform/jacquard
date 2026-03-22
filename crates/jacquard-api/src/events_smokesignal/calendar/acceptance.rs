@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "events.smokesignal.calendar.acceptance",
+    tag = "$type"
+)]
 pub struct Acceptance<'a> {
     ///The CID (Content Identifier) of the rsvp that this proof validates.
     #[serde(borrow)]

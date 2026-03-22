@@ -42,7 +42,11 @@ pub struct Intent<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.user-intents.demo.declaration",
+    tag = "$type"
+)]
 pub struct Declaration<'a> {
     ///Inclusion of account data in bulk 'snapshot' datasets which are publicly redistributed, even if only for a fixed time period
     #[serde(skip_serializing_if = "Option::is_none")]

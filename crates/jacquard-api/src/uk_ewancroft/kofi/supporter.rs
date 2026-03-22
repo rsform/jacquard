@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "uk.ewancroft.kofi.supporter", tag = "$type")]
 pub struct Supporter<'a> {
     ///Display name from Ko-fi.
     #[serde(borrow)]

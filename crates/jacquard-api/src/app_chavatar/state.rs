@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.chavatar.state", tag = "$type")]
 pub struct State<'a> {
     ///TID (ID) of the currently active avatar in the settings array.
     #[serde(borrow)]
@@ -124,37 +124,37 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cursor;
         type LastUpdated;
+        type Cursor;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cursor = Unset;
         type LastUpdated = Unset;
-    }
-    ///State transition - sets the `cursor` field to Set
-    pub struct SetCursor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCursor<S> {}
-    impl<S: State> State for SetCursor<S> {
-        type Cursor = Set<members::cursor>;
-        type LastUpdated = S::LastUpdated;
+        type Cursor = Unset;
     }
     ///State transition - sets the `last_updated` field to Set
     pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
     impl<S: State> State for SetLastUpdated<S> {
-        type Cursor = S::Cursor;
         type LastUpdated = Set<members::last_updated>;
+        type Cursor = S::Cursor;
+    }
+    ///State transition - sets the `cursor` field to Set
+    pub struct SetCursor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCursor<S> {}
+    impl<S: State> State for SetCursor<S> {
+        type LastUpdated = S::LastUpdated;
+        type Cursor = Set<members::cursor>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cursor` field
-        pub struct cursor(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
+        ///Marker type for the `cursor` field
+        pub struct cursor(());
     }
 }
 
@@ -224,8 +224,8 @@ where
 impl<'a, S> StateBuilder<'a, S>
 where
     S: state_state::State,
-    S::Cursor: state_state::IsSet,
     S::LastUpdated: state_state::IsSet,
+    S::Cursor: state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> State<'a> {

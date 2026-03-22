@@ -34,7 +34,7 @@ use crate::sh_tangled::repo::pull;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "sh.tangled.repo.pull", tag = "$type")]
 pub struct Pull<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -241,67 +241,67 @@ pub mod pull_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type PatchBlob;
         type Target;
+        type PatchBlob;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type PatchBlob = Unset;
         type Target = Unset;
+        type PatchBlob = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type PatchBlob = S::PatchBlob;
-        type Target = S::Target;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `patch_blob` field to Set
-    pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
-    impl<S: State> State for SetPatchBlob<S> {
-        type Title = S::Title;
-        type PatchBlob = Set<members::patch_blob>;
-        type Target = S::Target;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type Title = S::Title;
-        type PatchBlob = S::PatchBlob;
         type Target = Set<members::target>;
+        type PatchBlob = S::PatchBlob;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `patch_blob` field to Set
+    pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
+    impl<S: State> State for SetPatchBlob<S> {
+        type Target = S::Target;
+        type PatchBlob = Set<members::patch_blob>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type PatchBlob = S::PatchBlob;
         type Target = S::Target;
+        type PatchBlob = S::PatchBlob;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Target = S::Target;
+        type PatchBlob = S::PatchBlob;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `patch_blob` field
-        pub struct patch_blob(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `patch_blob` field
+        pub struct patch_blob(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -484,10 +484,10 @@ where
 impl<'a, S> PullBuilder<'a, S>
 where
     S: pull_state::State,
-    S::Title: pull_state::IsSet,
-    S::PatchBlob: pull_state::IsSet,
     S::Target: pull_state::IsSet,
+    S::PatchBlob: pull_state::IsSet,
     S::CreatedAt: pull_state::IsSet,
+    S::Title: pull_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pull<'a> {
@@ -699,37 +699,37 @@ pub mod target_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Branch;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Branch = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Branch = S::Branch;
+        type Repo = Unset;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBranch<S> {}
     impl<S: State> State for SetBranch<S> {
-        type Repo = S::Repo;
         type Branch = Set<members::branch>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Branch = S::Branch;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `branch` field
         pub struct branch(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -799,8 +799,8 @@ where
 impl<'a, S> TargetBuilder<'a, S>
 where
     S: target_state::State,
-    S::Repo: target_state::IsSet,
     S::Branch: target_state::IsSet,
+    S::Repo: target_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Target<'a> {

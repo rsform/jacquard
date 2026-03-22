@@ -30,7 +30,7 @@ use crate::blue__2048::SyncStatus;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "blue.2048.player.profile", tag = "$type")]
 pub struct Profile<'a> {
     pub created_at: Datetime,
     ///Does not want to show up anywhere. Keep stats to your PDS.  Defaults to `false`.

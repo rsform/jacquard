@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "social.pmsky.vote", tag = "$type")]
 pub struct Vote<'a> {
     ///The persistent, anonymous identifier for the user casting the vote.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -134,65 +134,65 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cts;
         type Uri;
         type Src;
-        type Cts;
         type Val;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cts = Unset;
         type Uri = Unset;
         type Src = Unset;
-        type Cts = Unset;
         type Val = Unset;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Cts = Set<members::cts>;
+        type Uri = S::Uri;
+        type Src = S::Src;
+        type Val = S::Val;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Cts = S::Cts;
         type Uri = Set<members::uri>;
         type Src = S::Src;
-        type Cts = S::Cts;
         type Val = S::Val;
     }
     ///State transition - sets the `src` field to Set
     pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrc<S> {}
     impl<S: State> State for SetSrc<S> {
+        type Cts = S::Cts;
         type Uri = S::Uri;
         type Src = Set<members::src>;
-        type Cts = S::Cts;
-        type Val = S::Val;
-    }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCts<S> {}
-    impl<S: State> State for SetCts<S> {
-        type Uri = S::Uri;
-        type Src = S::Src;
-        type Cts = Set<members::cts>;
         type Val = S::Val;
     }
     ///State transition - sets the `val` field to Set
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
+        type Cts = S::Cts;
         type Uri = S::Uri;
         type Src = S::Src;
-        type Cts = S::Cts;
         type Val = Set<members::val>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cts` field
+        pub struct cts(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `src` field
         pub struct src(());
-        ///Marker type for the `cts` field
-        pub struct cts(());
         ///Marker type for the `val` field
         pub struct val(());
     }
@@ -363,9 +363,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
+    S::Cts: vote_state::IsSet,
     S::Uri: vote_state::IsSet,
     S::Src: vote_state::IsSet,
-    S::Cts: vote_state::IsSet,
     S::Val: vote_state::IsSet,
 {
     /// Build the final struct

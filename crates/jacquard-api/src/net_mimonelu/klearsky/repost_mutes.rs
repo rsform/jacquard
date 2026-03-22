@@ -30,7 +30,11 @@ use crate::net_mimonelu::klearsky::repost_mutes;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.mimonelu.klearsky.repostMutes",
+    tag = "$type"
+)]
 pub struct RepostMutes<'a> {
     ///Timestamp when this record was created (or last rewritten).
     pub created_at: Datetime,

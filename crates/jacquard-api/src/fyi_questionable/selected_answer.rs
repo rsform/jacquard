@@ -30,7 +30,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "fyi.questionable.selectedAnswer",
+    tag = "$type"
+)]
 pub struct SelectedAnswer<'a> {
     #[serde(borrow)]
     pub answer_ref: StrongRef<'a>,

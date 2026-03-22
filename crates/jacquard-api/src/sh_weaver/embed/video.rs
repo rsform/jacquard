@@ -72,8 +72,7 @@ pub struct Video<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum VideoDimensions<'a> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
     AspectRatio(Box<AspectRatio<'a>>),
@@ -109,8 +108,7 @@ pub struct View<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ViewDimensions<'a> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
     AspectRatio(Box<AspectRatio<'a>>),

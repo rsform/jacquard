@@ -30,7 +30,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "fyi.unravel.frontpage.comment",
+    tag = "$type"
+)]
 pub struct Comment<'a> {
     ///The content of the comment.
     #[serde(borrow)]

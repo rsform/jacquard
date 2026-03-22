@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "social.drydown.review", tag = "$type")]
 pub struct Review<'a> {
     ///Final: Depth and evolution (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -370,37 +370,37 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fragrance;
         type CreatedAt;
+        type Fragrance;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fragrance = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `fragrance` field to Set
-    pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFragrance<S> {}
-    impl<S: State> State for SetFragrance<S> {
-        type Fragrance = Set<members::fragrance>;
-        type CreatedAt = S::CreatedAt;
+        type Fragrance = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Fragrance = S::Fragrance;
         type CreatedAt = Set<members::created_at>;
+        type Fragrance = S::Fragrance;
+    }
+    ///State transition - sets the `fragrance` field to Set
+    pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFragrance<S> {}
+    impl<S: State> State for SetFragrance<S> {
+        type CreatedAt = S::CreatedAt;
+        type Fragrance = Set<members::fragrance>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fragrance` field
-        pub struct fragrance(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `fragrance` field
+        pub struct fragrance(());
     }
 }
 
@@ -746,8 +746,8 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::Fragrance: review_state::IsSet,
     S::CreatedAt: review_state::IsSet,
+    S::Fragrance: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {

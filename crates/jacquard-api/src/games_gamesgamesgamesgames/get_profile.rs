@@ -44,8 +44,7 @@ pub struct GetProfileOutput<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum GetProfileOutputProfile<'a> {
     #[serde(rename = "games.gamesgamesgamesgames.defs#actorProfileDetailView")]
     ActorProfileDetailView(Box<ActorProfileDetailView<'a>>),

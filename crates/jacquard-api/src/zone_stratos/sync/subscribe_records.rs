@@ -15,7 +15,7 @@ use jacquard_common::CowStr;
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::types::cid::CidLink;
-use jacquard_common::types::string::{Did, Tid, Datetime};
+use jacquard_common::types::string::{Did, Tid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -43,6 +43,120 @@ pub struct Commit<'a> {
     pub seq: i64,
     ///Timestamp of when the event was sequenced.
     pub time: Datetime,
+}
+
+/// An enrollment event indicating a user has enrolled or unenrolled from the service.
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase")]
+pub struct Enrollment<'a> {
+    ///The enrollment action.
+    #[serde(borrow)]
+    pub action: EnrollmentAction<'a>,
+    ///The boundaries assigned to the user.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(borrow)]
+    pub boundaries: Option<Vec<CowStr<'a>>>,
+    ///The DID of the user.
+    #[serde(borrow)]
+    pub did: Did<'a>,
+    ///The Stratos service endpoint URL.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(borrow)]
+    pub service: Option<UriValue<'a>>,
+    ///Timestamp of the enrollment event.
+    pub time: Datetime,
+}
+
+/// The enrollment action.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EnrollmentAction<'a> {
+    Enroll,
+    Unenroll,
+    Other(CowStr<'a>),
+}
+
+impl<'a> EnrollmentAction<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Enroll => "enroll",
+            Self::Unenroll => "unenroll",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for EnrollmentAction<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "enroll" => Self::Enroll,
+            "unenroll" => Self::Unenroll,
+            _ => Self::Other(CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for EnrollmentAction<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "enroll" => Self::Enroll,
+            "unenroll" => Self::Unenroll,
+            _ => Self::Other(CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for EnrollmentAction<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for EnrollmentAction<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for EnrollmentAction<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for EnrollmentAction<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for EnrollmentAction<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for EnrollmentAction<'_> {
+    type Output = EnrollmentAction<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EnrollmentAction::Enroll => EnrollmentAction::Enroll,
+            EnrollmentAction::Unenroll => EnrollmentAction::Unenroll,
+            EnrollmentAction::Other(v) => EnrollmentAction::Other(v.into_static()),
+        }
+    }
 }
 
 /// An informational message about the subscription state.
@@ -151,12 +265,16 @@ impl jacquard_common::IntoStatic for InfoName<'_> {
 pub struct SubscribeRecords<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Option<Did<'a>>,
     ///(max length: 253)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
     pub domain: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(borrow)]
+    pub sync_token: Option<CowStr<'a>>,
 }
 
 
@@ -167,6 +285,8 @@ pub struct SubscribeRecords<'a> {
 pub enum SubscribeRecordsMessage<'a> {
     #[serde(rename = "#commit")]
     Commit(Box<subscribe_records::Commit<'a>>),
+    #[serde(rename = "#enrollment")]
+    Enrollment(Box<subscribe_records::Enrollment<'a>>),
     #[serde(rename = "#info")]
     Info(Box<subscribe_records::Info<'a>>),
 }
@@ -185,6 +305,12 @@ impl<'a> SubscribeRecordsMessage<'a> {
                     body,
                 )?;
                 Ok(Self::Commit(Box::new(variant)))
+            }
+            "#enrollment" => {
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
+                Ok(Self::Enrollment(Box::new(variant)))
             }
             "#info" => {
                 let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
@@ -380,6 +506,32 @@ impl<'a> LexiconSchema for Commit<'a> {
     }
 }
 
+impl<'a> LexiconSchema for Enrollment<'a> {
+    fn nsid() -> &'static str {
+        "zone.stratos.sync.subscribeRecords"
+    }
+    fn def_name() -> &'static str {
+        "enrollment"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_zone_stratos_sync_subscribeRecords()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        {
+            let value = &self.action;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("action"),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 impl<'a> LexiconSchema for Info<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.sync.subscribeRecords"
@@ -487,85 +639,85 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Seq;
         type Ops;
         type Time;
-        type Rev;
         type Did;
-        type Seq;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Seq = Unset;
         type Ops = Unset;
         type Time = Unset;
-        type Rev = Unset;
         type Did = Unset;
-        type Seq = Unset;
-    }
-    ///State transition - sets the `ops` field to Set
-    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOps<S> {}
-    impl<S: State> State for SetOps<S> {
-        type Ops = Set<members::ops>;
-        type Time = S::Time;
-        type Rev = S::Rev;
-        type Did = S::Did;
-        type Seq = S::Seq;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Ops = S::Ops;
-        type Time = Set<members::time>;
-        type Rev = S::Rev;
-        type Did = S::Did;
-        type Seq = S::Seq;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Ops = S::Ops;
-        type Time = S::Time;
-        type Rev = Set<members::rev>;
-        type Did = S::Did;
-        type Seq = S::Seq;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Ops = S::Ops;
-        type Time = S::Time;
-        type Rev = S::Rev;
-        type Did = Set<members::did>;
-        type Seq = S::Seq;
+        type Rev = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeq<S> {}
     impl<S: State> State for SetSeq<S> {
+        type Seq = Set<members::seq>;
         type Ops = S::Ops;
         type Time = S::Time;
-        type Rev = S::Rev;
         type Did = S::Did;
-        type Seq = Set<members::seq>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `ops` field to Set
+    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOps<S> {}
+    impl<S: State> State for SetOps<S> {
+        type Seq = S::Seq;
+        type Ops = Set<members::ops>;
+        type Time = S::Time;
+        type Did = S::Did;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
+        type Ops = S::Ops;
+        type Time = Set<members::time>;
+        type Did = S::Did;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Seq = S::Seq;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Did = Set<members::did>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Seq = S::Seq;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Did = S::Did;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `seq` field
+        pub struct seq(());
         ///Marker type for the `ops` field
         pub struct ops(());
         ///Marker type for the `time` field
         pub struct time(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `seq` field
-        pub struct seq(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -698,11 +850,11 @@ where
 impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
+    S::Seq: commit_state::IsSet,
     S::Ops: commit_state::IsSet,
     S::Time: commit_state::IsSet,
-    S::Rev: commit_state::IsSet,
     S::Did: commit_state::IsSet,
-    S::Seq: commit_state::IsSet,
+    S::Rev: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
@@ -816,6 +968,80 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("enrollment"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "An enrollment event indicating a user has enrolled or unenrolled from the service.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("did"), SmolStr::new_static("action"),
+                            SmolStr::new_static("time")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("action"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("The enrollment action."),
+                                ),
+                                max_length: Some(32usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("boundaries"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static("The boundaries assigned to the user."),
+                                ),
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("The DID of the user."),
+                                ),
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("service"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("The Stratos service endpoint URL."),
+                                ),
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("time"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Timestamp of the enrollment event."),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("info"),
                 LexUserType::Object(LexObject {
                     description: Some(
@@ -859,7 +1085,6 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                 LexUserType::XrpcSubscription(LexXrpcSubscription {
                     parameters: Some(
                         LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("did")]),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = BTreeMap::new();
@@ -874,7 +1099,7 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                                     LexXrpcParametersProperty::String(LexString {
                                         description: Some(
                                             CowStr::new_static(
-                                                "The DID of the account to subscribe to.",
+                                                "The DID of the account to subscribe to. If omitted, subscribes to service-level enrollment events.",
                                             ),
                                         ),
                                         format: Some(LexStringFormat::Did),
@@ -890,6 +1115,17 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                                             ),
                                         ),
                                         max_length: Some(253usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("syncToken"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Signed service JWT for AppView authentication. Must include iss, aud, exp, and lxm claims. Required for service callers; owner callers may use the Authorization header instead.",
+                                            ),
+                                        ),
                                         ..Default::default()
                                     }),
                                 );
@@ -956,7 +1192,7 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
     }
 }
 
-pub mod subscribe_records_state {
+pub mod enrollment_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
@@ -966,32 +1202,225 @@ pub mod subscribe_records_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Time;
+        type Action;
         type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Time = Unset;
+        type Action = Unset;
         type Did = Unset;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Time = Set<members::time>;
+        type Action = S::Action;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Time = S::Time;
+        type Action = Set<members::action>;
+        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
+        type Time = S::Time;
+        type Action = S::Action;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `time` field
+        pub struct time(());
+        ///Marker type for the `action` field
+        pub struct action(());
         ///Marker type for the `did` field
         pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
+pub struct EnrollmentBuilder<'a, S: enrollment_state::State> {
+    _state: PhantomData<fn() -> S>,
+    _fields: (
+        Option<EnrollmentAction<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Did<'a>>,
+        Option<UriValue<'a>>,
+        Option<Datetime>,
+    ),
+    _lifetime: PhantomData<&'a ()>,
+}
+
+impl<'a> Enrollment<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EnrollmentBuilder<'a, enrollment_state::Empty> {
+        EnrollmentBuilder::new()
+    }
+}
+
+impl<'a> EnrollmentBuilder<'a, enrollment_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EnrollmentBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EnrollmentBuilder<'a, S>
+where
+    S: enrollment_state::State,
+    S::Action: enrollment_state::IsUnset,
+{
+    /// Set the `action` field (required)
+    pub fn action(
+        mut self,
+        value: impl Into<EnrollmentAction<'a>>,
+    ) -> EnrollmentBuilder<'a, enrollment_state::SetAction<S>> {
+        self._fields.0 = Option::Some(value.into());
+        EnrollmentBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
+        }
+    }
+}
+
+impl<'a, S: enrollment_state::State> EnrollmentBuilder<'a, S> {
+    /// Set the `boundaries` field (optional)
+    pub fn boundaries(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `boundaries` field to an Option value (optional)
+    pub fn maybe_boundaries(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<'a, S> EnrollmentBuilder<'a, S>
+where
+    S: enrollment_state::State,
+    S::Did: enrollment_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<Did<'a>>,
+    ) -> EnrollmentBuilder<'a, enrollment_state::SetDid<S>> {
+        self._fields.2 = Option::Some(value.into());
+        EnrollmentBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
+        }
+    }
+}
+
+impl<'a, S: enrollment_state::State> EnrollmentBuilder<'a, S> {
+    /// Set the `service` field (optional)
+    pub fn service(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `service` field to an Option value (optional)
+    pub fn maybe_service(mut self, value: Option<UriValue<'a>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<'a, S> EnrollmentBuilder<'a, S>
+where
+    S: enrollment_state::State,
+    S::Time: enrollment_state::IsUnset,
+{
+    /// Set the `time` field (required)
+    pub fn time(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> EnrollmentBuilder<'a, enrollment_state::SetTime<S>> {
+        self._fields.4 = Option::Some(value.into());
+        EnrollmentBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EnrollmentBuilder<'a, S>
+where
+    S: enrollment_state::State,
+    S::Time: enrollment_state::IsSet,
+    S::Action: enrollment_state::IsSet,
+    S::Did: enrollment_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Enrollment<'a> {
+        Enrollment {
+            action: self._fields.0.unwrap(),
+            boundaries: self._fields.1,
+            did: self._fields.2.unwrap(),
+            service: self._fields.3,
+            time: self._fields.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+    ) -> Enrollment<'a> {
+        Enrollment {
+            action: self._fields.0.unwrap(),
+            boundaries: self._fields.1,
+            did: self._fields.2.unwrap(),
+            service: self._fields.3,
+            time: self._fields.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod subscribe_records_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
 pub struct SubscribeRecordsBuilder<'a, S: subscribe_records_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1007,7 +1436,7 @@ impl<'a> SubscribeRecordsBuilder<'a, subscribe_records_state::Empty> {
     pub fn new() -> Self {
         SubscribeRecordsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _lifetime: PhantomData,
         }
     }
@@ -1026,22 +1455,16 @@ impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SubscribeRecordsBuilder<'a, S>
-where
-    S: subscribe_records_state::State,
-    S::Did: subscribe_records_state::IsUnset,
-{
-    /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<'a>>,
-    ) -> SubscribeRecordsBuilder<'a, subscribe_records_state::SetDid<S>> {
-        self._fields.1 = Option::Some(value.into());
-        SubscribeRecordsBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _lifetime: PhantomData,
-        }
+impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
+    /// Set the `did` field (optional)
+    pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `did` field to an Option value (optional)
+    pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
+        self._fields.1 = value;
+        self
     }
 }
 
@@ -1058,17 +1481,30 @@ impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
     }
 }
 
+impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
+    /// Set the `syncToken` field (optional)
+    pub fn sync_token(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `syncToken` field to an Option value (optional)
+    pub fn maybe_sync_token(mut self, value: Option<CowStr<'a>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
 impl<'a, S> SubscribeRecordsBuilder<'a, S>
 where
     S: subscribe_records_state::State,
-    S::Did: subscribe_records_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubscribeRecords<'a> {
         SubscribeRecords {
             cursor: self._fields.0,
-            did: self._fields.1.unwrap(),
+            did: self._fields.1,
             domain: self._fields.2,
+            sync_token: self._fields.3,
         }
     }
 }

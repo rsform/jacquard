@@ -30,7 +30,11 @@ use crate::net_anisota::beta::game::progress;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.anisota.beta.game.progress",
+    tag = "$type"
+)]
 pub struct Progress<'a> {
     ///URI of the card that was advanced when triggerSource is card_advance
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -345,85 +349,85 @@ pub mod progress_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TotalXp;
+        type ProgressPercentage;
         type XpToNextLevel;
         type Level;
         type CreatedAt;
-        type ProgressPercentage;
+        type TotalXp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TotalXp = Unset;
+        type ProgressPercentage = Unset;
         type XpToNextLevel = Unset;
         type Level = Unset;
         type CreatedAt = Unset;
-        type ProgressPercentage = Unset;
-    }
-    ///State transition - sets the `total_xp` field to Set
-    pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalXp<S> {}
-    impl<S: State> State for SetTotalXp<S> {
-        type TotalXp = Set<members::total_xp>;
-        type XpToNextLevel = S::XpToNextLevel;
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
-    }
-    ///State transition - sets the `xp_to_next_level` field to Set
-    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
-    impl<S: State> State for SetXpToNextLevel<S> {
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = Set<members::xp_to_next_level>;
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = S::XpToNextLevel;
-        type Level = Set<members::level>;
-        type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = S::XpToNextLevel;
-        type Level = S::Level;
-        type CreatedAt = Set<members::created_at>;
-        type ProgressPercentage = S::ProgressPercentage;
+        type TotalXp = Unset;
     }
     ///State transition - sets the `progress_percentage` field to Set
     pub struct SetProgressPercentage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProgressPercentage<S> {}
     impl<S: State> State for SetProgressPercentage<S> {
-        type TotalXp = S::TotalXp;
+        type ProgressPercentage = Set<members::progress_percentage>;
         type XpToNextLevel = S::XpToNextLevel;
         type Level = S::Level;
         type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = Set<members::progress_percentage>;
+        type TotalXp = S::TotalXp;
+    }
+    ///State transition - sets the `xp_to_next_level` field to Set
+    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
+    impl<S: State> State for SetXpToNextLevel<S> {
+        type ProgressPercentage = S::ProgressPercentage;
+        type XpToNextLevel = Set<members::xp_to_next_level>;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalXp = S::TotalXp;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type ProgressPercentage = S::ProgressPercentage;
+        type XpToNextLevel = S::XpToNextLevel;
+        type Level = Set<members::level>;
+        type CreatedAt = S::CreatedAt;
+        type TotalXp = S::TotalXp;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ProgressPercentage = S::ProgressPercentage;
+        type XpToNextLevel = S::XpToNextLevel;
+        type Level = S::Level;
+        type CreatedAt = Set<members::created_at>;
+        type TotalXp = S::TotalXp;
+    }
+    ///State transition - sets the `total_xp` field to Set
+    pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalXp<S> {}
+    impl<S: State> State for SetTotalXp<S> {
+        type ProgressPercentage = S::ProgressPercentage;
+        type XpToNextLevel = S::XpToNextLevel;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalXp = Set<members::total_xp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total_xp` field
-        pub struct total_xp(());
+        ///Marker type for the `progress_percentage` field
+        pub struct progress_percentage(());
         ///Marker type for the `xp_to_next_level` field
         pub struct xp_to_next_level(());
         ///Marker type for the `level` field
         pub struct level(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `progress_percentage` field
-        pub struct progress_percentage(());
+        ///Marker type for the `total_xp` field
+        pub struct total_xp(());
     }
 }
 
@@ -715,11 +719,11 @@ where
 impl<'a, S> ProgressBuilder<'a, S>
 where
     S: progress_state::State,
-    S::TotalXp: progress_state::IsSet,
+    S::ProgressPercentage: progress_state::IsSet,
     S::XpToNextLevel: progress_state::IsSet,
     S::Level: progress_state::IsSet,
     S::CreatedAt: progress_state::IsSet,
-    S::ProgressPercentage: progress_state::IsSet,
+    S::TotalXp: progress_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Progress<'a> {

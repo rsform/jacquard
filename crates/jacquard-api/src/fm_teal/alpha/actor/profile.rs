@@ -45,7 +45,7 @@ pub struct FeaturedItem<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "fm.teal.alpha.actor.profile", tag = "$type")]
 pub struct Profile<'a> {
     ///Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "Option::is_none")]

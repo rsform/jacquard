@@ -32,7 +32,7 @@ use crate::app_certified::location;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.certified.location", tag = "$type")]
 pub struct Location<'a> {
     ///Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
@@ -61,8 +61,7 @@ pub struct Location<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum LocationLocation<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -400,85 +399,85 @@ pub mod location_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Location;
         type LpVersion;
-        type CreatedAt;
-        type LocationType;
+        type Location;
         type Srs;
+        type LocationType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Location = Unset;
         type LpVersion = Unset;
-        type CreatedAt = Unset;
-        type LocationType = Unset;
+        type Location = Unset;
         type Srs = Unset;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocation<S> {}
-    impl<S: State> State for SetLocation<S> {
-        type Location = Set<members::location>;
-        type LpVersion = S::LpVersion;
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
-        type Srs = S::Srs;
+        type LocationType = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `lp_version` field to Set
     pub struct SetLpVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLpVersion<S> {}
     impl<S: State> State for SetLpVersion<S> {
-        type Location = S::Location;
         type LpVersion = Set<members::lp_version>;
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
-        type Srs = S::Srs;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Location = S::Location;
-        type LpVersion = S::LpVersion;
-        type CreatedAt = Set<members::created_at>;
+        type Srs = S::Srs;
         type LocationType = S::LocationType;
-        type Srs = S::Srs;
-    }
-    ///State transition - sets the `location_type` field to Set
-    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocationType<S> {}
-    impl<S: State> State for SetLocationType<S> {
-        type Location = S::Location;
-        type LpVersion = S::LpVersion;
         type CreatedAt = S::CreatedAt;
-        type LocationType = Set<members::location_type>;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocation<S> {}
+    impl<S: State> State for SetLocation<S> {
+        type LpVersion = S::LpVersion;
+        type Location = Set<members::location>;
         type Srs = S::Srs;
+        type LocationType = S::LocationType;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `srs` field to Set
     pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrs<S> {}
     impl<S: State> State for SetSrs<S> {
-        type Location = S::Location;
         type LpVersion = S::LpVersion;
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
+        type Location = S::Location;
         type Srs = Set<members::srs>;
+        type LocationType = S::LocationType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `location_type` field to Set
+    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocationType<S> {}
+    impl<S: State> State for SetLocationType<S> {
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+        type Srs = S::Srs;
+        type LocationType = Set<members::location_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+        type Srs = S::Srs;
+        type LocationType = S::LocationType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `location` field
-        pub struct location(());
         ///Marker type for the `lp_version` field
         pub struct lp_version(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `location_type` field
-        pub struct location_type(());
+        ///Marker type for the `location` field
+        pub struct location(());
         ///Marker type for the `srs` field
         pub struct srs(());
+        ///Marker type for the `location_type` field
+        pub struct location_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -639,11 +638,11 @@ where
 impl<'a, S> LocationBuilder<'a, S>
 where
     S: location_state::State,
-    S::Location: location_state::IsSet,
     S::LpVersion: location_state::IsSet,
-    S::CreatedAt: location_state::IsSet,
-    S::LocationType: location_state::IsSet,
+    S::Location: location_state::IsSet,
     S::Srs: location_state::IsSet,
+    S::LocationType: location_state::IsSet,
+    S::CreatedAt: location_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Location<'a> {

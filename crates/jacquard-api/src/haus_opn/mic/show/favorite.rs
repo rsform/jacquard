@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "haus.opn.mic.show.favorite", tag = "$type")]
 pub struct Favorite<'a> {
     pub created_at: Datetime,
     ///The AT-URI of the haus.opn.mic.show record.

@@ -50,7 +50,7 @@ pub struct Category<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "art.cllctv.feed.post", tag = "$type")]
 pub struct Post<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -88,8 +88,7 @@ pub struct Post<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum PostContent<'a> {
     #[serde(rename = "art.cllctv.content.plaintext")]
     Plaintext(Box<Plaintext<'a>>),
@@ -100,8 +99,7 @@ pub enum PostContent<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum PostEmbed<'a> {
     #[serde(rename = "art.cllctv.embed.images")]
     Images(Box<Images<'a>>),

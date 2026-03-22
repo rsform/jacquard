@@ -41,7 +41,7 @@ pub struct AspectRatio<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.nblr.feed.post", tag = "$type")]
 pub struct Post<'a> {
     ///Approximate aspect ratio of the image (width:height).
     #[serde(skip_serializing_if = "Option::is_none")]

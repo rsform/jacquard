@@ -32,7 +32,11 @@ use crate::org_hypercerts::Uri;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.helper.workScopeTag",
+    tag = "$type"
+)]
 pub struct WorkScopeTag<'a> {
     ///Optional array of alternative names or identifiers for this scope.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,8 +71,7 @@ pub struct WorkScopeTag<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum WorkScopeTagExternalReference<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<'a>>),
@@ -215,51 +218,51 @@ pub mod work_scope_tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
-        type CreatedAt;
         type Label;
+        type CreatedAt;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
-        type CreatedAt = Unset;
         type Label = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type CreatedAt = S::CreatedAt;
-        type Label = S::Label;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Key = S::Key;
-        type CreatedAt = Set<members::created_at>;
-        type Label = S::Label;
+        type CreatedAt = Unset;
+        type Key = Unset;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
-        type Key = S::Key;
-        type CreatedAt = S::CreatedAt;
         type Label = Set<members::label>;
+        type CreatedAt = S::CreatedAt;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Label = S::Label;
+        type CreatedAt = Set<members::created_at>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Label = S::Label;
+        type CreatedAt = S::CreatedAt;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `label` field
         pub struct label(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -428,9 +431,9 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
 impl<'a, S> WorkScopeTagBuilder<'a, S>
 where
     S: work_scope_tag_state::State,
-    S::Key: work_scope_tag_state::IsSet,
-    S::CreatedAt: work_scope_tag_state::IsSet,
     S::Label: work_scope_tag_state::IsSet,
+    S::CreatedAt: work_scope_tag_state::IsSet,
+    S::Key: work_scope_tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WorkScopeTag<'a> {

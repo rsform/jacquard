@@ -30,7 +30,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "games.gamesgamesgamesgames.claimReview",
+    tag = "$type"
+)]
 pub struct ClaimReview<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -223,8 +227,8 @@ pub mod claim_review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Claim;
         type ReviewedBy;
+        type Claim;
         type CreatedAt;
         type Status;
     }
@@ -232,26 +236,26 @@ pub mod claim_review_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Claim = Unset;
         type ReviewedBy = Unset;
+        type Claim = Unset;
         type CreatedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `claim` field to Set
-    pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClaim<S> {}
-    impl<S: State> State for SetClaim<S> {
-        type Claim = Set<members::claim>;
-        type ReviewedBy = S::ReviewedBy;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
     }
     ///State transition - sets the `reviewed_by` field to Set
     pub struct SetReviewedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReviewedBy<S> {}
     impl<S: State> State for SetReviewedBy<S> {
-        type Claim = S::Claim;
         type ReviewedBy = Set<members::reviewed_by>;
+        type Claim = S::Claim;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `claim` field to Set
+    pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClaim<S> {}
+    impl<S: State> State for SetClaim<S> {
+        type ReviewedBy = S::ReviewedBy;
+        type Claim = Set<members::claim>;
         type CreatedAt = S::CreatedAt;
         type Status = S::Status;
     }
@@ -259,8 +263,8 @@ pub mod claim_review_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Claim = S::Claim;
         type ReviewedBy = S::ReviewedBy;
+        type Claim = S::Claim;
         type CreatedAt = Set<members::created_at>;
         type Status = S::Status;
     }
@@ -268,18 +272,18 @@ pub mod claim_review_state {
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Claim = S::Claim;
         type ReviewedBy = S::ReviewedBy;
+        type Claim = S::Claim;
         type CreatedAt = S::CreatedAt;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim` field
-        pub struct claim(());
         ///Marker type for the `reviewed_by` field
         pub struct reviewed_by(());
+        ///Marker type for the `claim` field
+        pub struct claim(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `status` field
@@ -424,8 +428,8 @@ where
 impl<'a, S> ClaimReviewBuilder<'a, S>
 where
     S: claim_review_state::State,
-    S::Claim: claim_review_state::IsSet,
     S::ReviewedBy: claim_review_state::IsSet,
+    S::Claim: claim_review_state::IsSet,
     S::CreatedAt: claim_review_state::IsSet,
     S::Status: claim_review_state::IsSet,
 {

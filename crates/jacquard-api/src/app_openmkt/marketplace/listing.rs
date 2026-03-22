@@ -49,7 +49,11 @@ pub struct LocationObj<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.openmkt.marketplace.listing",
+    tag = "$type"
+)]
 pub struct Listing<'a> {
     #[serde(borrow)]
     pub category: CowStr<'a>,
@@ -390,9 +394,9 @@ pub mod listing_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type Location;
         type Price;
         type Category;
+        type Location;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -400,9 +404,9 @@ pub mod listing_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type Location = Unset;
         type Price = Unset;
         type Category = Unset;
+        type Location = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
@@ -410,19 +414,9 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
+        type Price = S::Price;
+        type Category = S::Category;
         type Location = S::Location;
-        type Price = S::Price;
-        type Category = S::Category;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocation<S> {}
-    impl<S: State> State for SetLocation<S> {
-        type Title = S::Title;
-        type Location = Set<members::location>;
-        type Price = S::Price;
-        type Category = S::Category;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `price` field to Set
@@ -430,9 +424,9 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetPrice<S> {}
     impl<S: State> State for SetPrice<S> {
         type Title = S::Title;
-        type Location = S::Location;
         type Price = Set<members::price>;
         type Category = S::Category;
+        type Location = S::Location;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `category` field to Set
@@ -440,9 +434,19 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetCategory<S> {}
     impl<S: State> State for SetCategory<S> {
         type Title = S::Title;
-        type Location = S::Location;
         type Price = S::Price;
         type Category = Set<members::category>;
+        type Location = S::Location;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocation<S> {}
+    impl<S: State> State for SetLocation<S> {
+        type Title = S::Title;
+        type Price = S::Price;
+        type Category = S::Category;
+        type Location = Set<members::location>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -450,9 +454,9 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
-        type Location = S::Location;
         type Price = S::Price;
         type Category = S::Category;
+        type Location = S::Location;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -460,12 +464,12 @@ pub mod listing_state {
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `location` field
-        pub struct location(());
         ///Marker type for the `price` field
         pub struct price(());
         ///Marker type for the `category` field
         pub struct category(());
+        ///Marker type for the `location` field
+        pub struct location(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -688,9 +692,9 @@ impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
     S::Title: listing_state::IsSet,
-    S::Location: listing_state::IsSet,
     S::Price: listing_state::IsSet,
     S::Category: listing_state::IsSet,
+    S::Location: listing_state::IsSet,
     S::CreatedAt: listing_state::IsSet,
 {
     /// Build the final struct

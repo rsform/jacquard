@@ -34,7 +34,11 @@ use crate::social_showcase::VisibilitySettings;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.showcase.profile.preferences",
+    tag = "$type"
+)]
 pub struct Preferences<'a> {
     #[serde(borrow)]
     pub activity: ActivitySettings<'a>,
@@ -133,85 +137,85 @@ pub mod preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Notifications;
-        type Visibility;
-        type Activity;
         type Privacy;
+        type UpdatedAt;
+        type Visibility;
+        type Notifications;
+        type Activity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type Notifications = Unset;
-        type Visibility = Unset;
-        type Activity = Unset;
         type Privacy = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Notifications = S::Notifications;
-        type Visibility = S::Visibility;
-        type Activity = S::Activity;
-        type Privacy = S::Privacy;
-    }
-    ///State transition - sets the `notifications` field to Set
-    pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotifications<S> {}
-    impl<S: State> State for SetNotifications<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Notifications = Set<members::notifications>;
-        type Visibility = S::Visibility;
-        type Activity = S::Activity;
-        type Privacy = S::Privacy;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Notifications = S::Notifications;
-        type Visibility = Set<members::visibility>;
-        type Activity = S::Activity;
-        type Privacy = S::Privacy;
-    }
-    ///State transition - sets the `activity` field to Set
-    pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivity<S> {}
-    impl<S: State> State for SetActivity<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Notifications = S::Notifications;
-        type Visibility = S::Visibility;
-        type Activity = Set<members::activity>;
-        type Privacy = S::Privacy;
+        type UpdatedAt = Unset;
+        type Visibility = Unset;
+        type Notifications = Unset;
+        type Activity = Unset;
     }
     ///State transition - sets the `privacy` field to Set
     pub struct SetPrivacy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPrivacy<S> {}
     impl<S: State> State for SetPrivacy<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Notifications = S::Notifications;
-        type Visibility = S::Visibility;
-        type Activity = S::Activity;
         type Privacy = Set<members::privacy>;
+        type UpdatedAt = S::UpdatedAt;
+        type Visibility = S::Visibility;
+        type Notifications = S::Notifications;
+        type Activity = S::Activity;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Privacy = S::Privacy;
+        type UpdatedAt = Set<members::updated_at>;
+        type Visibility = S::Visibility;
+        type Notifications = S::Notifications;
+        type Activity = S::Activity;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Privacy = S::Privacy;
+        type UpdatedAt = S::UpdatedAt;
+        type Visibility = Set<members::visibility>;
+        type Notifications = S::Notifications;
+        type Activity = S::Activity;
+    }
+    ///State transition - sets the `notifications` field to Set
+    pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotifications<S> {}
+    impl<S: State> State for SetNotifications<S> {
+        type Privacy = S::Privacy;
+        type UpdatedAt = S::UpdatedAt;
+        type Visibility = S::Visibility;
+        type Notifications = Set<members::notifications>;
+        type Activity = S::Activity;
+    }
+    ///State transition - sets the `activity` field to Set
+    pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivity<S> {}
+    impl<S: State> State for SetActivity<S> {
+        type Privacy = S::Privacy;
+        type UpdatedAt = S::UpdatedAt;
+        type Visibility = S::Visibility;
+        type Notifications = S::Notifications;
+        type Activity = Set<members::activity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `notifications` field
-        pub struct notifications(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
-        ///Marker type for the `activity` field
-        pub struct activity(());
         ///Marker type for the `privacy` field
         pub struct privacy(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
+        ///Marker type for the `notifications` field
+        pub struct notifications(());
+        ///Marker type for the `activity` field
+        pub struct activity(());
     }
 }
 
@@ -372,11 +376,11 @@ where
 impl<'a, S> PreferencesBuilder<'a, S>
 where
     S: preferences_state::State,
-    S::UpdatedAt: preferences_state::IsSet,
-    S::Notifications: preferences_state::IsSet,
-    S::Visibility: preferences_state::IsSet,
-    S::Activity: preferences_state::IsSet,
     S::Privacy: preferences_state::IsSet,
+    S::UpdatedAt: preferences_state::IsSet,
+    S::Visibility: preferences_state::IsSet,
+    S::Notifications: preferences_state::IsSet,
+    S::Activity: preferences_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Preferences<'a> {

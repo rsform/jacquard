@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "network.slices.waitlist.request",
+    tag = "$type"
+)]
 pub struct Request<'a> {
     ///When the user joined the waitlist
     pub created_at: Datetime,

@@ -30,7 +30,7 @@ use crate::media_ionosphere::Track;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "media.ionosphere.log", tag = "$type")]
 pub struct Log<'a> {
     pub created_at: Datetime,
     ///Version identifier

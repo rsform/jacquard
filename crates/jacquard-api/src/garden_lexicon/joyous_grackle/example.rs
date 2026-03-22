@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "garden.lexicon.joyous-grackle.example",
+    tag = "$type"
+)]
 pub struct Example<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 

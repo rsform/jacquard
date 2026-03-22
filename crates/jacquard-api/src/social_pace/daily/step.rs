@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "social.pace.daily.step", tag = "$type")]
 pub struct Step<'a> {
     ///The first time this record was created
     pub created_at: Datetime,
@@ -115,50 +115,50 @@ pub mod step_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type UpdatedAt;
         type Steps;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type UpdatedAt = Unset;
         type Steps = Unset;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Steps = S::Steps;
         type UpdatedAt = S::UpdatedAt;
-        type Steps = S::Steps;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
-        type Steps = S::Steps;
     }
     ///State transition - sets the `steps` field to Set
     pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSteps<S> {}
     impl<S: State> State for SetSteps<S> {
         type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
         type Steps = Set<members::steps>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type Steps = S::Steps;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `steps` field
         pub struct steps(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -248,8 +248,8 @@ impl<'a, S> StepBuilder<'a, S>
 where
     S: step_state::State,
     S::CreatedAt: step_state::IsSet,
-    S::UpdatedAt: step_state::IsSet,
     S::Steps: step_state::IsSet,
+    S::UpdatedAt: step_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Step<'a> {

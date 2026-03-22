@@ -52,7 +52,7 @@ pub struct ListRule<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "app.bsky.feed.threadgate", tag = "$type")]
 pub struct Threadgate<'a> {
     ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,8 +71,7 @@ pub struct Threadgate<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum ThreadgateAllowItem<'a> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     MentionRule(Box<threadgate::MentionRule<'a>>),

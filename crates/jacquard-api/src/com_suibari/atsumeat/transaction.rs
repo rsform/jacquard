@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.suibari.atsumeat.transaction",
+    tag = "$type"
+)]
 pub struct Transaction<'a> {
     pub created_at: Datetime,
     ///Flag to indicate if this is an Easy Exchange (random partner).
@@ -267,37 +271,37 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Status;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
         type Status = Set<members::status>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Status = S::Status;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -468,8 +472,8 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
-    S::CreatedAt: transaction_state::IsSet,
     S::Status: transaction_state::IsSet,
+    S::CreatedAt: transaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Transaction<'a> {

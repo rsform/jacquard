@@ -39,7 +39,7 @@ pub struct IntervalSchedule<'a> {
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "diy.razorgirl.winter.job", tag = "$type")]
 pub struct Job<'a> {
     pub created_at: Datetime,
     /// Defaults to `0`.
@@ -64,8 +64,7 @@ pub struct Job<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum JobSchedule<'a> {
     #[serde(rename = "diy.razorgirl.winter.job#onceSchedule")]
     OnceSchedule(Box<job::OnceSchedule<'a>>),
@@ -309,37 +308,37 @@ pub mod interval_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seconds;
         type Type;
+        type Seconds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seconds = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `seconds` field to Set
-    pub struct SetSeconds<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeconds<S> {}
-    impl<S: State> State for SetSeconds<S> {
-        type Seconds = Set<members::seconds>;
-        type Type = S::Type;
+        type Seconds = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Seconds = S::Seconds;
         type Type = Set<members::r#type>;
+        type Seconds = S::Seconds;
+    }
+    ///State transition - sets the `seconds` field to Set
+    pub struct SetSeconds<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeconds<S> {}
+    impl<S: State> State for SetSeconds<S> {
+        type Type = S::Type;
+        type Seconds = Set<members::seconds>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seconds` field
-        pub struct seconds(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `seconds` field
+        pub struct seconds(());
     }
 }
 
@@ -409,8 +408,8 @@ where
 impl<'a, S> IntervalScheduleBuilder<'a, S>
 where
     S: interval_schedule_state::State,
-    S::Seconds: interval_schedule_state::IsSet,
     S::Type: interval_schedule_state::IsSet,
+    S::Seconds: interval_schedule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IntervalSchedule<'a> {
@@ -595,67 +594,67 @@ pub mod job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Schedule;
         type Instructions;
         type CreatedAt;
+        type Schedule;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Schedule = Unset;
         type Instructions = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Schedule = S::Schedule;
-        type Instructions = S::Instructions;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `schedule` field to Set
-    pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchedule<S> {}
-    impl<S: State> State for SetSchedule<S> {
-        type Name = S::Name;
-        type Schedule = Set<members::schedule>;
-        type Instructions = S::Instructions;
-        type CreatedAt = S::CreatedAt;
+        type Schedule = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `instructions` field to Set
     pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInstructions<S> {}
     impl<S: State> State for SetInstructions<S> {
-        type Name = S::Name;
-        type Schedule = S::Schedule;
         type Instructions = Set<members::instructions>;
         type CreatedAt = S::CreatedAt;
+        type Schedule = S::Schedule;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type Schedule = S::Schedule;
         type Instructions = S::Instructions;
         type CreatedAt = Set<members::created_at>;
+        type Schedule = S::Schedule;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `schedule` field to Set
+    pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchedule<S> {}
+    impl<S: State> State for SetSchedule<S> {
+        type Instructions = S::Instructions;
+        type CreatedAt = S::CreatedAt;
+        type Schedule = Set<members::schedule>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Instructions = S::Instructions;
+        type CreatedAt = S::CreatedAt;
+        type Schedule = S::Schedule;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `schedule` field
-        pub struct schedule(());
         ///Marker type for the `instructions` field
         pub struct instructions(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `schedule` field
+        pub struct schedule(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -824,10 +823,10 @@ impl<'a, S: job_state::State> JobBuilder<'a, S> {
 impl<'a, S> JobBuilder<'a, S>
 where
     S: job_state::State,
-    S::Name: job_state::IsSet,
-    S::Schedule: job_state::IsSet,
     S::Instructions: job_state::IsSet,
     S::CreatedAt: job_state::IsSet,
+    S::Schedule: job_state::IsSet,
+    S::Name: job_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Job<'a> {

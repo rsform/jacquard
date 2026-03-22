@@ -30,7 +30,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.alternativeproto.submission",
+    tag = "$type"
+)]
 pub struct Submission<'a> {
     ///Services this project is an alternative to
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -309,85 +313,85 @@ pub mod submission_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
-        type Description;
         type AuthType;
-        type CreatedAt;
         type Name;
+        type Url;
+        type CreatedAt;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
-        type Description = Unset;
         type AuthType = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Description = S::Description;
-        type AuthType = S::AuthType;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Url = S::Url;
-        type Description = Set<members::description>;
-        type AuthType = S::AuthType;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+        type Url = Unset;
+        type CreatedAt = Unset;
+        type Description = Unset;
     }
     ///State transition - sets the `auth_type` field to Set
     pub struct SetAuthType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthType<S> {}
     impl<S: State> State for SetAuthType<S> {
-        type Url = S::Url;
-        type Description = S::Description;
         type AuthType = Set<members::auth_type>;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
         type Description = S::Description;
-        type AuthType = S::AuthType;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Url = S::Url;
-        type Description = S::Description;
         type AuthType = S::AuthType;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type AuthType = S::AuthType;
+        type Name = S::Name;
+        type Url = Set<members::url>;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AuthType = S::AuthType;
+        type Name = S::Name;
+        type Url = S::Url;
+        type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type AuthType = S::AuthType;
+        type Name = S::Name;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `auth_type` field
         pub struct auth_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -590,11 +594,11 @@ where
 impl<'a, S> SubmissionBuilder<'a, S>
 where
     S: submission_state::State,
-    S::Url: submission_state::IsSet,
-    S::Description: submission_state::IsSet,
     S::AuthType: submission_state::IsSet,
-    S::CreatedAt: submission_state::IsSet,
     S::Name: submission_state::IsSet,
+    S::Url: submission_state::IsSet,
+    S::CreatedAt: submission_state::IsSet,
+    S::Description: submission_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Submission<'a> {

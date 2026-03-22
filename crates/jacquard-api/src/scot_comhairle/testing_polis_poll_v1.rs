@@ -29,7 +29,11 @@ use serde::{Serialize, Deserialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(
+    rename_all = "camelCase",
+    rename = "scot.comhairle.testingPolisPollV1",
+    tag = "$type"
+)]
 pub struct TestingPolisPollV1<'a> {
     ///Optional timestamp when the poll was closed to new submissions
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -141,37 +145,37 @@ pub mod testing_polis_poll_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Topic;
         type CreatedAt;
+        type Topic;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Topic = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type Topic = Set<members::topic>;
-        type CreatedAt = S::CreatedAt;
+        type Topic = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Topic = S::Topic;
         type CreatedAt = Set<members::created_at>;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type CreatedAt = S::CreatedAt;
+        type Topic = Set<members::topic>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `topic` field
-        pub struct topic(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
     }
 }
 
@@ -272,8 +276,8 @@ where
 impl<'a, S> TestingPolisPollV1Builder<'a, S>
 where
     S: testing_polis_poll_v1_state::State,
-    S::Topic: testing_polis_poll_v1_state::IsSet,
     S::CreatedAt: testing_polis_poll_v1_state::IsSet,
+    S::Topic: testing_polis_poll_v1_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestingPolisPollV1<'a> {

@@ -168,37 +168,37 @@ pub mod review_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type Claim;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type Claim = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Claim = S::Claim;
+        type Status = Unset;
     }
     ///State transition - sets the `claim` field to Set
     pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClaim<S> {}
     impl<S: State> State for SetClaim<S> {
-        type Status = S::Status;
         type Claim = Set<members::claim>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Claim = S::Claim;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `claim` field
         pub struct claim(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -299,8 +299,8 @@ where
 impl<'a, S> ReviewClaimBuilder<'a, S>
 where
     S: review_claim_state::State,
-    S::Status: review_claim_state::IsSet,
     S::Claim: review_claim_state::IsSet,
+    S::Status: review_claim_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReviewClaim<'a> {

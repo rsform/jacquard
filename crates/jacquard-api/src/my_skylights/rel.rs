@@ -30,7 +30,7 @@ use crate::my_skylights::rel;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "my.skylights.rel", tag = "$type")]
 pub struct Rel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<Vec<Datetime>>,
@@ -473,51 +473,51 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Value;
         type UpdatedAt;
         type CreatedAt;
-        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Value = Unset;
         type UpdatedAt = Unset;
         type CreatedAt = Unset;
-        type Value = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type CreatedAt = S::CreatedAt;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type CreatedAt = Set<members::created_at>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
         type UpdatedAt = S::UpdatedAt;
         type CreatedAt = S::CreatedAt;
-        type Value = Set<members::value>;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Value = S::Value;
+        type UpdatedAt = Set<members::updated_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Value = S::Value;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `value` field
-        pub struct value(());
     }
 }
 
@@ -606,9 +606,9 @@ where
 impl<'a, S> NoteBuilder<'a, S>
 where
     S: note_state::State,
+    S::Value: note_state::IsSet,
     S::UpdatedAt: note_state::IsSet,
     S::CreatedAt: note_state::IsSet,
-    S::Value: note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Note<'a> {

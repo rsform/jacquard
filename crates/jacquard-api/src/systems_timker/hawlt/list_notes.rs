@@ -235,8 +235,8 @@ pub mod note_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Cid;
-        type Value;
         type IndexedAt;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -244,8 +244,8 @@ pub mod note_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Cid = Unset;
-        type Value = Unset;
         type IndexedAt = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
@@ -253,8 +253,8 @@ pub mod note_view_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
-        type Value = S::Value;
         type IndexedAt = S::IndexedAt;
+        type Value = S::Value;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -262,17 +262,8 @@ pub mod note_view_state {
     impl<S: State> State for SetCid<S> {
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type IndexedAt = S::IndexedAt;
         type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Value = Set<members::value>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -280,8 +271,17 @@ pub mod note_view_state {
     impl<S: State> State for SetIndexedAt<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Value = S::Value;
         type IndexedAt = Set<members::indexed_at>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -290,10 +290,10 @@ pub mod note_view_state {
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -403,8 +403,8 @@ where
     S: note_view_state::State,
     S::Uri: note_view_state::IsSet,
     S::Cid: note_view_state::IsSet,
-    S::Value: note_view_state::IsSet,
     S::IndexedAt: note_view_state::IsSet,
+    S::Value: note_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NoteView<'a> {

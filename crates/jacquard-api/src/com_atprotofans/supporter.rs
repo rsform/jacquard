@@ -32,7 +32,7 @@ use crate::com_atprotofans::supporter_proof::SupporterProof;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "com.atprotofans.supporter", tag = "$type")]
 pub struct Supporter<'a> {
     ///Attestation proofs for this support relationship.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,8 +46,7 @@ pub struct Supporter<'a> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum SupporterSignaturesItem<'a> {
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<StrongRef<'a>>),

@@ -35,8 +35,7 @@ use crate::social_clippr::actor;
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
+#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
 pub enum PreferencesItem<'a> {
     #[serde(rename = "social.clippr.actor.defs#publishingScopesPref")]
     PublishingScopesPref(Box<actor::PublishingScopesPref<'a>>),
@@ -265,51 +264,51 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type DisplayName;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type DisplayName = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type DisplayName = S::DisplayName;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Handle = S::Handle;
         type DisplayName = Set<members::display_name>;
         type Did = S::Did;
+        type Handle = S::Handle;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type DisplayName = S::DisplayName;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -444,9 +443,9 @@ where
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
-    S::Handle: profile_view_state::IsSet,
     S::DisplayName: profile_view_state::IsSet,
     S::Did: profile_view_state::IsSet,
+    S::Handle: profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileView<'a> {

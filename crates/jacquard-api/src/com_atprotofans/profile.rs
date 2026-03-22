@@ -31,7 +31,7 @@ use crate::app_bsky::richtext::facet::Facet;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", rename = "com.atprotofans.profile", tag = "$type")]
 pub struct Profile<'a> {
     ///Whether the identity is currently accepting new supporters.
     #[serde(skip_serializing_if = "Option::is_none")]
