@@ -62,6 +62,12 @@ pub enum AtDataError {
     /// Floating point numbers are not allowed in AT Protocol
     #[error("floating point numbers not allowed in AT protocol data")]
     FloatNotAllowed,
+    /// Invalid data type for AT Protocol data
+    #[error("invalid data type for AT protocol data")]
+    InvalidType,
+    /// Deserialization error
+    #[error("deserialization error")]
+    Deserialization,
 }
 
 impl<S> Data<S>

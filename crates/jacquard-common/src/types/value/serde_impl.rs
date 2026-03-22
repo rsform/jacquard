@@ -304,52 +304,41 @@ where
         }
     }
 
-    // Check for $type field to detect special structures
-    let type_field = map.remove("$type").and_then(|v| {
-        if let Data::String(AtprotoStr::String(s)) = v {
-            Some(s)
-        } else {
-            None
-        }
-    });
-
-    // Check for blob
-    if let Some(type_str) = type_field {
-        if infer_from_type(type_str.as_ref()) == DataModelType::Blob {
-            // Try to construct blob from the collected data
-            let ref_cid = map.remove("ref").and_then(|v| {
-                if let Data::CidLink(cid) = v {
-                    Some(cid)
-                } else {
-                    None
-                }
-            });
-
-            let mime_type = map.remove("mimeType").and_then(|v| {
-                if let Data::String(AtprotoStr::String(s)) = v {
-                    Some(s)
-                } else {
-                    None
-                }
-            });
-
-            let size = map.remove("size").and_then(|v| {
-                if let Data::Integer(i) = v {
-                    Some(i as usize)
-                } else {
-                    None
-                }
-            });
-
-            if let (Some(ref_cid), Some(mime_cowstr), Some(size)) = (ref_cid, mime_type, size) {
-                return Ok(Data::Blob(Blob {
-                    // ref_cid is already Cid<CowStr<'s>>; wrap directly.
-                    r#ref: CidLink(ref_cid),
-                    mime_type: MimeType::new(mime_cowstr),
-                    size,
-                }));
+    // Check for $type field to detect blobs. Peek first, only remove if we match.
+    let is_blob = map
+        .get("$type")
+        .and_then(|v| match v {
+            Data::String(AtprotoStr::String(s)) => {
+                Some(infer_from_type(s.as_ref()) == DataModelType::Blob)
             }
-        }
+            _ => None,
+        })
+        .unwrap_or(false);
+
+    if is_blob
+        && matches!(map.get("ref"), Some(Data::CidLink(_)))
+        && matches!(
+            map.get("mimeType"),
+            Some(Data::String(AtprotoStr::String(_)))
+        )
+        && matches!(map.get("size"), Some(Data::Integer(_)))
+    {
+        // All fields verified — remove by key.
+        let Some(Data::CidLink(ref_cid)) = map.remove("ref") else {
+            return Err(AtDataError::Deserialization);
+        };
+        let Some(Data::String(AtprotoStr::String(mime_str))) = map.remove("mimeType") else {
+            return Err(AtDataError::Deserialization);
+        };
+        let Some(Data::Integer(size)) = map.remove("size") else {
+            return Err(AtDataError::Deserialization);
+        };
+        map.remove("$type");
+        return Ok(Data::Blob(Blob {
+            r#ref: CidLink(ref_cid),
+            mime_type: MimeType::new(mime_str),
+            size: size as usize,
+        }));
     }
 
     // Apply type inference for string fields based on key names.

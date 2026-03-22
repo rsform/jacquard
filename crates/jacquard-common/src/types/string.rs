@@ -130,7 +130,6 @@ impl<S: Bos<str> + AsRef<str>> AtprotoStr<S> {
                 match uri {
                     UriValue::Any(_) => {}
                     _ => {
-                        drop(s);
                         return Self::Uri(UriValue::new(string).expect("already checked"));
                     }
                 }
@@ -141,7 +140,6 @@ impl<S: Bos<str> + AsRef<str>> AtprotoStr<S> {
         if IpldCid::try_from(s).is_ok() || s.starts_with("bafy") {
             return Self::Cid(unsafe { Cid::unchecked_str(string) });
         }
-        drop(s);
         // Fallback: plain string.
         Self::String(string)
     }

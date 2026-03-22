@@ -99,7 +99,7 @@ pub struct JetstreamCommit<'a> {
     /// Record data (present for create/update)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub record: Option<Data<'a>>,
+    pub record: Option<Data<CowStr<'a>>>,
     /// Content identifier
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -372,7 +372,7 @@ impl SubscriptionResp for JetstreamStream {
     type Message<'de> = JetstreamMessage<'de>;
 
     /// Generic error type
-    type Error<'de> = crate::xrpc::GenericError<'de>;
+    type Error = crate::xrpc::GenericError;
 }
 
 impl<'a> XrpcSubscription for JetstreamParams<'a> {
@@ -447,7 +447,7 @@ impl SubscriptionResp for JetstreamRawStream {
     type Message<'de> = RawJetstreamMessage<'de>;
 
     /// Generic error type
-    type Error<'de> = crate::xrpc::GenericError<'de>;
+    type Error = crate::xrpc::GenericError;
 }
 
 impl<'a> XrpcSubscription for RawJetstreamParams<'a> {

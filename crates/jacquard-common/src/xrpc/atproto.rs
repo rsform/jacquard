@@ -17,7 +17,6 @@ use crate::xrpc::{GenericError, XrpcMethod, XrpcRequest, XrpcResp};
 use alloc::vec::Vec;
 use core::error::Error;
 use core::fmt::{self, Display};
-use core::marker::PhantomData;
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 
@@ -125,11 +124,11 @@ pub struct ListRecordsResponse;
 impl XrpcResp for ListRecordsResponse {
     const NSID: &'static str = "com.atproto.repo.listRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListRecordsOutput;
-    type Err<'de> = GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListRecordsOutput<S>;
+    type Err = GenericError;
 }
 
-impl<'a, S> XrpcRequest for ListRecords<S>
+impl<S> XrpcRequest for ListRecords<S>
 where
     S: Bos<str> + AsRef<str> + Serialize,
 {
@@ -201,17 +200,19 @@ where
     }
 }
 
-/// Error type for com.atproto.repo.getRecord.
+/// Error type for com.atproto.repo.getRecord. Always SmolStr-backed.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[allow(missing_docs)]
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRecordError<'a> {
+pub enum GetRecordError {
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(Option<CowStr<'a>>),
+    RecordNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(other)]
+    Other,
 }
 
-impl<'a> Display for GetRecordError<'a> {
+impl Display for GetRecordError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::RecordNotFound(msg) => {
@@ -221,21 +222,12 @@ impl<'a> Display for GetRecordError<'a> {
                 }
                 Ok(())
             }
+            Self::Other => write!(f, "Unknown error"),
         }
     }
 }
 
-impl Error for GetRecordError<'_> {}
-
-impl IntoStatic for GetRecordError<'_> {
-    type Output = GetRecordError<'static>;
-
-    fn into_static(self) -> Self::Output {
-        match self {
-            Self::RecordNotFound(msg) => GetRecordError::RecordNotFound(msg.into_static()),
-        }
-    }
-}
+impl Error for GetRecordError {}
 
 /// Response marker for com.atproto.repo.getRecord.
 pub struct GetRecordResponse;
@@ -243,8 +235,8 @@ pub struct GetRecordResponse;
 impl XrpcResp for GetRecordResponse {
     const NSID: &'static str = "com.atproto.repo.getRecord";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecordOutput;
-    type Err<'de> = GetRecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetRecordOutput<S>;
+    type Err = GetRecordError;
 }
 
 impl<'a> XrpcRequest for GetRecord<'a> {
@@ -268,8 +260,7 @@ pub struct ResolveHandle<S: Bos<str> + AsRef<str> = DefaultStr> {
 impl<S> IntoStatic for ResolveHandle<S>
 where
     S: Bos<str> + AsRef<str> + IntoStatic,
-    <S as IntoStatic>::Output: Bos<str>,
-    <S as IntoStatic>::Output: AsRef<str>,
+    S::Output: Bos<str> + AsRef<str>,
 {
     type Output = ResolveHandle<<S as IntoStatic>::Output>;
 
@@ -291,8 +282,7 @@ pub struct ResolveHandleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 impl<S> IntoStatic for ResolveHandleOutput<S>
 where
     S: Bos<str> + AsRef<str> + IntoStatic,
-    <S as IntoStatic>::Output: Bos<str>,
-    <S as IntoStatic>::Output: AsRef<str>,
+    S::Output: Bos<str> + AsRef<str>,
 {
     type Output = ResolveHandleOutput<<S as IntoStatic>::Output>;
 
@@ -303,17 +293,19 @@ where
     }
 }
 
-/// Error type for com.atproto.identity.resolveHandle.
+/// Error type for com.atproto.identity.resolveHandle. Always SmolStr-backed.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "error", content = "message")]
 #[allow(missing_docs)]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveHandleError<'a> {
+pub enum ResolveHandleError {
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(Option<CowStr<'a>>),
+    HandleNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(other)]
+    Other,
 }
 
-impl<'a> Display for ResolveHandleError<'a> {
+impl Display for ResolveHandleError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::HandleNotFound(msg) => {
@@ -323,21 +315,12 @@ impl<'a> Display for ResolveHandleError<'a> {
                 }
                 Ok(())
             }
+            Self::Other => write!(f, "Unknown error"),
         }
     }
 }
 
-impl Error for ResolveHandleError<'_> {}
-
-impl IntoStatic for ResolveHandleError<'_> {
-    type Output = ResolveHandleError<'static>;
-
-    fn into_static(self) -> Self::Output {
-        match self {
-            Self::HandleNotFound(msg) => ResolveHandleError::HandleNotFound(msg.into_static()),
-        }
-    }
-}
+impl Error for ResolveHandleError {}
 
 /// Response marker for com.atproto.identity.resolveHandle.
 pub struct ResolveHandleResponse;
@@ -345,8 +328,8 @@ pub struct ResolveHandleResponse;
 impl XrpcResp for ResolveHandleResponse {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveHandleOutput;
-    type Err<'de> = ResolveHandleError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResolveHandleOutput<S>;
+    type Err = ResolveHandleError;
 }
 
 impl<S: Bos<str> + AsRef<str> + Serialize> XrpcRequest for ResolveHandle<S> {
@@ -407,19 +390,21 @@ where
     }
 }
 
-/// Error type for com.atproto.identity.resolveDid.
+/// Error type for com.atproto.identity.resolveDid. Always SmolStr-backed.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
 #[allow(missing_docs)]
-pub enum ResolveDidError<'a> {
+pub enum ResolveDidError {
     #[serde(rename = "DidNotFound")]
-    DidNotFound(Option<CowStr<'a>>),
+    DidNotFound(Option<SmolStr>),
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(Option<CowStr<'a>>),
+    DidDeactivated(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(other)]
+    Other,
 }
 
-impl<'a> Display for ResolveDidError<'a> {
+impl Display for ResolveDidError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::DidNotFound(msg) => {
@@ -436,22 +421,12 @@ impl<'a> Display for ResolveDidError<'a> {
                 }
                 Ok(())
             }
+            Self::Other => write!(f, "Unknown error"),
         }
     }
 }
 
-impl Error for ResolveDidError<'_> {}
-
-impl IntoStatic for ResolveDidError<'_> {
-    type Output = ResolveDidError<'static>;
-
-    fn into_static(self) -> Self::Output {
-        match self {
-            Self::DidNotFound(msg) => ResolveDidError::DidNotFound(msg.into_static()),
-            Self::DidDeactivated(msg) => ResolveDidError::DidDeactivated(msg.into_static()),
-        }
-    }
-}
+impl Error for ResolveDidError {}
 
 /// Response marker for com.atproto.identity.resolveDid.
 pub struct ResolveDidResponse;
@@ -459,8 +434,8 @@ pub struct ResolveDidResponse;
 impl XrpcResp for ResolveDidResponse {
     const NSID: &'static str = "com.atproto.identity.resolveDid";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveDidOutput;
-    type Err<'de> = ResolveDidError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResolveDidOutput<S>;
+    type Err = ResolveDidError;
 }
 
 impl<S> XrpcRequest for ResolveDid<S>
@@ -557,7 +532,6 @@ mod tests {
     fn test_resolve_did_output_deserializes() {
         let json_str = r#"{"didDoc": {}}"#;
         let output: ResolveDidOutput = serde_json::from_str(json_str).unwrap();
-        // Just verify it parses without error
         let _ = output;
     }
 

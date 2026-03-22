@@ -67,7 +67,7 @@ pub struct DidDocument<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Services associated with this DID (e.g., AtprotoPersonalDataServer)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub service: Option<Vec<Service<S>>>,
-    // Forward‑compatible capture of unmodeled fields
+    /// Forward‑compatible capture of unmodeled fields
     #[serde(flatten)]
     pub extra_data: BTreeMap<SmolStr, Data<S>>,
 }
@@ -141,6 +141,7 @@ where
                 if s.r#type.as_ref() == "AtprotoPersonalDataServer" {
                     match &s.service_endpoint {
                         Some(Data::String(AtprotoStr::Uri(u))) => Uri::parse(u.as_ref()).ok(),
+                        Some(Data::String(AtprotoStr::String(s))) => Uri::parse(s.as_ref()).ok(),
                         _ => None,
                     }
                 } else {
@@ -181,7 +182,7 @@ pub struct VerificationMethod<S: Bos<str> + AsRef<str>> {
     /// Multikey `publicKeyMultibase` (base58btc)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key_multibase: Option<S>,
-    // Forward‑compatible capture of unmodeled fields
+    /// Forward‑compatible capture of unmodeled fields
     #[serde(flatten)]
     pub extra_data: BTreeMap<SmolStr, Data<S>>,
 }
@@ -222,7 +223,7 @@ pub struct Service<S: Bos<str> + AsRef<str>> {
     /// currently atproto expects this to be a url
     #[serde(skip_serializing_if = "Option::is_none")]
     pub service_endpoint: Option<Data<S>>,
-    // Forward‑compatible capture of unmodeled fields
+    /// Forward‑compatible capture of unmodeled fields
     #[serde(flatten)]
     pub extra_data: BTreeMap<SmolStr, Data<S>>,
 }

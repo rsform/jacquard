@@ -260,7 +260,6 @@ where
             return AtprotoStr::Uri(UriValue::Any(string));
         }
     } else if s.len() == 13 {
-        drop(s);
         if let Ok(tid) = Tid::new(string.as_ref()) {
             return AtprotoStr::Tid(tid);
         }
@@ -270,7 +269,6 @@ where
             return AtprotoStr::Cid(unsafe { Cid::unchecked_str(string) });
         }
     }
-    drop(s);
 
     AtprotoStr::String(string)
 }

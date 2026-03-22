@@ -26,6 +26,7 @@ use n0_future::stream::Boxed;
 #[cfg(target_arch = "wasm32")]
 use n0_future::stream::BoxedLocal as Boxed;
 use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
 
 /// Encoding format for subscription messages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,8 +54,8 @@ pub trait SubscriptionResp {
     /// Message union type
     type Message<'de>: Deserialize<'de> + IntoStatic;
 
-    /// Error union type
-    type Error<'de>: Error + Deserialize<'de> + IntoStatic;
+    /// Error union type. Always owned (`DeserializeOwned`).
+    type Error: Error + DeserializeOwned;
 
     /// Decode a message from bytes.
     ///
@@ -531,17 +532,17 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
     }
 
     /// Converts the subscription into a stream of loosely-typed atproto data.
-    pub fn into_data_stream(self) -> (WsSink, Boxed<Result<Data<'static>, StreamError>>) {
+    pub fn into_data_stream(self) -> (WsSink, Boxed<Result<Data<smol_str::SmolStr>, StreamError>>) {
         use n0_future::StreamExt as _;
 
         let (tx, rx) = self.connection.split();
 
-        fn parse_msg<'a>(bytes: &'a [u8]) -> Result<Data<'a>, serde_json::Error> {
+        fn parse_msg(bytes: &[u8]) -> Result<Data<smol_str::SmolStr>, serde_json::Error> {
             serde_json::from_slice(bytes)
         }
-        fn parse_cbor<'a>(
-            bytes: &'a [u8],
-        ) -> Result<Data<'a>, serde_ipld_dagcbor::DecodeError<core::convert::Infallible>> {
+        fn parse_cbor(
+            bytes: &[u8],
+        ) -> Result<Data<smol_str::SmolStr>, serde_ipld_dagcbor::DecodeError<core::convert::Infallible>> {
             serde_ipld_dagcbor::from_slice(bytes)
         }
 

@@ -58,10 +58,8 @@ impl<S: Bos<str> + AsRef<str>> AtIdentifier<S> {
     pub fn new(ident: S) -> Result<Self, AtStrError> {
         let s = ident.as_ref();
         if validate_did(s).is_ok() {
-            drop(s);
             Ok(AtIdentifier::Did(unsafe { Did::unchecked(ident) }))
         } else {
-            drop(s);
             Handle::new(ident).map(AtIdentifier::Handle)
         }
     }
