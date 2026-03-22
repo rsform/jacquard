@@ -17,7 +17,6 @@ pub mod streaming;
 pub mod atproto;
 
 use alloc::borrow::ToOwned;
-use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use ipld_core::ipld::Ipld;
@@ -1058,6 +1057,7 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
         S: XrpcProcedureStream + 'static,
         <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp,
     {
+        use alloc::boxed::Box;
         use futures::TryStreamExt;
 
         let uri = xrpc_endpoint_uri(&self.base, <S::Request as XrpcRequest>::NSID, None).map_err(

@@ -10,9 +10,9 @@ use jacquard_common::{
 use std::collections::BTreeMap;
 
 // Helper to create plain string Data
-fn data_string(s: &str) -> Data<'static> {
+fn data_string(s: &str) -> Data<SmolStr> {
     use smol_str::ToSmolStr;
-    Data::String(AtprotoStr::String(CowStr::Owned(s.to_smolstr())))
+    Data::String(AtprotoStr::String(s.to_smolstr()))
 }
 
 // Test schema: Simple object with required string field

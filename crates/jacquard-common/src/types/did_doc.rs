@@ -2,7 +2,7 @@ use crate::deps::fluent_uri::Uri;
 use crate::types::crypto::{CryptoError, PublicKey};
 use crate::types::string::{AtprotoStr, Did, Handle};
 use crate::types::value::Data;
-use crate::{Bos, DefaultStr, IntoStatic};
+use crate::{Bos, DefaultStr};
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use bon::Builder;
@@ -84,10 +84,9 @@ pub fn default_context() -> Vec<SmolStr> {
 impl<S> crate::IntoStatic for DidDocument<S>
 where
     S: Bos<str> + AsRef<str> + crate::IntoStatic,
-    <S as IntoStatic>::Output: AsRef<str>,
-    <S as IntoStatic>::Output: Bos<str>,
+    S::Output: AsRef<str> + Bos<str>,
 {
-    type Output = DidDocument<<S as crate::IntoStatic>::Output>;
+    type Output = DidDocument<S::Output>;
     fn into_static(self) -> Self::Output {
         DidDocument {
             context: default_context(),
@@ -190,10 +189,9 @@ pub struct VerificationMethod<S: Bos<str> + AsRef<str>> {
 impl<S> crate::IntoStatic for VerificationMethod<S>
 where
     S: Bos<str> + AsRef<str> + crate::IntoStatic,
-    <S as IntoStatic>::Output: AsRef<str>,
-    <S as IntoStatic>::Output: Bos<str>,
+    S::Output: AsRef<str> + Bos<str>,
 {
-    type Output = VerificationMethod<<S as crate::IntoStatic>::Output>;
+    type Output = VerificationMethod<S::Output>;
     fn into_static(self) -> Self::Output {
         VerificationMethod {
             id: self.id.into_static(),
@@ -231,10 +229,9 @@ pub struct Service<S: Bos<str> + AsRef<str>> {
 impl<S> crate::IntoStatic for Service<S>
 where
     S: Bos<str> + AsRef<str> + crate::IntoStatic,
-    <S as IntoStatic>::Output: AsRef<str>,
-    <S as IntoStatic>::Output: Bos<str>,
+    S::Output: AsRef<str> + Bos<str>,
 {
-    type Output = Service<<S as crate::IntoStatic>::Output>;
+    type Output = Service<S::Output>;
     fn into_static(self) -> Self::Output {
         Service {
             id: self.id.into_static(),

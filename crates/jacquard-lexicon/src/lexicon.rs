@@ -140,7 +140,7 @@ pub struct LexRefUnion<'s> {
 pub struct LexBlob<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
-    pub accept: Option<Vec<MimeType<'s>>>,
+    pub accept: Option<Vec<MimeType<CowStr<'s>>>>,
     pub max_size: Option<usize>,
 }
 

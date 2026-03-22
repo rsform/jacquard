@@ -964,9 +964,9 @@ fn field_vec_smol(name: &str, opt: &Option<Vec<SmolStr>>, p: &DocPaths) -> Token
 }
 
 /// Emit `field_name: Some(vec![MimeType(CowStr::new_static(...))]),` when present, or nothing.
-fn field_vec_mime(
+fn field_vec_mime<S: jacquard_common::Bos<str> + AsRef<str>>(
     name: &str,
-    opt: &Option<Vec<jacquard_common::types::blob::MimeType>>,
+    opt: &Option<Vec<jacquard_common::types::blob::MimeType<S>>>,
     p: &DocPaths,
 ) -> TokenStream {
     let cow = &p.cow;
@@ -974,7 +974,7 @@ fn field_vec_mime(
     match opt {
         Some(v) => {
             let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
-            let mime_strs: Vec<_> = v.iter().map(|m| m.0.as_ref()).collect();
+            let mime_strs: Vec<&str> = v.iter().map(|m| m.as_str()).collect();
             quote! { #ident: Some(vec![#(#mime(#cow::new_static(#mime_strs))),*]), }
         }
         None => TokenStream::new(),
