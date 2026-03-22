@@ -12,6 +12,7 @@
 use bon::Builder;
 use bytes::Bytes;
 use http::StatusCode;
+use jacquard_common::bos::Bos;
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::error::BoxError;
 use jacquard_common::types::did::Did;
@@ -20,7 +21,7 @@ use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtprotoStr, Handle};
 use jacquard_common::types::uri::UriValue;
 use jacquard_common::types::value::{AtDataError, Data};
-use jacquard_common::{CowStr, IntoStatic, deps::smol_str};
+use jacquard_common::{CowStr, deps::smol_str};
 use n0_future::time::Duration;
 use smol_str::SmolStr;
 use std::collections::BTreeMap;
@@ -81,14 +82,14 @@ pub struct DidDocResponse {
     #[allow(missing_docs)]
     pub status: StatusCode,
     /// Optional DID we intended to resolve; used for validation helpers
-    pub requested: Option<Did<'static>>,
+    pub requested: Option<Did>,
 }
 
 impl DidDocResponse {
-    /// Parse as borrowed DidDocument<'_>
-    pub fn parse<'b>(&'b self) -> Result<DidDocument<'b>> {
+    /// Parse as borrowed DidDocument
+    pub fn parse<'b>(&'b self) -> Result<DidDocument<CowStr<'b>>> {
         if self.status.is_success() {
-            if let Ok(doc) = serde_json::from_slice::<DidDocument<'b>>(&self.buffer) {
+            if let Ok(doc) = serde_json::from_slice::<DidDocument<CowStr<'b>>>(&self.buffer) {
                 Ok(doc)
             } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'b>>(&self.buffer) {
                 let pds_uri = Uri::parse(mini_doc.pds.as_ref())
@@ -97,7 +98,9 @@ impl DidDocResponse {
                 Ok(DidDocument {
                     context: default_context(),
                     id: mini_doc.did,
-                    also_known_as: Some(vec![CowStr::from(mini_doc.handle)]),
+                    also_known_as: Some(vec![CowStr::Owned(SmolStr::from(
+                        mini_doc.handle.as_str(),
+                    ))]),
                     verification_method: None,
                     service: Some(vec![Service {
                         id: CowStr::new_static("#atproto_pds"),
@@ -131,21 +134,31 @@ impl DidDocResponse {
     /// Parse and validate that the DID in the document matches the requested DID if present.
     ///
     /// On mismatch, returns an error that contains the owned document for inspection.
-    pub fn parse_validated<'b>(&'b self) -> Result<DidDocument<'b>> {
+    pub fn parse_validated<'b>(&'b self) -> Result<DidDocument<CowStr<'b>>> {
         let doc = self.parse()?;
         if let Some(expected) = &self.requested {
             if doc.id.as_str() != expected.as_str() {
-                return Err(IdentityError::doc_id_mismatch(
-                    expected.clone(),
-                    doc.clone().into_static(),
-                ));
+                // Re-parse as owned for the error payload.
+                let owned_doc =
+                    serde_json::from_slice::<DidDocument>(&self.buffer).unwrap_or_else(|_| {
+                        // Fallback: construct minimal doc for error reporting.
+                        DidDocument {
+                            context: default_context(),
+                            id: Did::new_owned(doc.id.as_str()).expect("already validated DID"),
+                            also_known_as: None,
+                            verification_method: None,
+                            service: None,
+                            extra_data: BTreeMap::new(),
+                        }
+                    });
+                return Err(IdentityError::doc_id_mismatch(expected.clone(), owned_doc));
             }
         }
         Ok(doc)
     }
 
-    /// Parse as owned DidDocument<'static>
-    pub fn into_owned(self) -> Result<DidDocument<'static>> {
+    /// Parse as owned DidDocument
+    pub fn into_owned(self) -> Result<DidDocument> {
         let did_str = self
             .requested
             .as_ref()
@@ -153,28 +166,27 @@ impl DidDocResponse {
             .unwrap_or_else(|| SmolStr::new_static("unknown"));
 
         if self.status.is_success() {
-            if let Ok(doc) = serde_json::from_slice::<DidDocument<'_>>(&self.buffer) {
-                Ok(doc.into_static())
+            if let Ok(doc) = serde_json::from_slice::<DidDocument>(&self.buffer) {
+                Ok(doc)
             } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'_>>(&self.buffer) {
                 let pds_uri = Uri::parse(mini_doc.pds.as_ref())
                     .map_err(|e| IdentityError::url(e))?
                     .to_owned();
                 Ok(DidDocument {
                     context: default_context(),
-                    id: mini_doc.did,
-                    also_known_as: Some(vec![CowStr::from(mini_doc.handle)]),
+                    id: Did::new_owned(mini_doc.did.as_str()).expect("already validated DID"),
+                    also_known_as: Some(vec![SmolStr::from(mini_doc.handle.as_str())]),
                     verification_method: None,
                     service: Some(vec![Service {
-                        id: CowStr::new_static("#atproto_pds"),
-                        r#type: CowStr::new_static("AtprotoPersonalDataServer"),
+                        id: SmolStr::new_static("#atproto_pds"),
+                        r#type: SmolStr::new_static("AtprotoPersonalDataServer"),
                         service_endpoint: Some(Data::String(AtprotoStr::Uri(UriValue::Https(
                             pds_uri,
                         )))),
                         extra_data: BTreeMap::new(),
                     }]),
                     extra_data: BTreeMap::new(),
-                }
-                .into_static())
+                })
             } else {
                 Err(IdentityError::missing_pds_endpoint(did_str))
             }
@@ -191,9 +203,9 @@ impl DidDocResponse {
 #[allow(missing_docs)]
 pub struct MiniDoc<'a> {
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<CowStr<'a>>,
     #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<CowStr<'a>>,
     #[serde(borrow)]
     pub pds: CowStr<'a>,
     #[serde(borrow, rename = "signingKey", alias = "signing_key")]
@@ -303,38 +315,50 @@ pub trait IdentityResolver {
 
     /// Resolve handle
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_handle(&self, handle: &Handle<'_>) -> impl Future<Output = Result<Did<'static>>>
+    fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
+        &self,
+        handle: &Handle<S>,
+    ) -> impl Future<Output = Result<Did>>
     where
         Self: Sync;
 
     /// Resolve handle
     #[cfg(target_arch = "wasm32")]
-    fn resolve_handle(&self, handle: &Handle<'_>) -> impl Future<Output = Result<Did<'static>>>;
+    fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
+        &self,
+        handle: &Handle<S>,
+    ) -> impl Future<Output = Result<Did>>;
 
     /// Resolve DID document
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_did_doc(&self, did: &Did<'_>) -> impl Future<Output = Result<DidDocResponse>>
+    fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
+        &self,
+        did: &Did<S>,
+    ) -> impl Future<Output = Result<DidDocResponse>>
     where
         Self: Sync;
 
     /// Resolve DID document
     #[cfg(target_arch = "wasm32")]
-    fn resolve_did_doc(&self, did: &Did<'_>) -> impl Future<Output = Result<DidDocResponse>>;
+    fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
+        &self,
+        did: &Did<S>,
+    ) -> impl Future<Output = Result<DidDocResponse>>;
 
     /// Resolve DID doc from an identifier
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_ident(
+    fn resolve_ident<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        actor: &AtIdentifier<'_>,
+        actor: &AtIdentifier<S>,
     ) -> impl Future<Output = Result<DidDocResponse>>
     where
         Self: Sync,
     {
         async move {
             match actor {
-                AtIdentifier::Did(did) => self.resolve_did_doc(&did).await,
+                AtIdentifier::Did(did) => self.resolve_did_doc(did).await,
                 AtIdentifier::Handle(handle) => {
-                    let did = self.resolve_handle(&handle).await?;
+                    let did = self.resolve_handle(handle).await?;
                     self.resolve_did_doc(&did).await
                 }
             }
@@ -343,15 +367,15 @@ pub trait IdentityResolver {
 
     /// Resolve DID doc from an identifier
     #[cfg(target_arch = "wasm32")]
-    fn resolve_ident(
+    fn resolve_ident<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        actor: &AtIdentifier<'_>,
+        actor: &AtIdentifier<S>,
     ) -> impl Future<Output = Result<DidDocResponse>> {
         async move {
             match actor {
-                AtIdentifier::Did(did) => self.resolve_did_doc(&did).await,
+                AtIdentifier::Did(did) => self.resolve_did_doc(did).await,
                 AtIdentifier::Handle(handle) => {
-                    let did = self.resolve_handle(&handle).await?;
+                    let did = self.resolve_handle(handle).await?;
                     self.resolve_did_doc(&did).await
                 }
             }
@@ -360,18 +384,18 @@ pub trait IdentityResolver {
 
     /// Resolve DID doc from an identifier
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_ident_owned(
+    fn resolve_ident_owned<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        actor: &AtIdentifier<'_>,
-    ) -> impl Future<Output = Result<DidDocument<'static>>>
+        actor: &AtIdentifier<S>,
+    ) -> impl Future<Output = Result<DidDocument>>
     where
         Self: Sync,
     {
         async move {
             match actor {
-                AtIdentifier::Did(did) => self.resolve_did_doc_owned(&did).await,
+                AtIdentifier::Did(did) => self.resolve_did_doc_owned(did).await,
                 AtIdentifier::Handle(handle) => {
-                    let did = self.resolve_handle(&handle).await?;
+                    let did = self.resolve_handle(handle).await?;
                     self.resolve_did_doc_owned(&did).await
                 }
             }
@@ -380,15 +404,15 @@ pub trait IdentityResolver {
 
     /// Resolve DID doc from an identifier
     #[cfg(target_arch = "wasm32")]
-    fn resolve_ident_owned(
+    fn resolve_ident_owned<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        actor: &AtIdentifier<'_>,
-    ) -> impl Future<Output = Result<DidDocument<'static>>> {
+        actor: &AtIdentifier<S>,
+    ) -> impl Future<Output = Result<DidDocument>> {
         async move {
             match actor {
-                AtIdentifier::Did(did) => self.resolve_did_doc_owned(&did).await,
+                AtIdentifier::Did(did) => self.resolve_did_doc_owned(did).await,
                 AtIdentifier::Handle(handle) => {
-                    let did = self.resolve_handle(&handle).await?;
+                    let did = self.resolve_handle(handle).await?;
                     self.resolve_did_doc_owned(&did).await
                 }
             }
@@ -397,10 +421,10 @@ pub trait IdentityResolver {
 
     /// Resolve the DID document and return an owned version
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_did_doc_owned(
+    fn resolve_did_doc_owned<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        did: &Did<'_>,
-    ) -> impl Future<Output = Result<DidDocument<'static>>>
+        did: &Did<S>,
+    ) -> impl Future<Output = Result<DidDocument>>
     where
         Self: Sync,
     {
@@ -409,18 +433,18 @@ pub trait IdentityResolver {
 
     /// Resolve the DID document and return an owned version
     #[cfg(target_arch = "wasm32")]
-    fn resolve_did_doc_owned(
+    fn resolve_did_doc_owned<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        did: &Did<'_>,
-    ) -> impl Future<Output = Result<DidDocument<'static>>> {
+        did: &Did<S>,
+    ) -> impl Future<Output = Result<DidDocument>> {
         async { self.resolve_did_doc(did).await?.into_owned() }
     }
 
     /// Return the PDS url for a DID
     #[cfg(not(target_arch = "wasm32"))]
-    fn pds_for_did(
+    fn pds_for_did<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<S>,
     ) -> impl Future<Output = Result<jacquard_common::deps::fluent_uri::Uri<String>>>
     where
         Self: Sync,
@@ -431,22 +455,31 @@ pub trait IdentityResolver {
             // Default-on doc id equality check
             if self.options().validate_doc_id {
                 if doc.id.as_str() != did.as_str() {
+                    let owned_doc = resp.clone().into_owned().unwrap_or_else(|_| DidDocument {
+                        context: default_context(),
+                        id: Did::new_owned(doc.id.as_str()).expect("already validated DID"),
+                        also_known_as: None,
+                        verification_method: None,
+                        service: None,
+                        extra_data: BTreeMap::new(),
+                    });
                     return Err(IdentityError::doc_id_mismatch(
-                        did.clone().into_static(),
-                        doc.clone().into_static(),
+                        Did::new_owned(did.as_str()).expect("already validated DID"),
+                        owned_doc,
                     ));
                 }
             }
             doc.pds_endpoint()
+                .map(|u| u.to_owned())
                 .ok_or_else(|| IdentityError::missing_pds_endpoint(did.as_str()))
         }
     }
 
     /// Return the PDS url for a DID
     #[cfg(target_arch = "wasm32")]
-    fn pds_for_did(
+    fn pds_for_did<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<S>,
     ) -> impl Future<Output = Result<jacquard_common::deps::fluent_uri::Uri<String>>> {
         async {
             let resp = self.resolve_did_doc(did).await?;
@@ -454,23 +487,32 @@ pub trait IdentityResolver {
             // Default-on doc id equality check
             if self.options().validate_doc_id {
                 if doc.id.as_str() != did.as_str() {
+                    let owned_doc = resp.clone().into_owned().unwrap_or_else(|_| DidDocument {
+                        context: default_context(),
+                        id: Did::new_owned(doc.id.as_str()).expect("already validated DID"),
+                        also_known_as: None,
+                        verification_method: None,
+                        service: None,
+                        extra_data: BTreeMap::new(),
+                    });
                     return Err(IdentityError::doc_id_mismatch(
-                        did.clone().into_static(),
-                        doc.clone().into_static(),
+                        Did::new_owned(did.as_str()).expect("already validated DID"),
+                        owned_doc,
                     ));
                 }
             }
             doc.pds_endpoint()
+                .map(|u| u.to_owned())
                 .ok_or_else(|| IdentityError::missing_pds_endpoint(did.as_str()))
         }
     }
 
-    /// Return the DIS and PDS url for a handle
+    /// Return the DID and PDS url for a handle
     #[cfg(not(target_arch = "wasm32"))]
-    fn pds_for_handle(
+    fn pds_for_handle<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<(Did<'static>, jacquard_common::deps::fluent_uri::Uri<String>)>>
+        handle: &Handle<S>,
+    ) -> impl Future<Output = Result<(Did, jacquard_common::deps::fluent_uri::Uri<String>)>>
     where
         Self: Sync,
     {
@@ -481,13 +523,12 @@ pub trait IdentityResolver {
         }
     }
 
-    /// Return the DIS and PDS url for a handle
+    /// Return the DID and PDS url for a handle
     #[cfg(target_arch = "wasm32")]
-    fn pds_for_handle(
+    fn pds_for_handle<S: Bos<str> + AsRef<str> + Sync>(
         &self,
-        handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<(Did<'static>, jacquard_common::deps::fluent_uri::Uri<String>)>>
-    {
+        handle: &Handle<S>,
+    ) -> impl Future<Output = Result<(Did, jacquard_common::deps::fluent_uri::Uri<String>)>> {
         async {
             let did = self.resolve_handle(handle).await?;
             let pds = self.pds_for_did(&did).await?;
@@ -503,12 +544,18 @@ impl<T: IdentityResolver + Sync> IdentityResolver for std::sync::Arc<T> {
     }
 
     /// Resolve handle
-    async fn resolve_handle(&self, handle: &Handle<'_>) -> Result<Did<'static>> {
+    async fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
+        &self,
+        handle: &Handle<S>,
+    ) -> Result<Did> {
         self.as_ref().resolve_handle(handle).await
     }
 
     /// Resolve DID document
-    async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse> {
+    async fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
+        &self,
+        did: &Did<S>,
+    ) -> Result<DidDocResponse> {
         self.as_ref().resolve_did_doc(did).await
     }
 }
@@ -520,12 +567,18 @@ impl<T: IdentityResolver> IdentityResolver for std::sync::Arc<T> {
     }
 
     /// Resolve handle
-    async fn resolve_handle(&self, handle: &Handle<'_>) -> Result<Did<'static>> {
+    async fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
+        &self,
+        handle: &Handle<S>,
+    ) -> Result<Did> {
         self.as_ref().resolve_handle(handle).await
     }
 
     /// Resolve DID document
-    async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse> {
+    async fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
+        &self,
+        did: &Did<S>,
+    ) -> Result<DidDocResponse> {
         self.as_ref().resolve_did_doc(did).await
     }
 }
@@ -662,9 +715,9 @@ pub enum IdentityErrorKind {
     )]
     DocIdMismatch {
         /// The DID that was requested and expected to appear as the document `id`.
-        expected: Did<'static>,
+        expected: Did,
         /// The DID document we *actually* got
-        doc: DidDocument<'static>,
+        doc: DidDocument,
     },
 }
 
@@ -791,7 +844,7 @@ impl IdentityError {
     }
 
     /// Create a doc id mismatch error
-    pub fn doc_id_mismatch(expected: Did<'static>, doc: DidDocument<'static>) -> Self {
+    pub fn doc_id_mismatch(expected: Did, doc: DidDocument) -> Self {
         Self::new(IdentityErrorKind::DocIdMismatch { expected, doc }, None)
     }
 }

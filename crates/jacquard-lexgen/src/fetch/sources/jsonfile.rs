@@ -1,9 +1,9 @@
 use super::LexiconSource;
-use jacquard_common::IntoStatic;
 use jacquard_common::types::value::Data;
+use jacquard_common::{Bos, IntoStatic};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{IntoDiagnostic, Result};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
@@ -15,7 +15,7 @@ pub struct JsonFileSource {
 #[derive(Deserialize)]
 struct RecordsFile<'a> {
     #[serde(borrow)]
-    records: Vec<Data<'a>>,
+    records: Vec<Data<&'a str>>,
 }
 
 impl LexiconSource for JsonFileSource {
@@ -37,7 +37,9 @@ impl LexiconSource for JsonFileSource {
 }
 
 impl JsonFileSource {
-    fn parse_lexicon_record(record_data: &Data<'_>) -> Option<LexiconDoc<'static>> {
+    fn parse_lexicon_record<S: Bos<str> + AsRef<str> + Sync + Serialize>(
+        record_data: &Data<S>,
+    ) -> Option<LexiconDoc<'static>> {
         let value = match record_data {
             Data::Object(map) => map.0.get("value")?,
             _ => return None,

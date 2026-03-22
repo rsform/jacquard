@@ -290,7 +290,7 @@ impl IntoStatic for CallOptions<'_> {
 /// ```
 pub trait XrpcExt: HttpClient {
     /// Start building an XRPC call for the given base URI.
-    fn xrpc<'a>(&'a self, base: Uri<String>) -> XrpcCall<'a, Self>
+    fn xrpc<'a>(&'a self, base: Uri<&'a str>) -> XrpcCall<'a, Self>
     where
         Self: Sized,
     {
@@ -454,7 +454,7 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
 /// ```
 pub struct XrpcCall<'a, C: HttpClient> {
     pub(crate) client: &'a C,
-    pub(crate) base: Uri<String>,
+    pub(crate) base: Uri<&'a str>,
     pub(crate) opts: CallOptions<'a>,
 }
 
@@ -578,11 +578,7 @@ impl From<Header> for HeaderName {
 /// 3. Builds new path: `{base_path}/xrpc/{nsid}`
 /// 4. Optionally sets query from serialized parameters
 /// 5. Returns the constructed URI
-fn xrpc_endpoint_uri(
-    base: &Uri<String>,
-    nsid: &str,
-    query: Option<&str>,
-) -> XrpcResult<Uri<String>> {
+fn xrpc_endpoint_uri(base: &Uri<&str>, nsid: &str, query: Option<&str>) -> XrpcResult<Uri<String>> {
     use crate::error::ClientError;
 
     let base_path = base.path().as_str().trim_end_matches('/');
@@ -615,13 +611,12 @@ fn xrpc_endpoint_uri(
     }
 
     Uri::parse(uri_str)
-        .map(|u| u.to_owned())
         .map_err(|_| ClientError::invalid_request("Failed to construct XRPC endpoint URI"))
 }
 
 /// Build an HTTP request for an XRPC call given base URI and options
 pub fn build_http_request<'s, R>(
-    base: &Uri<String>,
+    base: &Uri<&str>,
     req: &R,
     opts: &CallOptions<'_>,
 ) -> XrpcResult<Request<Vec<u8>>>
@@ -1207,9 +1202,7 @@ mod tests {
         let opts = CallOptions::default();
 
         // AC1.1: Base URI without trailing slash + NSID produces correct `/xrpc/{nsid}` path
-        let base1 = Uri::parse("https://pds.example.com")
-            .expect("URI should be valid")
-            .to_owned();
+        let base1 = Uri::parse("https://pds.example.com").expect("URI should be valid");
         let req1 = build_http_request(&base1, &Req, &opts).unwrap();
         let uri1 = req1.uri().to_string();
         assert!(
@@ -1223,9 +1216,7 @@ mod tests {
         );
 
         // AC1.2: Base URI with sub-path preserves it: `/base/xrpc/{nsid}`
-        let base2 = Uri::parse("https://pds.example.com/base")
-            .expect("URI should be valid")
-            .to_owned();
+        let base2 = Uri::parse("https://pds.example.com/base").expect("URI should be valid");
         let req2 = build_http_request(&base2, &Req, &opts).unwrap();
         let uri2 = req2.uri().to_string();
         assert!(
@@ -1239,9 +1230,7 @@ mod tests {
         );
 
         // AC1.5: Base URI with trailing slash is normalized (slash stripped) before construction
-        let base_with_slash = Uri::parse("https://pds.example.com/")
-            .expect("URI should be valid")
-            .to_owned();
+        let base_with_slash = Uri::parse("https://pds.example.com/").expect("URI should be valid");
         let req_slash = build_http_request(&base_with_slash, &Req, &opts).unwrap();
         let uri_slash = req_slash.uri().to_string();
         assert!(
@@ -1285,9 +1274,7 @@ mod tests {
         }
 
         let opts = CallOptions::default();
-        let base = Uri::parse("https://pds.example.com")
-            .expect("URI should be valid")
-            .to_owned();
+        let base = Uri::parse("https://pds.example.com").expect("URI should be valid");
 
         // AC1.3: Query parameters from serde serialisation are set correctly
         let req_with_params = QueryReq {
@@ -1359,9 +1346,7 @@ mod tests {
         }
 
         let opts = CallOptions::default();
-        let base = Uri::parse("https://pds.example.com")
-            .expect("URI should be valid")
-            .to_owned();
+        let base = Uri::parse("https://pds.example.com").expect("URI should be valid");
 
         // AC1.3: Test with spaces (serde_html_form uses + for spaces per application/x-www-form-urlencoded)
         let req_spaces = QueryReq {
@@ -1447,9 +1432,7 @@ mod tests {
         let opts = CallOptions::default();
 
         // Ensure no double slashes in path
-        let base1 = Uri::parse("https://pds")
-            .expect("URI should be valid")
-            .to_owned();
+        let base1 = Uri::parse("https://pds").expect("URI should be valid");
         let req1 = build_http_request(&base1, &Req, &opts).unwrap();
         let uri1 = req1.uri().to_string();
         assert!(
@@ -1458,9 +1441,7 @@ mod tests {
             uri1
         );
 
-        let base2 = Uri::parse("https://pds/base")
-            .expect("URI should be valid")
-            .to_owned();
+        let base2 = Uri::parse("https://pds/base").expect("URI should be valid");
         let req2 = build_http_request(&base2, &Req, &opts).unwrap();
         let uri2 = req2.uri().to_string();
         assert!(

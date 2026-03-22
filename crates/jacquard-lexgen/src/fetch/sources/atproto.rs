@@ -1,14 +1,16 @@
 use super::LexiconSource;
-use jacquard_common::xrpc::atproto::{ListRecords, ListRecordsRecord};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::xrpc::XrpcExt;
-use jacquard_common::{CowStr, IntoStatic};
+use jacquard_common::xrpc::atproto::{ListRecords, ListRecordsRecord};
+use jacquard_common::{Bos, IntoStatic};
 use jacquard_identity::JacquardResolver;
 use jacquard_identity::lexicon_resolver::LexiconSchemaResolver;
 use jacquard_identity::resolver::{IdentityResolver, ResolverOptions};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{Result, miette};
+use serde::Serialize;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -19,10 +21,10 @@ pub struct AtProtoSource {
 
 impl AtProtoSource {
     /// Fetch a single lexicon schema by NSID using DNS + XRPC resolution
-    async fn fetch_single_lexicon(
+    async fn fetch_single_lexicon<S: Bos<str> + AsRef<str> + Sync>(
         &self,
         resolver: &JacquardResolver,
-        nsid: &Nsid<'_>,
+        nsid: &Nsid<S>,
     ) -> Result<HashMap<String, LexiconDoc<'_>>> {
         let schema = resolver
             .resolve_lexicon_schema(nsid)
@@ -35,7 +37,9 @@ impl AtProtoSource {
         Ok(lexicons)
     }
 
-    fn parse_lexicon_record(record_data: &ListRecordsRecord<'_>) -> Option<LexiconDoc<'static>> {
+    fn parse_lexicon_record<S: Bos<str> + AsRef<str> + Sync + Serialize>(
+        record_data: &ListRecordsRecord<S>,
+    ) -> Option<LexiconDoc<'static>> {
         // // Extract the 'value' field from the record
         // let value = match record_data {
         //     jacquard_common::types::value::Data::Object(map) => map.0.get("value")?,
@@ -67,12 +71,12 @@ impl LexiconSource for AtProtoSource {
         let resolver = JacquardResolver::new_dns(http.clone(), ResolverOptions::default());
 
         // Try parsing as NSID first (for single lexicon fetch)
-        if let Ok(nsid) = Nsid::new(&self.endpoint) {
+        if let Ok(nsid) = Nsid::new(self.endpoint.as_ref()) {
             return self.fetch_single_lexicon(&resolver, &nsid).await;
         }
 
         // Otherwise parse as at-identifier (handle or DID) for bulk fetch
-        let identifier = AtIdentifier::new(&self.endpoint)
+        let identifier = AtIdentifier::new(self.endpoint.as_ref())
             .map_err(|e| miette!("Invalid endpoint '{}': {}", self.endpoint, e))?;
 
         // Resolve to get PDS endpoint
@@ -91,7 +95,7 @@ impl LexiconSource for AtProtoSource {
 
         // Determine repo - use slice if provided, otherwise use the resolved DID
         let repo = if let Some(ref slice) = self.slice {
-            AtIdentifier::new(slice)
+            AtIdentifier::new(slice.as_ref())
                 .map_err(|e| miette!("Invalid slice '{}': {}", slice, e))?
                 .into_static()
         } else {
@@ -129,7 +133,7 @@ impl LexiconSource for AtProtoSource {
                 eprintln!("Warning: Batch decode failed from {}: {}", self.endpoint, e);
                 eprintln!("Retrying with limit=1 to skip invalid records...");
 
-                let mut cursor: Option<CowStr> = None;
+                let mut cursor: Option<SmolStr> = None;
                 loop {
                     let req = ListRecords {
                         repo: repo.clone().into_static().into(),
