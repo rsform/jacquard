@@ -29,22 +29,26 @@ use smol_str::SmolStr;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ListRecords<'a> {
-    #[serde(borrow)]
-    pub collection: Nsid<CowStr<'a>>,
+pub struct ListRecords<S = DefaultStr>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    pub collection: Nsid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
-    pub repo: AtIdentifier<CowStr<'a>>,
+    pub repo: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reverse: Option<bool>,
 }
 
-impl IntoStatic for ListRecords<'_> {
-    type Output = ListRecords<'static>;
+impl<S> IntoStatic for ListRecords<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    S::Output: Bos<str> + AsRef<str>,
+{
+    type Output = ListRecords<S::Output>;
 
     fn into_static(self) -> Self::Output {
         ListRecords {
@@ -61,16 +65,21 @@ impl IntoStatic for ListRecords<'_> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ListRecordsOutput<'a> {
+pub struct ListRecordsOutput<S = DefaultStr>
+where
+    S: Bos<str> + AsRef<str>,
+{
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub records: Vec<ListRecordsRecord<'a>>,
+    pub cursor: Option<S>,
+    pub records: Vec<ListRecordsRecord<S>>,
 }
 
-impl IntoStatic for ListRecordsOutput<'_> {
-    type Output = ListRecordsOutput<'static>;
+impl<S> IntoStatic for ListRecordsOutput<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    S::Output: Bos<str> + AsRef<str>,
+{
+    type Output = ListRecordsOutput<S::Output>;
 
     fn into_static(self) -> Self::Output {
         ListRecordsOutput {
@@ -84,18 +93,22 @@ impl IntoStatic for ListRecordsOutput<'_> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ListRecordsRecord<'a> {
+pub struct ListRecordsRecord<S = DefaultStr>
+where
+    S: Bos<str> + AsRef<str>,
+{
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<CowStr<'a>>>,
-    #[serde(borrow)]
-    pub uri: AtUri<CowStr<'a>>,
-    #[serde(borrow)]
-    pub value: Data<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Data<S>,
 }
 
-impl IntoStatic for ListRecordsRecord<'_> {
-    type Output = ListRecordsRecord<'static>;
+impl<S> IntoStatic for ListRecordsRecord<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    S::Output: Bos<str> + AsRef<str>,
+{
+    type Output = ListRecordsRecord<<S as IntoStatic>::Output>;
 
     fn into_static(self) -> Self::Output {
         ListRecordsRecord {
@@ -112,11 +125,14 @@ pub struct ListRecordsResponse;
 impl XrpcResp for ListRecordsResponse {
     const NSID: &'static str = "com.atproto.repo.listRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListRecordsOutput<'de>;
+    type Output<'de> = ListRecordsOutput;
     type Err<'de> = GenericError<'de>;
 }
 
-impl<'a> XrpcRequest for ListRecords<'a> {
+impl<'a, S> XrpcRequest for ListRecords<S>
+where
+    S: Bos<str> + AsRef<str> + Serialize,
+{
     const NSID: &'static str = "com.atproto.repo.listRecords";
     const METHOD: XrpcMethod = XrpcMethod::Query;
     type Response = ListRecordsResponse;
@@ -159,18 +175,22 @@ impl IntoStatic for GetRecord<'_> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[allow(missing_docs)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecordOutput<'a> {
+pub struct GetRecordOutput<S = DefaultStr>
+where
+    S: Bos<str> + AsRef<str>,
+{
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<CowStr<'a>>>,
-    #[serde(borrow)]
-    pub uri: AtUri<CowStr<'a>>,
-    #[serde(borrow)]
-    pub value: Data<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Data<S>,
 }
 
-impl IntoStatic for GetRecordOutput<'_> {
-    type Output = GetRecordOutput<'static>;
+impl<S> IntoStatic for GetRecordOutput<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    S::Output: Bos<str> + AsRef<str>,
+{
+    type Output = GetRecordOutput<S::Output>;
 
     fn into_static(self) -> Self::Output {
         GetRecordOutput {
@@ -223,7 +243,7 @@ pub struct GetRecordResponse;
 impl XrpcResp for GetRecordResponse {
     const NSID: &'static str = "com.atproto.repo.getRecord";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecordOutput<'de>;
+    type Output<'de> = GetRecordOutput;
     type Err<'de> = GetRecordError<'de>;
 }
 
@@ -366,13 +386,19 @@ where
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ResolveDidOutput<'a> {
-    #[serde(borrow)]
-    pub did_doc: Data<'a>,
+pub struct ResolveDidOutput<S = DefaultStr>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    pub did_doc: Data<S>,
 }
 
-impl IntoStatic for ResolveDidOutput<'_> {
-    type Output = ResolveDidOutput<'static>;
+impl<S> IntoStatic for ResolveDidOutput<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    S::Output: Bos<str> + AsRef<str>,
+{
+    type Output = ResolveDidOutput<S::Output>;
 
     fn into_static(self) -> Self::Output {
         ResolveDidOutput {
@@ -433,7 +459,7 @@ pub struct ResolveDidResponse;
 impl XrpcResp for ResolveDidResponse {
     const NSID: &'static str = "com.atproto.identity.resolveDid";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveDidOutput<'de>;
+    type Output<'de> = ResolveDidOutput;
     type Err<'de> = ResolveDidError<'de>;
 }
 

@@ -2,6 +2,7 @@ use crate::cowstr::ToCowStr;
 
 use super::*;
 use core::str::FromStr;
+use std::string::String;
 
 /// Canonicalize JSON by sorting object keys recursively
 fn canonicalize_json(value: &serde_json::Value) -> serde_json::Value {
@@ -118,7 +119,7 @@ fn serialize_deserialize_array() {
         assert!(matches!(items[1], Data::Boolean(true)));
         assert!(matches!(items[2], Data::Integer(42)));
         if let Data::String(AtprotoStr::String(s)) = &items[3] {
-            assert_eq!(s.as_ref(), "test");
+            assert_eq!(s, "test");
         } else {
             panic!("expected plain string");
         }
@@ -333,7 +334,7 @@ fn test_from_data_struct() {
     let mut map = BTreeMap::new();
     map.insert(
         SmolStr::new_static("name"),
-        Data::String(AtprotoStr::String("Alice".into())),
+        Data::String(AtprotoStr::String("Alice")),
     );
     map.insert(SmolStr::new_static("age"), Data::Integer(30));
     let data = Data::Object(Object(map));
@@ -345,7 +346,7 @@ fn test_from_data_struct() {
 
 #[test]
 fn test_from_data_vec() {
-    let data = Data::Array(Array(vec![
+    let data: Data = Data::Array(Array(vec![
         Data::Integer(1),
         Data::Integer(2),
         Data::Integer(3),
@@ -375,7 +376,7 @@ fn test_from_data_nested() {
     let mut nested_map = BTreeMap::new();
     nested_map.insert(
         SmolStr::new_static("value"),
-        Data::String(AtprotoStr::String("test".into())),
+        Data::String(AtprotoStr::String("test")),
     );
 
     let mut parent_map = BTreeMap::new();
@@ -427,7 +428,7 @@ fn test_from_data_option() {
     let mut map = BTreeMap::new();
     map.insert(
         SmolStr::new_static("required"),
-        Data::String(AtprotoStr::String("value".into())),
+        Data::String(AtprotoStr::String("value")),
     );
     // optional field not present
     let data = Data::Object(Object(map));
@@ -522,7 +523,7 @@ fn test_datetime_and_nsid_deserialization() {
     map.insert(
         SmolStr::new_static("nsid"),
         Data::String(AtprotoStr::Nsid(
-            Nsid::new_static("app.bsky.feed.post").unwrap(),
+            Nsid::<CowStr<'_>>::new_static("app.bsky.feed.post").unwrap(),
         )),
     );
     map.insert(
@@ -626,13 +627,13 @@ fn test_atidentifier_deserialization() {
     map.insert(
         SmolStr::new_static("ident_did"),
         Data::String(AtprotoStr::AtIdentifier(AtIdentifier::Did(
-            Did::new_owned("did:plc:abc").unwrap(),
+            Did::new("did:plc:abc").unwrap(),
         ))),
     );
     map.insert(
         SmolStr::new_static("ident_handle"),
         Data::String(AtprotoStr::AtIdentifier(AtIdentifier::Handle(
-            Handle::new_static("bob.test").unwrap(),
+            Handle::new("bob.test").unwrap(),
         ))),
     );
     let data = Data::Object(Object(map));
@@ -730,13 +731,13 @@ fn test_to_data_with_inference() {
         created_at: "2024-01-15T12:30:45.123Z".to_string(),
     };
 
-    let data = to_data(&post).unwrap();
+    let data: Data = to_data(&post).unwrap();
 
     match data {
         Data::Object(obj) => {
             // Check text is plain string
             match obj.0.get("text").unwrap() {
-                Data::String(AtprotoStr::String(s)) => assert_eq!(s.as_ref(), "hello world"),
+                Data::String(AtprotoStr::String(s)) => assert_eq!(s, "hello world"),
                 _ => panic!("expected plain string for text"),
             }
             // Check DID was inferred
@@ -774,7 +775,7 @@ fn test_option_vec_deserialization() {
     let mut map_with_langs = BTreeMap::new();
     map_with_langs.insert(
         SmolStr::new_static("text"),
-        Data::String(AtprotoStr::String("hello".into())),
+        Data::String(AtprotoStr::String("hello")),
     );
     map_with_langs.insert(
         SmolStr::new_static("langs"),
@@ -794,7 +795,7 @@ fn test_option_vec_deserialization() {
     let mut map_without_langs = BTreeMap::new();
     map_without_langs.insert(
         SmolStr::new_static("text"),
-        Data::String(AtprotoStr::String("world".into())),
+        Data::String(AtprotoStr::String("world")),
     );
     let data_without_langs = Data::Object(Object(map_without_langs));
 
@@ -807,7 +808,7 @@ fn test_option_vec_deserialization() {
     let mut map_with_null = BTreeMap::new();
     map_with_null.insert(
         SmolStr::new_static("text"),
-        Data::String(AtprotoStr::String("null test".into())),
+        Data::String(AtprotoStr::String("null test")),
     );
     map_with_null.insert(SmolStr::new_static("langs"), Data::Null);
     let data_with_null = Data::Object(Object(map_with_null));
@@ -821,36 +822,36 @@ fn test_option_vec_deserialization() {
 fn test_data_accessors() {
     // Test as_object
     let mut map = BTreeMap::new();
-    map.insert(SmolStr::new_static("key"), Data::Integer(42));
+    map.insert(SmolStr::new_static("key"), Data::<&str>::Integer(42));
     let obj_data = Data::Object(Object(map.clone()));
     assert!(obj_data.as_object().is_some());
     assert_eq!(obj_data.as_object().unwrap().0.len(), 1);
-    assert!(Data::Null.as_object().is_none());
+    assert!(Data::<&str>::Null.as_object().is_none());
 
     // Test as_array
-    let arr_data = Data::Array(Array(vec![Data::Integer(1), Data::Integer(2)]));
+    let arr_data = Data::<&str>::Array(Array(vec![Data::Integer(1), Data::Integer(2)]));
     assert!(arr_data.as_array().is_some());
     assert_eq!(arr_data.as_array().unwrap().0.len(), 2);
-    assert!(Data::Null.as_array().is_none());
+    assert!(Data::<&str>::Null.as_array().is_none());
 
     // Test as_str
-    let str_data = Data::String(AtprotoStr::String("hello".into()));
+    let str_data = Data::<&str>::String(AtprotoStr::String("hello".into()));
     assert_eq!(str_data.as_str(), Some("hello"));
-    assert!(Data::Null.as_str().is_none());
+    assert!(Data::<&str>::Null.as_str().is_none());
 
     // Test as_integer
-    let int_data = Data::Integer(42);
+    let int_data: Data = Data::Integer(42);
     assert_eq!(int_data.as_integer(), Some(42));
-    assert!(Data::Null.as_integer().is_none());
+    assert!(Data::<&str>::Null.as_integer().is_none());
 
     // Test as_boolean
-    let bool_data = Data::Boolean(true);
+    let bool_data: Data = Data::Boolean(true);
     assert_eq!(bool_data.as_boolean(), Some(true));
-    assert!(Data::Null.as_boolean().is_none());
+    assert!(Data::<&str>::Null.as_boolean().is_none());
 
     // Test is_null
-    assert!(Data::Null.is_null());
-    assert!(!Data::Integer(0).is_null());
+    assert!(Data::<&str>::Null.is_null());
+    assert!(!Data::<&str>::Integer(0).is_null());
 }
 
 #[test]
@@ -887,18 +888,18 @@ fn test_rawdata_accessors() {
 #[test]
 fn test_data_to_dag_cbor() {
     // Test simple types
-    let null_data = Data::Null;
+    let null_data: Data = Data::Null;
     assert!(null_data.to_dag_cbor().is_ok());
 
-    let int_data = Data::Integer(42);
+    let int_data: Data = Data::Integer(42);
     assert!(int_data.to_dag_cbor().is_ok());
 
-    let str_data = Data::String(AtprotoStr::String("hello".into()));
+    let str_data: Data = Data::String(AtprotoStr::String("hello".into()));
     assert!(str_data.to_dag_cbor().is_ok());
 
     // Test complex types
     let mut map = BTreeMap::new();
-    map.insert(SmolStr::new_static("num"), Data::Integer(42));
+    map.insert(SmolStr::new_static("num"), Data::<SmolStr>::Integer(42));
     map.insert(
         SmolStr::new_static("text"),
         Data::String(AtprotoStr::String("test".into())),
@@ -909,7 +910,7 @@ fn test_data_to_dag_cbor() {
     assert!(!cbor_result.unwrap().is_empty());
 
     // Test array
-    let arr_data = Data::Array(Array(vec![
+    let arr_data: Data = Data::Array(Array(vec![
         Data::Integer(1),
         Data::Integer(2),
         Data::Integer(3),
@@ -944,7 +945,7 @@ fn test_rawdata_to_dag_cbor() {
 #[test]
 fn test_object_methods() {
     let mut map = BTreeMap::new();
-    map.insert(SmolStr::new_static("num"), Data::Integer(42));
+    map.insert(SmolStr::new_static("num"), Data::<SmolStr>::Integer(42));
     map.insert(
         SmolStr::new_static("text"),
         Data::String(AtprotoStr::String("hello".into())),
@@ -964,7 +965,7 @@ fn test_object_methods() {
     assert_eq!(obj.len(), 2);
     assert!(!obj.is_empty());
 
-    let empty_obj = Object(BTreeMap::new());
+    let empty_obj: Object = Object(BTreeMap::new());
     assert_eq!(empty_obj.len(), 0);
     assert!(empty_obj.is_empty());
 
@@ -979,7 +980,7 @@ fn test_object_methods() {
 
 #[test]
 fn test_array_methods() {
-    let arr = Array(vec![Data::Integer(1), Data::Integer(2), Data::Integer(3)]);
+    let arr = Array::<&str>(vec![Data::Integer(1), Data::Integer(2), Data::Integer(3)]);
 
     // Test get
     assert_eq!(arr.get(0), Some(&Data::Integer(1)));
@@ -990,7 +991,7 @@ fn test_array_methods() {
     assert_eq!(arr.len(), 3);
     assert!(!arr.is_empty());
 
-    let empty_arr = Array(vec![]);
+    let empty_arr = Array::<&str>(vec![]);
     assert_eq!(empty_arr.len(), 0);
     assert!(empty_arr.is_empty());
 
@@ -1007,7 +1008,7 @@ fn test_get_at_path_simple() {
     let mut inner = BTreeMap::new();
     inner.insert(
         SmolStr::new_static("alt"),
-        Data::String(AtprotoStr::String("test".into())),
+        Data::String(AtprotoStr::String("test")),
     );
 
     let mut outer = BTreeMap::new();
@@ -1036,13 +1037,13 @@ fn test_get_at_path_arrays() {
     let mut item1 = BTreeMap::new();
     item1.insert(
         SmolStr::new_static("name"),
-        Data::String(AtprotoStr::String("first".into())),
+        Data::String(AtprotoStr::String("first")),
     );
 
     let mut item2 = BTreeMap::new();
     item2.insert(
         SmolStr::new_static("name"),
-        Data::String(AtprotoStr::String("second".into())),
+        Data::String(AtprotoStr::String("second")),
     );
 
     let items = Data::Array(Array(vec![
@@ -1073,13 +1074,13 @@ fn test_get_at_path_complex() {
     let mut img1 = BTreeMap::new();
     img1.insert(
         SmolStr::new_static("alt"),
-        Data::String(AtprotoStr::String("img1".into())),
+        Data::String(AtprotoStr::String("img1")),
     );
 
     let mut img2 = BTreeMap::new();
     img2.insert(
         SmolStr::new_static("alt"),
-        Data::String(AtprotoStr::String("img2".into())),
+        Data::String(AtprotoStr::String("img2")),
     );
 
     let images = Data::Array(Array(vec![
@@ -1133,7 +1134,7 @@ fn test_query_exact_path() {
     let mut inner = BTreeMap::new();
     inner.insert(
         SmolStr::new_static("handle"),
-        Data::String(AtprotoStr::String("alice.bsky.social".into())),
+        Data::String(AtprotoStr::String("alice.bsky.social")),
     );
 
     let mut outer = BTreeMap::new();
@@ -1153,19 +1154,19 @@ fn test_query_wildcard_array() {
     let mut actor1 = BTreeMap::new();
     actor1.insert(
         SmolStr::new_static("handle"),
-        Data::String(AtprotoStr::String("alice".into())),
+        Data::String(AtprotoStr::String("alice")),
     );
 
     let mut actor2 = BTreeMap::new();
     actor2.insert(
         SmolStr::new_static("handle"),
-        Data::String(AtprotoStr::String("bob".into())),
+        Data::String(AtprotoStr::String("bob")),
     );
 
     let mut actor3 = BTreeMap::new();
     actor3.insert(
         SmolStr::new_static("name"),
-        Data::String(AtprotoStr::String("carol".into())),
+        Data::String(AtprotoStr::String("carol")),
     );
 
     let actors = Data::Array(Array(vec![
@@ -1194,13 +1195,13 @@ fn test_query_wildcard_object() {
     let mut images = BTreeMap::new();
     images.insert(
         SmolStr::new_static("alt"),
-        Data::String(AtprotoStr::String("img".into())),
+        Data::String(AtprotoStr::String("img")),
     );
 
     let mut video = BTreeMap::new();
     video.insert(
         SmolStr::new_static("alt"),
-        Data::String(AtprotoStr::String("vid".into())),
+        Data::String(AtprotoStr::String("vid")),
     );
 
     let mut embed = BTreeMap::new();
@@ -1224,7 +1225,7 @@ fn test_query_scoped_recursion() {
     let mut handle_map = BTreeMap::new();
     handle_map.insert(
         SmolStr::new_static("handle"),
-        Data::String(AtprotoStr::String("alice".into())),
+        Data::String(AtprotoStr::String("alice")),
     );
 
     let mut profile_map = BTreeMap::new();
@@ -1260,13 +1261,13 @@ fn test_query_global_recursion() {
     let mut inner1 = BTreeMap::new();
     inner1.insert(
         SmolStr::new_static("cid"),
-        Data::String(AtprotoStr::String("cid1".into())),
+        Data::String(AtprotoStr::String("cid1")),
     );
 
     let mut inner2 = BTreeMap::new();
     inner2.insert(
         SmolStr::new_static("cid"),
-        Data::String(AtprotoStr::String("cid2".into())),
+        Data::String(AtprotoStr::String("cid2")),
     );
 
     let mut middle = BTreeMap::new();
@@ -1277,7 +1278,7 @@ fn test_query_global_recursion() {
     root.insert(SmolStr::new_static("thread"), Data::Object(Object(middle)));
     root.insert(
         SmolStr::new_static("cid"),
-        Data::String(AtprotoStr::String("cid3".into())),
+        Data::String(AtprotoStr::String("cid3")),
     );
 
     let data = Data::Object(Object(root));
@@ -1301,13 +1302,13 @@ fn test_query_combined_wildcard_field() {
     let mut actor1 = BTreeMap::new();
     actor1.insert(
         SmolStr::new_static("handle"),
-        Data::String(AtprotoStr::String("alice".into())),
+        Data::String(AtprotoStr::String("alice")),
     );
 
     let mut actor2 = BTreeMap::new();
     actor2.insert(
         SmolStr::new_static("handle"),
-        Data::String(AtprotoStr::String("bob".into())),
+        Data::String(AtprotoStr::String("bob")),
     );
 
     let actors = Data::Array(Array(vec![
@@ -1331,7 +1332,7 @@ fn test_query_combined_wildcard_field() {
 #[test]
 fn test_query_no_match() {
     let mut map = BTreeMap::new();
-    map.insert(SmolStr::new_static("foo"), Data::Integer(42));
+    map.insert(SmolStr::new_static("foo"), Data::<&str>::Integer(42));
     let data = Data::Object(Object(map));
 
     // Field doesn't exist
@@ -1345,7 +1346,7 @@ fn test_query_no_match() {
 #[test]
 fn test_query_result_helpers() {
     let mut map = BTreeMap::new();
-    map.insert(SmolStr::new_static("value"), Data::Integer(42));
+    map.insert(SmolStr::new_static("value"), Data::<&str>::Integer(42));
     let data = Data::Object(Object(map));
 
     let result = data.query("value");
@@ -1380,7 +1381,7 @@ fn test_type_discriminator() {
 
     // Object without $type field
     let mut map2 = BTreeMap::new();
-    map2.insert(SmolStr::new_static("foo"), Data::Integer(42));
+    map2.insert(SmolStr::new_static("foo"), Data::<&str>::Integer(42));
     let obj2 = Object(map2);
 
     assert_eq!(obj2.type_discriminator(), None);
@@ -1389,7 +1390,7 @@ fn test_type_discriminator() {
     assert_eq!(data2.type_discriminator(), None);
 
     // Non-object data
-    let data3 = Data::Integer(42);
+    let data3: Data = Data::Integer(42);
     assert_eq!(data3.type_discriminator(), None);
 
     // RawData with $type

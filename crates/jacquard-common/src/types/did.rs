@@ -12,7 +12,7 @@ use regex_automata::meta::Regex;
 #[cfg(target_arch = "wasm32")]
 use regex_lite::Regex;
 use serde::{Deserialize, Deserializer, Serialize};
-use smol_str::{SmolStr, ToSmolStr};
+use smol_str::SmolStr;
 
 use super::Lazy;
 
@@ -159,6 +159,13 @@ where
     }
 }
 
+impl<S: Bos<str>> Did<S> {
+    /// Convert to a `Did` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S>>(self) -> Did<B> {
+        Did(B::from(self.0))
+    }
+}
+
 impl FromStr for Did {
     type Err = AtStrError;
 
@@ -258,7 +265,9 @@ mod tests {
         // new() does not strip — use new_owned() for that.
         assert!(Did::<&str>::new("at://did:plc:foo").is_err());
         assert_eq!(
-            Did::<SmolStr>::new_owned("at://did:plc:foo").unwrap().as_str(),
+            Did::<SmolStr>::new_owned("at://did:plc:foo")
+                .unwrap()
+                .as_str(),
             "did:plc:foo"
         );
         assert_eq!(

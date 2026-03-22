@@ -1,10 +1,9 @@
 use crate::deps::fluent_uri::Uri;
 use crate::types::crypto::{CryptoError, PublicKey};
-use crate::types::string::{Did, Handle};
+use crate::types::string::{AtprotoStr, Did, Handle};
 use crate::types::value::Data;
-use crate::{Bos, CowStr, DefaultStr, IntoStatic};
+use crate::{Bos, DefaultStr, IntoStatic};
 use alloc::collections::BTreeMap;
-use alloc::string::String;
 use alloc::vec::Vec;
 use bon::Builder;
 use serde::{Deserialize, Serialize};
@@ -69,9 +68,8 @@ pub struct DidDocument<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub service: Option<Vec<Service<S>>>,
     // Forward‑compatible capture of unmodeled fields
-    // TODO: re-enable extra data fields
-    // #[serde(flatten)]
-    // pub extra_data: BTreeMap<SmolStr, Data<'static>>,
+    #[serde(flatten)]
+    pub extra_data: BTreeMap<SmolStr, Data<S>>,
 }
 
 /// Default context fields for DID documents
@@ -98,7 +96,7 @@ where
             verification_method: self.verification_method.into_static(),
             service: self.service.into_static(),
             // TODO: re-enable extra data fields
-            // extra_data: self.extra_data.into_static(),
+            extra_data: self.extra_data.into_static(),
         }
     }
 }
@@ -135,15 +133,14 @@ where
         })
     }
 
-    /// Extract the AtprotoPersonalDataServer service endpoint as a `fluent_uri::Uri<String>`.
+    /// Extract the AtprotoPersonalDataServer service endpoint as a `fluent_uri::Uri<&str>`.
     /// Accepts endpoint as string or object (string preferred).
     pub fn pds_endpoint(&self) -> Option<Uri<&str>> {
         self.service.as_ref().and_then(|services| {
             services.iter().find_map(|s| {
                 if s.r#type.as_ref() == "AtprotoPersonalDataServer" {
                     match &s.service_endpoint {
-                        Some(strv) => Uri::parse(strv.as_ref()).ok(),
-
+                        Some(Data::String(AtprotoStr::Uri(u))) => Uri::parse(u.as_ref()).ok(),
                         _ => None,
                     }
                 } else {
@@ -185,9 +182,8 @@ pub struct VerificationMethod<S: Bos<str> + AsRef<str>> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key_multibase: Option<S>,
     // Forward‑compatible capture of unmodeled fields
-    // TODO: re-enable extra data fields
-    // #[serde(flatten)]
-    // pub extra_data: BTreeMap<SmolStr, Data<'static>>,
+    #[serde(flatten)]
+    pub extra_data: BTreeMap<SmolStr, Data<S>>,
 }
 
 impl<S> crate::IntoStatic for VerificationMethod<S>
@@ -204,7 +200,7 @@ where
             controller: self.controller.into_static(),
             public_key_multibase: self.public_key_multibase.into_static(),
             // TODO: re-enable extra data fields
-            // extra_data: self.extra_data.into_static(),
+            extra_data: self.extra_data.into_static(),
         }
     }
 }
@@ -224,14 +220,11 @@ pub struct Service<S: Bos<str> + AsRef<str>> {
     #[serde(rename = "type")]
     pub r#type: S,
     /// currently atproto expects this to be a url
-    ///
-    /// TODO: add back in map/set support once Data<'_> is migrated
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub service_endpoint: Option<S>,
+    pub service_endpoint: Option<Data<S>>,
     // Forward‑compatible capture of unmodeled fields
-    // TODO: re-enable extra data fields
-    // #[serde(flatten)]
-    // pub extra_data: BTreeMap<SmolStr, Data<'static>>,
+    #[serde(flatten)]
+    pub extra_data: BTreeMap<SmolStr, Data<S>>,
 }
 
 impl<S> crate::IntoStatic for Service<S>
@@ -247,7 +240,7 @@ where
             r#type: self.r#type.into_static(),
             service_endpoint: self.service_endpoint.into_static(),
             // TODO: re-enable extra data fields
-            // extra_data: self.extra_data.into_static(),
+            extra_data: self.extra_data.into_static(),
         }
     }
 }

@@ -98,6 +98,13 @@ where
     }
 }
 
+impl<T: RecordKeyType> RecordKey<T> {
+    /// Convert the inner key to a different type.
+    pub fn convert<U: RecordKeyType + From<T>>(self) -> RecordKey<U> {
+        RecordKey(U::from(self.0))
+    }
+}
+
 /// AT Protocol record key (generic "any" type)
 ///
 /// Record keys uniquely identify records within a collection. This is the catch-all
@@ -229,6 +236,13 @@ where
 
     fn into_static(self) -> Self::Output {
         Rkey(self.0.into_static())
+    }
+}
+
+impl<S: Bos<str>> Rkey<S> {
+    /// Convert to an `Rkey` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S>>(self) -> Rkey<B> {
+        Rkey(B::from(self.0))
     }
 }
 

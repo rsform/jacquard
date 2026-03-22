@@ -1,10 +1,11 @@
+use crate::bos::{Bos, DefaultStr};
 use alloc::string::{String, ToString};
 use alloc::sync::Arc;
 use core::str::FromStr;
 #[cfg(feature = "std")]
 use miette::{Diagnostic, SourceSpan};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use smol_str::{SmolStr, ToSmolStr};
+use smol_str::SmolStr;
 
 /// Source span for error reporting (offset, length)
 /// With `std` feature, this is `miette::SourceSpan`. Without, a simple tuple struct.
@@ -26,8 +27,6 @@ impl From<(usize, usize)> for SourceSpan {
     }
 }
 
-use crate::bos::{Bos, DefaultStr};
-use crate::cowstr::ToCowStr;
 pub use crate::{
     CowStr,
     types::{
@@ -58,7 +57,7 @@ use crate::{
 /// record keys are intentionally NOT parsed from bare strings as the validation
 /// is too permissive and would catch too many values.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AtprotoStr<S: Bos<str> + AsRef<str> + Clone + Serialize = DefaultStr> {
+pub enum AtprotoStr<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// ISO 8601 datetime
     Datetime(Datetime),
     /// BCP 47 language tag
@@ -90,7 +89,7 @@ use crate::types::did::validate_did;
 use crate::types::handle::validate_handle;
 use crate::types::nsid::validate_nsid;
 
-impl<S: Bos<str> + AsRef<str> + Clone + Serialize> AtprotoStr<S> {
+impl<S: Bos<str> + AsRef<str>> AtprotoStr<S> {
     /// Classify and wrap a string value into the appropriate variant.
     ///
     /// This is fairly exhaustive and potentially **slow**, prefer using anything
@@ -191,13 +190,13 @@ impl<S: Bos<str> + AsRef<str> + Clone + Serialize> AtprotoStr<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Clone + Serialize> AsRef<str> for AtprotoStr<S> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for AtprotoStr<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Clone + Serialize> Serialize for AtprotoStr<S> {
+impl<S: Bos<str> + AsRef<str> + Serialize> Serialize for AtprotoStr<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: Serializer,
@@ -208,7 +207,7 @@ impl<S: Bos<str> + AsRef<str> + Clone + Serialize> Serialize for AtprotoStr<S> {
 
 impl<'de, S> Deserialize<'de> for AtprotoStr<S>
 where
-    S: Bos<str> + AsRef<str> + Clone + Serialize + Deserialize<'de>,
+    S: Bos<str> + AsRef<str> + Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -219,9 +218,29 @@ where
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Clone + Serialize + IntoStatic> IntoStatic for AtprotoStr<S>
+impl<S: Bos<str> + AsRef<str>> AtprotoStr<S> {
+    /// Convert to an `AtprotoStr` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> AtprotoStr<B> {
+        match self {
+            AtprotoStr::Datetime(dt) => AtprotoStr::Datetime(dt),
+            AtprotoStr::Language(lang) => AtprotoStr::Language(lang),
+            AtprotoStr::Tid(tid) => AtprotoStr::Tid(tid),
+            AtprotoStr::Nsid(nsid) => AtprotoStr::Nsid(nsid.convert()),
+            AtprotoStr::Did(did) => AtprotoStr::Did(did.convert()),
+            AtprotoStr::Handle(handle) => AtprotoStr::Handle(handle.convert()),
+            AtprotoStr::AtIdentifier(ident) => AtprotoStr::AtIdentifier(ident.convert()),
+            AtprotoStr::AtUri(at_uri) => AtprotoStr::AtUri(at_uri.convert()),
+            AtprotoStr::Uri(uri) => AtprotoStr::Uri(uri.convert()),
+            AtprotoStr::Cid(cid) => AtprotoStr::Cid(cid.convert()),
+            AtprotoStr::RecordKey(rkey) => AtprotoStr::RecordKey(RecordKey(rkey.0.convert())),
+            AtprotoStr::String(s) => AtprotoStr::String(B::from(s)),
+        }
+    }
+}
+
+impl<S: Bos<str> + AsRef<str> + IntoStatic> IntoStatic for AtprotoStr<S>
 where
-    S::Output: Bos<str> + AsRef<str> + Clone + Serialize,
+    S::Output: Bos<str> + AsRef<str>,
 {
     type Output = AtprotoStr<S::Output>;
 

@@ -4,8 +4,7 @@ use crate::{CowStr, IntoStatic, types::cid::CidLink};
 use alloc::string::{String, ToString};
 use core::convert::Infallible;
 use core::{fmt, hash::Hash, ops::Deref, str::FromStr};
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
-use smol_str::{SmolStr, ToSmolStr};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 /// Blob reference for binary data in AT Protocol.
 ///
@@ -78,6 +77,17 @@ where
     }
 }
 
+impl<S: Bos<str> + AsRef<str>> Blob<S> {
+    /// Convert to a `Blob` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> Blob<B> {
+        Blob {
+            r#ref: self.r#ref.convert(),
+            mime_type: self.mime_type.convert(),
+            size: self.size,
+        }
+    }
+}
+
 /// Tagged blob reference with `$type` field for serde.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "$type", rename_all = "lowercase")]
@@ -126,6 +136,15 @@ where
     }
 }
 
+impl<S: Bos<str> + AsRef<str>> BlobRef<S> {
+    /// Convert to a `BlobRef` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> BlobRef<B> {
+        match self {
+            BlobRef::Blob(blob) => BlobRef::Blob(blob.convert()),
+        }
+    }
+}
+
 /// MIME type identifier for blob data.
 ///
 /// Used to specify the content type of blobs. Supports patterns like "image/*" and "*/*".
@@ -142,34 +161,27 @@ impl<S: Bos<str> + AsRef<str>> MimeType<S> {
     }
 }
 
-impl<'m> MimeType<&'m str> {
-    /// Infallible constructor, borrows from input.
-    pub fn new(mime_type: &'m str) -> Self {
+impl<S: Bos<str>> MimeType<S> {
+    /// Infallible constructor, wraps the input directly.
+    pub fn new(mime_type: S) -> Self {
         Self(mime_type)
     }
 
-    /// Infallible constructor for trusted MIME type strings.
-    pub fn raw(mime_type: &'m str) -> Self {
-        Self(mime_type)
+    /// Convert to a `MimeType` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S>>(self) -> MimeType<B> {
+        MimeType(B::from(self.0))
     }
 }
 
-impl<S: Bos<str> + From<SmolStr>> MimeType<S> {
+impl<S: Bos<str> + FromStr> MimeType<S> {
     /// Infallible constructor, takes ownership.
     pub fn new_owned(mime_type: impl AsRef<str>) -> Self {
-        Self(S::from(mime_type.as_ref().to_smolstr()))
+        Self(S::from_str(mime_type.as_ref()).unwrap_or_else(|_| unreachable!()))
     }
 
     /// Infallible constructor for static strings.
     pub fn new_static(mime_type: &'static str) -> Self {
-        Self(S::from(SmolStr::new_static(mime_type)))
-    }
-}
-
-impl<'m> MimeType<CowStr<'m>> {
-    /// Infallible constructor, borrows if possible.
-    pub fn new_cow(mime_type: CowStr<'m>) -> Self {
-        Self(mime_type)
+        Self(S::from_str(mime_type).unwrap_or_else(|_| unreachable!()))
     }
 }
 

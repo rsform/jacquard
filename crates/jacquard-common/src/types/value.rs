@@ -1,14 +1,15 @@
 use crate::{
-    IntoStatic,
+    Bos, DefaultStr, IntoStatic,
     types::{DataModelType, LexiconStringType, UriType, blob::Blob, string::*},
 };
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use alloc::string::ToString;
 use alloc::vec::Vec;
 use bytes::Bytes;
 use core::convert::Infallible;
 use ipld_core::ipld::Ipld;
+use serde::Serialize;
 use smol_str::{SmolStr, ToSmolStr};
 
 /// Conversion utilities for Data types
@@ -31,7 +32,7 @@ mod tests;
 /// This is the generic "unknown data" type used for lexicon values, extra fields captured
 /// by `#[lexicon]`, and IPLD data structures.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Data<'s> {
+pub enum Data<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Null value
     Null,
     /// Boolean value
@@ -39,17 +40,19 @@ pub enum Data<'s> {
     /// Integer value (no floats in AT Protocol)
     Integer(i64),
     /// String value (parsed into specific AT Protocol types when possible)
-    String(AtprotoStr<CowStr<'s>>),
+    String(AtprotoStr<S>),
     /// Raw bytes
     Bytes(Bytes),
     /// CID link reference
-    CidLink(Cid<CowStr<'s>>),
+    CidLink(Cid<S>),
     /// Array of values
-    Array(Array<'s>),
+    Array(Array<S>),
     /// Object/map of values
-    Object(Object<'s>),
+    Object(Object<S>),
     /// Blob reference with metadata
-    Blob(Blob<CowStr<'s>>),
+    Blob(Blob<S>),
+    /// Invalid number (floating point)
+    InvalidNumber(S),
 }
 
 /// Errors that can occur when working with AT Protocol data
@@ -61,7 +64,10 @@ pub enum AtDataError {
     FloatNotAllowed,
 }
 
-impl<'s> Data<'s> {
+impl<S> Data<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
     /// Get the data model type of this value
     pub fn data_type(&self) -> DataModelType {
         match self {
@@ -98,34 +104,12 @@ impl<'s> Data<'s> {
             Data::Array(_) => DataModelType::Array,
             Data::Object(_) => DataModelType::Object,
             Data::Blob(_) => DataModelType::Blob,
+            Data::InvalidNumber(_) => DataModelType::Bytes,
         }
-    }
-    /// Parse a Data value from a JSON value
-    pub fn from_json(json: &'s serde_json::Value) -> Result<Self, AtDataError> {
-        Ok(if let Some(value) = json.as_bool() {
-            Self::Boolean(value)
-        } else if let Some(value) = json.as_i64() {
-            Self::Integer(value)
-        } else if let Some(value) = json.as_str() {
-            Self::String(parsing::parse_string(value))
-        } else if let Some(value) = json.as_array() {
-            Self::Array(Array::from_json(value)?)
-        } else if let Some(value) = json.as_object() {
-            Object::from_json(value)?
-        } else if json.is_f64() {
-            return Err(AtDataError::FloatNotAllowed);
-        } else {
-            Self::Null
-        })
-    }
-
-    /// Parse a Data value from a JSON value (owned)
-    pub fn from_json_owned(json: serde_json::Value) -> Result<Data<'static>, AtDataError> {
-        Data::from_json(&json).map(|data| data.into_static())
     }
 
     /// Get as object if this is an Object variant
-    pub fn as_object(&self) -> Option<&Object<'s>> {
+    pub fn as_object(&self) -> Option<&Object<S>> {
         if let Data::Object(obj) = self {
             Some(obj)
         } else {
@@ -134,7 +118,7 @@ impl<'s> Data<'s> {
     }
 
     /// Get as array if this is an Array variant
-    pub fn as_array(&self) -> Option<&Array<'s>> {
+    pub fn as_array(&self) -> Option<&Array<S>> {
         if let Data::Array(arr) = self {
             Some(arr)
         } else {
@@ -152,7 +136,7 @@ impl<'s> Data<'s> {
     }
 
     /// Get as object if this is an Object variant
-    pub fn as_object_mut<'a>(&'a mut self) -> Option<&'a mut Object<'s>> {
+    pub fn as_object_mut<'a>(&'a mut self) -> Option<&'a mut Object<S>> {
         if let Data::Object(obj) = self {
             Some(obj)
         } else {
@@ -161,7 +145,7 @@ impl<'s> Data<'s> {
     }
 
     /// Get as array if this is an Array variant
-    pub fn as_array_mut<'a>(&'a mut self) -> Option<&'a mut Array<'s>> {
+    pub fn as_array_mut<'a>(&'a mut self) -> Option<&'a mut Array<S>> {
         if let Data::Array(arr) = self {
             Some(arr)
         } else {
@@ -170,7 +154,7 @@ impl<'s> Data<'s> {
     }
 
     /// Get as string if this is a String variant
-    pub fn as_str_mut(&'s mut self) -> Option<&'s mut AtprotoStr<CowStr<'s>>> {
+    pub fn as_str_mut<'s>(&'s mut self) -> Option<&'s mut AtprotoStr<S>> {
         if let Data::String(s) = self {
             Some(s)
         } else {
@@ -232,7 +216,10 @@ impl<'s> Data<'s> {
     /// This produces the deterministic CBOR encoding used for content-addressing.
     pub fn to_dag_cbor(
         &self,
-    ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<alloc::collections::TryReserveError>> {
+    ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<alloc::collections::TryReserveError>>
+    where
+        S: Serialize,
+    {
         serde_ipld_dagcbor::to_vec(self)
     }
 
@@ -250,23 +237,23 @@ impl<'s> Data<'s> {
     ///     println!("Alt text: {}", alt_text.as_str().unwrap());
     /// }
     /// ```
-    pub fn get_at_path(&'s self, path: &str) -> Option<&'s Data<'s>> {
+    pub fn get_at_path<'s>(&'s self, path: &str) -> Option<&'s Data<S>> {
         parse_and_traverse_path(self, path)
     }
 
     /// Get a mutable reference to a field at the given path
     ///
     /// Uses the same path syntax as [`get_at_path`](Self::get_at_path).
-    pub fn get_at_path_mut(&mut self, path: &str) -> Option<&mut Data<'s>> {
+    pub fn get_at_path_mut(&mut self, path: &str) -> Option<&mut Data<S>> {
         parse_and_traverse_path_mut(self, path)
     }
 
     /// Set the value at the given path, returning true if successful
     ///
     /// Uses the same path syntax as [`get_at_path`](Self::get_at_path).
-    pub fn set_at_path(&mut self, path: &str, new_data: Data<'_>) -> bool {
+    pub fn set_at_path(&mut self, path: &str, new_data: Data<S>) -> bool {
         if let Some(data) = parse_and_traverse_path_mut(self, path) {
-            *data = new_data.into_static();
+            *data = new_data;
             true
         } else {
             false
@@ -292,31 +279,36 @@ impl<'s> Data<'s> {
     /// // Global recursion
     /// let all_cids = data.query("...cid"); // all CIDs anywhere
     /// ```
-    pub fn query(&'s self, pattern: &str) -> QueryResult<'s> {
+    pub fn query<'s>(&'s self, pattern: &str) -> QueryResult<'s, S> {
         query_data(self, pattern)
-    }
-
-    /// Parse a Data value from an IPLD value (CBOR)
-    pub fn from_cbor(cbor: &'s Ipld) -> Result<Self, AtDataError> {
-        Ok(match cbor {
-            Ipld::Null => Data::Null,
-            Ipld::Bool(bool) => Data::Boolean(*bool),
-            Ipld::Integer(int) => Data::Integer(*int as i64),
-            Ipld::Float(_) => {
-                return Err(AtDataError::FloatNotAllowed);
-            }
-            Ipld::String(string) => Self::String(parsing::parse_string(string)),
-            Ipld::Bytes(items) => Self::Bytes(Bytes::copy_from_slice(items.as_slice())),
-            Ipld::List(iplds) => Self::Array(Array::from_cbor(iplds)?),
-            Ipld::Map(btree_map) => Object::from_cbor(btree_map)?,
-            Ipld::Link(cid) => Self::CidLink(Cid::ipld(*cid)),
-        })
     }
 }
 
-impl IntoStatic for Data<'_> {
-    type Output = Data<'static>;
-    fn into_static(self) -> Data<'static> {
+impl<S: Bos<str> + AsRef<str>> Data<S> {
+    /// Convert to a `Data` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> Data<B> {
+        match self {
+            Data::Null => Data::Null,
+            Data::Boolean(b) => Data::Boolean(b),
+            Data::Integer(i) => Data::Integer(i),
+            Data::String(s) => Data::String(s.convert()),
+            Data::Bytes(b) => Data::Bytes(b),
+            Data::CidLink(cid) => Data::CidLink(cid.convert()),
+            Data::Array(arr) => Data::Array(arr.convert()),
+            Data::Object(obj) => Data::Object(obj.convert()),
+            Data::Blob(blob) => Data::Blob(blob.convert()),
+            Data::InvalidNumber(float) => Data::InvalidNumber(float.into()),
+        }
+    }
+}
+
+impl<S> IntoStatic for Data<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    <S as IntoStatic>::Output: AsRef<str> + Bos<str>,
+{
+    type Output = Data<<S as IntoStatic>::Output>;
+    fn into_static(self) -> Data<<S as IntoStatic>::Output> {
         match self {
             Data::Null => Data::Null,
             Data::Boolean(bool) => Data::Boolean(bool),
@@ -327,22 +319,39 @@ impl IntoStatic for Data<'_> {
             Data::Object(object) => Data::Object(object.into_static()),
             Data::CidLink(cid) => Data::CidLink(cid.into_static()),
             Data::Blob(blob) => Data::Blob(blob.into_static()),
+            Data::InvalidNumber(float) => Data::InvalidNumber(float.into_static()),
         }
     }
 }
 
 /// Array of AT Protocol data values
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Array<'s>(pub Vec<Data<'s>>);
+pub struct Array<S = DefaultStr>(pub Vec<Data<S>>)
+where
+    S: Bos<str> + AsRef<str>;
 
-impl IntoStatic for Array<'_> {
-    type Output = Array<'static>;
-    fn into_static(self) -> Array<'static> {
+impl<S: Bos<str> + AsRef<str>> Array<S> {
+    /// Convert to an `Array` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> Array<B> {
+        Array(self.0.into_iter().map(|d| d.convert()).collect())
+    }
+}
+
+impl<S> IntoStatic for Array<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    <S as IntoStatic>::Output: AsRef<str> + Bos<str>,
+{
+    type Output = Array<<S as IntoStatic>::Output>;
+    fn into_static(self) -> Array<<S as IntoStatic>::Output> {
         Array(self.0.into_static())
     }
 }
 
-impl<'s> Array<'s> {
+impl<S> Array<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
     /// Get the number of elements in the array
     pub fn len(&self) -> usize {
         self.0.len()
@@ -354,40 +363,26 @@ impl<'s> Array<'s> {
     }
 
     /// Get an element by index
-    pub fn get(&self, index: usize) -> Option<&Data<'s>> {
+    pub fn get(&self, index: usize) -> Option<&Data<S>> {
         self.0.get(index)
     }
 
     /// Get a mutable reference to an element by index
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut Data<'s>> {
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut Data<S>> {
         self.0.get_mut(index)
     }
 
     /// Get an iterator over the array elements
-    pub fn iter(&self) -> core::slice::Iter<'_, Data<'s>> {
+    pub fn iter(&self) -> core::slice::Iter<'_, Data<S>> {
         self.0.iter()
-    }
-
-    /// Parse an array from JSON values
-    pub fn from_json(json: &'s Vec<serde_json::Value>) -> Result<Self, AtDataError> {
-        let mut array = Vec::with_capacity(json.len());
-        for item in json {
-            array.push(Data::from_json(item)?);
-        }
-        Ok(Self(array))
-    }
-    /// Parse an array from IPLD values (CBOR)
-    pub fn from_cbor(cbor: &'s Vec<Ipld>) -> Result<Self, AtDataError> {
-        let mut array = Vec::with_capacity(cbor.len());
-        for item in cbor {
-            array.push(Data::from_cbor(item)?);
-        }
-        Ok(Self(array))
     }
 }
 
-impl<'s> core::ops::Index<usize> for Array<'s> {
-    type Output = Data<'s>;
+impl<S> core::ops::Index<usize> for Array<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    type Output = Data<S>;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.0[index]
@@ -396,23 +391,39 @@ impl<'s> core::ops::Index<usize> for Array<'s> {
 
 /// Object/map of AT Protocol data values
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Object<'s>(pub BTreeMap<SmolStr, Data<'s>>);
+pub struct Object<S = DefaultStr>(pub BTreeMap<SmolStr, Data<S>>)
+where
+    S: Bos<str> + AsRef<str>;
 
-impl IntoStatic for Object<'_> {
-    type Output = Object<'static>;
-    fn into_static(self) -> Object<'static> {
+impl<S: Bos<str> + AsRef<str>> Object<S> {
+    /// Convert to an `Object` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> Object<B> {
+        Object(self.0.into_iter().map(|(k, v)| (k, v.convert())).collect())
+    }
+}
+
+impl<S> IntoStatic for Object<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    <S as IntoStatic>::Output: AsRef<str> + Bos<str>,
+{
+    type Output = Object<<S as IntoStatic>::Output>;
+    fn into_static(self) -> Object<<S as IntoStatic>::Output> {
         Object(self.0.into_static())
     }
 }
 
-impl<'s> Object<'s> {
+impl<S> Object<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     /// Get a value by key
-    pub fn get(&self, key: &str) -> Option<&Data<'s>> {
+    pub fn get(&self, key: &str) -> Option<&Data<S>> {
         self.0.get(key)
     }
 
     /// Get a mutable reference to a value by key
-    pub fn get_mut(&mut self, key: &str) -> Option<&mut Data<'s>> {
+    pub fn get_mut(&mut self, key: &str) -> Option<&mut Data<S>> {
         self.0.get_mut(key)
     }
 
@@ -432,12 +443,12 @@ impl<'s> Object<'s> {
     }
 
     /// Get an iterator over the key-value pairs
-    pub fn iter(&self) -> alloc::collections::btree_map::Iter<'_, SmolStr, Data<'s>> {
+    pub fn iter(&self) -> alloc::collections::btree_map::Iter<'_, SmolStr, Data<S>> {
         self.0.iter()
     }
 
     /// Get an iterator over the keys
-    pub fn keys(&self) -> alloc::collections::btree_map::Keys<'_, SmolStr, Data<'s>> {
+    pub fn keys(&self) -> alloc::collections::btree_map::Keys<'_, SmolStr, Data<S>> {
         self.0.keys()
     }
 
@@ -449,140 +460,16 @@ impl<'s> Object<'s> {
     }
 
     /// Get an iterator over the values
-    pub fn values(&self) -> alloc::collections::btree_map::Values<'_, SmolStr, Data<'s>> {
+    pub fn values(&self) -> alloc::collections::btree_map::Values<'_, SmolStr, Data<S>> {
         self.0.values()
-    }
-
-    /// Parse an object from a JSON map with type inference
-    ///
-    /// Uses key names to infer the appropriate AT Protocol types for values.
-    pub fn from_json(
-        json: &'s serde_json::Map<String, serde_json::Value>,
-    ) -> Result<Data<'s>, AtDataError> {
-        if let Some(type_field) = json.get("$type").and_then(|v| v.as_str()) {
-            if parsing::infer_from_type(type_field) == DataModelType::Blob {
-                if let Some(blob) = parsing::json_to_blob(json) {
-                    return Ok(Data::Blob(blob));
-                }
-            }
-        }
-        let mut map = BTreeMap::new();
-
-        for (key, value) in json {
-            if key == "$type" {
-                map.insert(key.to_smolstr(), Data::from_json(value)?);
-            }
-            match parsing::string_key_type_guess(key) {
-                DataModelType::Null if value.is_null() => {
-                    map.insert(key.to_smolstr(), Data::Null);
-                }
-                DataModelType::Boolean if value.is_boolean() => {
-                    map.insert(key.to_smolstr(), Data::Boolean(value.as_bool().unwrap()));
-                }
-                DataModelType::Integer if value.is_i64() => {
-                    map.insert(key.to_smolstr(), Data::Integer(value.as_i64().unwrap()));
-                }
-                DataModelType::Bytes if value.is_string() => {
-                    map.insert(
-                        key.to_smolstr(),
-                        parsing::decode_bytes(value.as_str().unwrap()),
-                    );
-                }
-                DataModelType::CidLink => {
-                    if let Some(value) = value.as_object() {
-                        if let Some(value) = value.get("$link").and_then(|v| v.as_str()) {
-                            map.insert(key.to_smolstr(), Data::CidLink(Cid::Str(value.into())));
-                        } else {
-                            map.insert(key.to_smolstr(), Object::from_json(value)?);
-                        }
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value)?);
-                    }
-                }
-                DataModelType::Blob if value.is_object() => {
-                    map.insert(
-                        key.to_smolstr(),
-                        Object::from_json(value.as_object().unwrap())?,
-                    );
-                }
-                DataModelType::Array if value.is_array() => {
-                    map.insert(
-                        key.to_smolstr(),
-                        Data::Array(Array::from_json(value.as_array().unwrap())?),
-                    );
-                }
-                DataModelType::Object if value.is_object() => {
-                    map.insert(
-                        key.to_smolstr(),
-                        Object::from_json(value.as_object().unwrap())?,
-                    );
-                }
-                DataModelType::String(string_type) if value.is_string() => {
-                    parsing::insert_string(&mut map, key, value.as_str().unwrap(), string_type)?;
-                }
-                _ => {
-                    map.insert(key.to_smolstr(), Data::from_json(value)?);
-                }
-            }
-        }
-
-        Ok(Data::Object(Object(map)))
-    }
-
-    /// Parse an object from IPLD (CBOR) with type inference
-    ///
-    /// Uses key names to infer the appropriate AT Protocol types for values.
-    pub fn from_cbor(cbor: &'s BTreeMap<String, Ipld>) -> Result<Data<'s>, AtDataError> {
-        if let Some(Ipld::String(type_field)) = cbor.get("$type") {
-            if parsing::infer_from_type(type_field) == DataModelType::Blob {
-                if let Some(blob) = parsing::cbor_to_blob(cbor) {
-                    return Ok(Data::Blob(blob));
-                }
-            }
-        }
-        let mut map = BTreeMap::new();
-
-        for (key, value) in cbor {
-            if key == "$type" {
-                map.insert(key.to_smolstr(), Data::from_cbor(value)?);
-            }
-            match (parsing::string_key_type_guess(key), value) {
-                (DataModelType::Null, Ipld::Null) => {
-                    map.insert(key.to_smolstr(), Data::Null);
-                }
-                (DataModelType::Boolean, Ipld::Bool(value)) => {
-                    map.insert(key.to_smolstr(), Data::Boolean(*value));
-                }
-                (DataModelType::Integer, Ipld::Integer(int)) => {
-                    map.insert(key.to_smolstr(), Data::Integer(*int as i64));
-                }
-                (DataModelType::Bytes, Ipld::Bytes(value)) => {
-                    map.insert(key.to_smolstr(), Data::Bytes(Bytes::copy_from_slice(value)));
-                }
-                (DataModelType::Blob, Ipld::Map(value)) => {
-                    map.insert(key.to_smolstr(), Object::from_cbor(value)?);
-                }
-                (DataModelType::Array, Ipld::List(value)) => {
-                    map.insert(key.to_smolstr(), Data::Array(Array::from_cbor(value)?));
-                }
-                (DataModelType::Object, Ipld::Map(value)) => {
-                    map.insert(key.to_smolstr(), Object::from_cbor(value)?);
-                }
-                (DataModelType::String(string_type), Ipld::String(value)) => {
-                    parsing::insert_string(&mut map, key, value, string_type)?;
-                }
-                _ => {
-                    map.insert(key.to_smolstr(), Data::from_cbor(value)?);
-                }
-            }
-        }
-
-        Ok(Data::Object(Object(map)))
     }
 }
 
-impl<'s> core::ops::Index<&str> for Object<'s> {
-    type Output = Data<'s>;
+impl<S> core::ops::Index<&str> for Object<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    type Output = Data<S>;
 
     fn index(&self, key: &str) -> &Self::Output {
         &self.0[key]
@@ -834,9 +721,10 @@ impl IntoStatic for RawData<'_> {
 /// # Ok(())
 /// # }
 /// ```
-pub fn from_data<'de, T>(data: &'de Data<'de>) -> Result<T, DataDeserializerError>
+pub fn from_data<'de, T, S>(data: &'de Data<S>) -> Result<T, DataDeserializerError>
 where
     T: serde::Deserialize<'de>,
+    S: Bos<str> + AsRef<str> + serde::Deserialize<'de> + core::convert::From<&'de str>,
 {
     T::deserialize(data)
 }
@@ -844,11 +732,15 @@ where
 /// Deserialize a typed value from a `Data` value
 ///
 /// Takes ownership rather than borrows. Will allocate.
-pub fn from_data_owned<'de, T>(data: Data<'_>) -> Result<T, DataDeserializerError>
+pub fn from_data_owned<'de, T, S>(
+    data: Data<S>,
+) -> Result<<T as IntoStatic>::Output, DataDeserializerError>
 where
-    T: serde::Deserialize<'de>,
+    T: serde::Deserialize<'de> + IntoStatic,
+    S: Bos<str> + AsRef<str> + serde::Deserialize<'de> + IntoStatic + core::convert::From<&'de str>,
+    <S as IntoStatic>::Output: Bos<str> + AsRef<str>,
 {
-    T::deserialize(data.into_static())
+    T::deserialize(data).map(|d| d.into_static())
 }
 
 /// Deserialize a typed value from a `serde_json::Value`
@@ -976,9 +868,10 @@ where
 /// # Ok(())
 /// # }
 /// ```
-pub fn to_data<T>(value: &T) -> Result<Data<'static>, convert::ConversionError>
+pub fn to_data<'s, T, S>(value: &T) -> Result<Data<S>, convert::ConversionError>
 where
     T: serde::Serialize,
+    S: Bos<str> + AsRef<str> + serde::Serialize + From<CowStr<'s>>,
 {
     let raw = to_raw_data(value).map_err(|e| convert::ConversionError::InvalidRawData {
         message: e.to_string(),
@@ -987,7 +880,10 @@ where
 }
 
 /// Parse and traverse a path through nested Data structures
-fn parse_and_traverse_path<'s>(data: &'s Data<'s>, path: &str) -> Option<&'s Data<'s>> {
+fn parse_and_traverse_path<'s, S>(data: &'s Data<S>, path: &str) -> Option<&'s Data<S>>
+where
+    S: AsRef<str> + Bos<str>,
+{
     let mut current = data;
     let mut path = path.trim_start_matches('.');
 
@@ -1049,10 +945,13 @@ fn parse_and_traverse_raw_path<'d>(data: &'d RawData<'d>, path: &str) -> Option<
 }
 
 /// Parse and traverse a path through nested Data structures
-fn parse_and_traverse_path_mut<'d, 's>(
-    data: &'s mut Data<'d>,
+fn parse_and_traverse_path_mut<'d, 's, S>(
+    data: &'s mut Data<S>,
     path: &str,
-) -> Option<&'s mut Data<'d>> {
+) -> Option<&'s mut Data<S>>
+where
+    S: AsRef<str> + Bos<str>,
+{
     let mut current = data;
     let mut path = path.trim_start_matches('.');
 
@@ -1118,20 +1017,26 @@ fn parse_and_traverse_raw_path_mut<'a, 'd>(
 
 /// Result of a data query operation
 #[derive(Debug, Clone, PartialEq)]
-pub enum QueryResult<'s> {
+pub enum QueryResult<'s, S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     /// Single value expected and found
-    Single(&'s Data<'s>),
+    Single(&'s Data<S>),
 
     /// Multiple values from wildcard or global recursion
-    Multiple(Vec<QueryMatch<'s>>),
+    Multiple(Vec<QueryMatch<'s, S>>),
 
     /// No matches found
     None,
 }
 
-impl<'s> QueryResult<'s> {
+impl<'s, S> QueryResult<'s, S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     /// Get single value if available
-    pub fn single(&self) -> Option<&'s Data<'s>> {
+    pub fn single(&self) -> Option<&'s Data<S>> {
         match self {
             QueryResult::Single(data) => Some(data),
             _ => None,
@@ -1139,7 +1044,7 @@ impl<'s> QueryResult<'s> {
     }
 
     /// Get multiple matches if available
-    pub fn multiple(&self) -> Option<&[QueryMatch<'s>]> {
+    pub fn multiple(&self) -> Option<&[QueryMatch<'s, S>]> {
         match self {
             QueryResult::Multiple(matches) => Some(matches),
             _ => None,
@@ -1147,7 +1052,7 @@ impl<'s> QueryResult<'s> {
     }
 
     /// Get first value regardless of result type
-    pub fn first(&self) -> Option<&'s Data<'s>> {
+    pub fn first(&self) -> Option<&'s Data<S>> {
         match self {
             QueryResult::Single(data) => Some(data),
             QueryResult::Multiple(matches) => matches.first().and_then(|m| m.value),
@@ -1161,7 +1066,7 @@ impl<'s> QueryResult<'s> {
     }
 
     /// Get all values as an iterator (flattens single/multiple)
-    pub fn values(&self) -> impl Iterator<Item = &'s Data<'s>> {
+    pub fn values(&self) -> impl Iterator<Item = &'s Data<S>> {
         match self {
             QueryResult::Single(data) => vec![*data].into_iter(),
             QueryResult::Multiple(matches) => matches
@@ -1176,11 +1081,14 @@ impl<'s> QueryResult<'s> {
 
 /// A single match from a query operation
 #[derive(Debug, Clone, PartialEq)]
-pub struct QueryMatch<'s> {
+pub struct QueryMatch<'s, S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     /// Path where this value was found (e.g., "actors\[0\].handle")
     pub path: SmolStr,
     /// The value (None if field was missing during wildcard iteration)
-    pub value: Option<&'s Data<'s>>,
+    pub value: Option<&'s Data<S>>,
 }
 
 /// Query pattern segment
@@ -1256,7 +1164,10 @@ fn parse_query_pattern(pattern: &str) -> Vec<QuerySegment> {
 }
 
 /// Execute a query on data
-fn query_data<'s>(data: &'s Data<'s>, pattern: &str) -> QueryResult<'s> {
+fn query_data<'s, S>(data: &'s Data<S>, pattern: &str) -> QueryResult<'s, S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     let segments = parse_query_pattern(pattern);
     if segments.is_empty() {
         return QueryResult::None;
@@ -1294,7 +1205,13 @@ fn query_data<'s>(data: &'s Data<'s>, pattern: &str) -> QueryResult<'s> {
 }
 
 /// Execute a single segment on current results
-fn execute_segment<'s>(current: &[QueryMatch<'s>], segment: &QuerySegment) -> Vec<QueryMatch<'s>> {
+fn execute_segment<'s, S>(
+    current: &[QueryMatch<'s, S>],
+    segment: &QuerySegment,
+) -> Vec<QueryMatch<'s, S>>
+where
+    S: AsRef<str> + Bos<str>,
+{
     let mut next = Vec::new();
 
     for qm in current {
@@ -1351,11 +1268,14 @@ fn execute_segment<'s>(current: &[QueryMatch<'s>], segment: &QuerySegment) -> Ve
 }
 
 /// Recursively find first occurrence of a field (scoped recursion)
-fn find_field_recursive<'s>(
-    data: &'s Data<'s>,
+fn find_field_recursive<'s, S>(
+    data: &'s Data<S>,
     field: &str,
     base_path: &SmolStr,
-) -> Option<QueryMatch<'s>> {
+) -> Option<QueryMatch<'s, S>>
+where
+    S: AsRef<str> + Bos<str>,
+{
     match data {
         Data::Object(obj) => {
             // Check direct children first
@@ -1390,12 +1310,14 @@ fn find_field_recursive<'s>(
 }
 
 /// Recursively find all occurrences of a field (global recursion)
-fn find_all_fields_recursive<'s>(
-    data: &'s Data<'s>,
+fn find_all_fields_recursive<'s, S>(
+    data: &'s Data<S>,
     field: &str,
     base_path: &SmolStr,
-    results: &mut Vec<QueryMatch<'s>>,
-) {
+    results: &mut Vec<QueryMatch<'s, S>>,
+) where
+    S: AsRef<str> + Bos<str>,
+{
     match data {
         Data::Object(obj) => {
             // Check direct children

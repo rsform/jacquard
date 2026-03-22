@@ -1,5 +1,5 @@
+use crate::Bos;
 use crate::types::cid::IpldCid;
-use alloc::borrow::ToOwned;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
@@ -8,7 +8,9 @@ use alloc::vec::Vec;
 use base64::{Engine, prelude::BASE64_STANDARD};
 use bytes::Bytes;
 use core::fmt;
+use core::marker::PhantomData;
 use core::str::FromStr;
+use serde::de::value::StrDeserializer;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::VariantAccess};
 use smol_str::{SmolStr, ToSmolStr};
 
@@ -28,7 +30,10 @@ use crate::{
     },
 };
 
-impl Serialize for Data<'_> {
+impl<D> Serialize for Data<D>
+where
+    D: Bos<str> + AsRef<str> + Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -65,13 +70,20 @@ impl Serialize for Data<'_> {
             Data::Array(arr) => arr.serialize(serializer),
             Data::Object(obj) => obj.serialize(serializer),
             Data::Blob(blob) => blob.serialize(serializer),
+            Data::InvalidNumber(float) => {
+                if let Ok(f) = float.as_ref().parse::<f32>() {
+                    f.serialize(serializer)
+                } else {
+                    float.serialize(serializer)
+                }
+            }
         }
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for Data<'a>
+impl<'de, S> Deserialize<'de> for Data<S>
 where
-    'de: 'a,
+    S: Bos<str> + AsRef<str> + Deserialize<'de>,
 {
     /// Currently only works for self-describing formats
     /// Thankfully the supported atproto data formats are both self-describing (json and dag-cbor).
@@ -80,14 +92,17 @@ where
     where
         D: Deserializer<'de>,
     {
-        deserializer.deserialize_any(DataVisitor)
+        deserializer.deserialize_any(DataVisitor(PhantomData))
     }
 }
 
-struct DataVisitor;
+struct DataVisitor<S>(PhantomData<S>);
 
-impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
-    type Value = Data<'v>;
+impl<'de: 'v, 'v, S> serde::de::Visitor<'v> for DataVisitor<S>
+where
+    S: Bos<str> + AsRef<str> + Deserialize<'v>,
+{
+    type Value = Data<S>;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_str("any valid AT Protocol data value")
@@ -135,13 +150,13 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
         Ok(Data::Integer((v % (i64::MAX as u64)) as i64))
     }
 
-    fn visit_f64<E>(self, _v: f64) -> Result<Self::Value, E>
+    fn visit_f64<E>(self, v: f64) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        Ok(Data::String(AtprotoStr::String(
-            CowStr::Owned(_v.to_smolstr()).into_static(),
-        )))
+        let v = v.to_smolstr();
+        let s = StrDeserializer::new(v.as_str());
+        Ok(Data::InvalidNumber(S::deserialize(s)?))
         // Err(E::custom(
         //     "floating point numbers not allowed in AT protocol data",
         // ))
@@ -151,25 +166,24 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
     where
         E: serde::de::Error,
     {
-        Ok(Data::String(AtprotoStr::String(
-            CowStr::Borrowed(v).into_static(),
-        )))
+        let s = StrDeserializer::new(v);
+        Ok(Data::String(AtprotoStr::String(S::deserialize(s)?)))
     }
 
     fn visit_borrowed_str<E>(self, v: &'v str) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        // Don't infer type here - just store as plain string
-        // Type inference happens in apply_type_inference based on field names
-        Ok(Data::String(AtprotoStr::String(v.into())))
+        let s = StrDeserializer::new(v);
+        Ok(Data::String(AtprotoStr::String(S::deserialize(s)?)))
     }
 
     fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        Ok(Data::String(AtprotoStr::String(v.into())))
+        let s = StrDeserializer::new(&v);
+        Ok(Data::String(AtprotoStr::String(S::deserialize(s)?)))
     }
 
     fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
@@ -200,7 +214,7 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
         match data.variant::<SmolStr>() {
             Ok((key, value)) => {
                 let mut map = BTreeMap::new();
-                if let Ok(variant) = value.newtype_variant::<Data>() {
+                if let Ok(variant) = value.newtype_variant::<Data<S>>() {
                     map.insert(key, variant);
                 }
                 Ok(Data::Object(Object(map)))
@@ -224,7 +238,7 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
     where
         D: Deserializer<'v>,
     {
-        deserializer.deserialize_any(CidAwareVisitor)
+        deserializer.deserialize_any(CidAwareVisitor(PhantomData))
     }
 
     fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
@@ -234,28 +248,30 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
         use serde::de::Error;
 
         // Peek at first key to check for special single-key patterns
-        let mut temp_map: BTreeMap<SmolStr, Data<'v>> = BTreeMap::new();
+        let mut temp_map: BTreeMap<SmolStr, Data<S>> = BTreeMap::new();
 
         while let Some(key) = map.next_key::<SmolStr>()? {
             // Check for special patterns on single-key maps
             if temp_map.is_empty() {
                 if key.as_str() == "$link" {
                     // {"$link": "cid_string"} pattern
-                    let cid_str: String = map.next_value()?;
+                    let cid_str: S = map.next_value()?;
                     // Check if there are more keys
                     if let Some(next_key) = map.next_key::<SmolStr>()? {
                         // More keys, treat as regular object
                         temp_map.insert(key, Data::String(AtprotoStr::String(cid_str.into())));
-                        let next_value: Data = map.next_value()?;
+                        let next_value: Data<S> = map.next_value()?;
                         temp_map.insert(next_key, next_value);
                         continue;
                     } else {
                         // Only key, return CidLink
-                        return Ok(Data::CidLink(Cid::cow_str(CowStr::from(cid_str))));
+                        return Ok(Data::CidLink(unsafe {
+                            Cid::unchecked_str(S::from(cid_str))
+                        }));
                     }
                 } else if key.as_str() == "$bytes" {
                     // {"$bytes": "base64_string"} pattern
-                    let bytes_str: String = map.next_value()?;
+                    let bytes_str: S = map.next_value()?;
                     // Check if there are more keys
                     if map.next_key::<SmolStr>()?.is_some() {
                         // More keys, treat as regular object - shouldn't happen but handle it
@@ -263,12 +279,12 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
                         continue;
                     } else {
                         // Only key, decode and return bytes
-                        return Ok(decode_bytes(&bytes_str));
+                        return Ok(decode_bytes(bytes_str));
                     }
                 }
             }
 
-            let value: Data = map.next_value()?;
+            let value: Data<S> = map.next_value()?;
             temp_map.insert(key, value);
         }
 
@@ -277,20 +293,21 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
     }
 }
 
-fn apply_type_inference<'s>(mut map: BTreeMap<SmolStr, Data<'s>>) -> Result<Data<'s>, AtDataError> {
+fn apply_type_inference<'s, S>(mut map: BTreeMap<SmolStr, Data<S>>) -> Result<Data<S>, AtDataError>
+where
+    S: AsRef<str> + Bos<str>,
+{
     // Check for CID link pattern first: {"$link": "cid_string"}
     if map.len() == 1 {
-        if let Some(Data::String(AtprotoStr::String(link))) = map.get("$link") {
-            // Need to extract ownership, can't borrow from map we're about to consume
-            let link_owned = link.clone();
-            return Ok(Data::CidLink(Cid::cow_str(link_owned)));
+        if let Some(Data::String(AtprotoStr::String(link))) = map.remove("$link") {
+            return Ok(Data::CidLink(unsafe { Cid::unchecked_str(link) }));
         }
     }
 
     // Check for $type field to detect special structures
-    let type_field = map.get("$type").and_then(|v| {
+    let type_field = map.remove("$type").and_then(|v| {
         if let Data::String(AtprotoStr::String(s)) = v {
-            Some(s.as_ref())
+            Some(s)
         } else {
             None
         }
@@ -298,27 +315,27 @@ fn apply_type_inference<'s>(mut map: BTreeMap<SmolStr, Data<'s>>) -> Result<Data
 
     // Check for blob
     if let Some(type_str) = type_field {
-        if infer_from_type(type_str) == DataModelType::Blob {
+        if infer_from_type(type_str.as_ref()) == DataModelType::Blob {
             // Try to construct blob from the collected data
-            let ref_cid = map.get("ref").and_then(|v| {
+            let ref_cid = map.remove("ref").and_then(|v| {
                 if let Data::CidLink(cid) = v {
-                    Some(cid.clone())
+                    Some(cid)
                 } else {
                     None
                 }
             });
 
-            let mime_type = map.get("mimeType").and_then(|v| {
+            let mime_type = map.remove("mimeType").and_then(|v| {
                 if let Data::String(AtprotoStr::String(s)) = v {
-                    Some(s.clone())
+                    Some(s)
                 } else {
                     None
                 }
             });
 
-            let size = map.get("size").and_then(|v| {
+            let size = map.remove("size").and_then(|v| {
                 if let Data::Integer(i) = v {
-                    Some(*i as usize)
+                    Some(i as usize)
                 } else {
                     None
                 }
@@ -328,73 +345,130 @@ fn apply_type_inference<'s>(mut map: BTreeMap<SmolStr, Data<'s>>) -> Result<Data
                 return Ok(Data::Blob(Blob {
                     // ref_cid is already Cid<CowStr<'s>>; wrap directly.
                     r#ref: CidLink(ref_cid),
-                    mime_type: MimeType::from(mime_cowstr),
+                    mime_type: MimeType::new(mime_cowstr),
                     size,
                 }));
             }
         }
     }
 
-    // Apply type inference for string fields based on key names (mutate in place)
-    for (key, value) in map.iter_mut() {
-        if let Data::String(AtprotoStr::String(s)) = value.to_owned() {
-            let type_hint = string_key_type_guess(key.as_str());
-            let refined = match type_hint {
-                DataModelType::String(string_type) => refine_string_by_type(s, string_type),
-                DataModelType::Bytes => {
-                    // Decode base64
-                    decode_bytes(&s)
+    // Apply type inference for string fields based on key names.
+    // Drain and rebuild to avoid cloning S values.
+    let map = map
+        .into_iter()
+        .map(|(key, value)| {
+            let refined = if let Data::String(AtprotoStr::String(s)) = value {
+                let type_hint = string_key_type_guess(key.as_str());
+                match type_hint {
+                    DataModelType::String(string_type) => refine_string_by_type(s, string_type),
+                    DataModelType::Bytes => decode_bytes(s),
+                    DataModelType::CidLink if key.as_str() == "$link" => {
+                        Data::CidLink(unsafe { Cid::unchecked_str(s) })
+                    }
+                    _ => Data::String(AtprotoStr::String(s)),
                 }
-                DataModelType::CidLink if key.as_str() == "$link" => Data::CidLink(Cid::cow_str(s)),
-                _ => continue, // no refinement needed
+            } else {
+                value
             };
-            *value = refined;
-        }
-    }
+            (key, refined)
+        })
+        .collect();
 
     Ok(Data::Object(Object(map)))
 }
 
-fn refine_string_by_type<'s>(s: CowStr<'s>, string_type: LexiconStringType) -> Data<'s> {
+fn refine_string_by_type<S>(s: S, string_type: LexiconStringType) -> Data<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    use crate::types::aturi::validate_and_index;
+    use crate::types::cid::IpldCid;
+    use crate::types::did::validate_did;
+    use crate::types::handle::validate_handle;
+    use crate::types::nsid::validate_nsid;
+    use crate::types::recordkey::validate_rkey;
+
     match string_type {
-        LexiconStringType::Datetime => Datetime::from_str(&s)
-            .map(|dt| Data::String(AtprotoStr::Datetime(dt)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::AtUri => AtUri::new_owned(s.clone())
-            .map(|uri| Data::String(AtprotoStr::AtUri(uri)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::Did => Did::new_owned(s.clone())
-            .map(|did| Data::String(AtprotoStr::Did(did)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::Handle => Handle::new_owned(s.clone())
-            .map(|handle| Data::String(AtprotoStr::Handle(handle)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::AtIdentifier => AtIdentifier::new_owned(s.clone())
-            .map(|ident| Data::String(AtprotoStr::AtIdentifier(ident)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::Nsid => Nsid::new_owned(s.clone())
-            .map(|nsid| Data::String(AtprotoStr::Nsid(nsid)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::Cid => Cid::<CowStr<'s>>::new_owned(s.as_bytes())
-            .map(|cid| Data::String(AtprotoStr::Cid(cid)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.into()))),
-        LexiconStringType::Language => Language::new(&s)
-            .map(|lang| Data::String(AtprotoStr::Language(lang)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::Tid => Tid::new(s.clone())
-            .map(|tid| Data::String(AtprotoStr::Tid(tid)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::RecordKey => Rkey::new(s.clone())
-            .map(|rkey| Data::String(AtprotoStr::RecordKey(RecordKey(rkey))))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::Uri(_) => UriValue::new_owned(s.clone())
-            .map(|uri| Data::String(AtprotoStr::Uri(uri)))
-            .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::String => Data::String(parse_string(&s).into_static()),
+        LexiconStringType::Datetime => {
+            if let Ok(dt) = Datetime::from_str(s.as_ref()) {
+                return Data::String(AtprotoStr::Datetime(dt));
+            }
+        }
+        LexiconStringType::AtUri => {
+            if validate_and_index(s.as_ref()).is_ok() {
+                return Data::String(AtprotoStr::AtUri(unsafe { AtUri::unchecked(s) }));
+            }
+        }
+        LexiconStringType::Did => {
+            if validate_did(s.as_ref()).is_ok() {
+                return Data::String(AtprotoStr::Did(unsafe { Did::unchecked(s) }));
+            }
+        }
+        LexiconStringType::Handle => {
+            if validate_handle(s.as_ref()).is_ok()
+                && !s.as_ref().contains(|c: char| c.is_ascii_uppercase())
+            {
+                return Data::String(AtprotoStr::Handle(unsafe { Handle::unchecked(s) }));
+            }
+        }
+        LexiconStringType::AtIdentifier => {
+            if validate_did(s.as_ref()).is_ok()
+                || (validate_handle(s.as_ref()).is_ok()
+                    && !s.as_ref().contains(|c: char| c.is_ascii_uppercase()))
+            {
+                return Data::String(AtprotoStr::AtIdentifier(unsafe {
+                    AtIdentifier::unchecked(s)
+                }));
+            }
+        }
+        LexiconStringType::Nsid => {
+            if validate_nsid(s.as_ref()).is_ok() {
+                return Data::String(AtprotoStr::Nsid(unsafe { Nsid::unchecked(s) }));
+            }
+        }
+        LexiconStringType::Cid => {
+            if IpldCid::try_from(s.as_ref().as_bytes()).is_ok() || s.as_ref().starts_with("bafy") {
+                return Data::String(AtprotoStr::Cid(unsafe { Cid::unchecked_str(s) }));
+            }
+        }
+        LexiconStringType::Language => {
+            if let Ok(lang) = Language::new(s.as_ref()) {
+                return Data::String(AtprotoStr::Language(lang));
+            }
+        }
+        LexiconStringType::Tid => {
+            if let Ok(tid) = Tid::new(s.as_ref()) {
+                return Data::String(AtprotoStr::Tid(tid));
+            }
+        }
+        LexiconStringType::RecordKey => {
+            if validate_rkey(s.as_ref()).is_ok() {
+                return Data::String(AtprotoStr::RecordKey(RecordKey(unsafe {
+                    Rkey::unchecked(s)
+                })));
+            }
+        }
+        LexiconStringType::Uri(_) => {
+            // UriValue::new is infallible but may fall through to Any.
+            // Prefer AtprotoStr::String over wrapping as Uri(Any).
+            match UriValue::new(s) {
+                Ok(UriValue::Any(s)) => return Data::String(AtprotoStr::String(s)),
+                Ok(uri) => return Data::String(AtprotoStr::Uri(uri)),
+                Err(_) => unreachable!(),
+            }
+        }
+        LexiconStringType::String => {
+            return Data::String(parse_string(s));
+        }
     }
+    // Fallback for failed validation.
+    Data::String(AtprotoStr::String(s))
 }
 
-impl Serialize for Array<'_> {
+impl<D> Serialize for Array<D>
+where
+    D: Bos<str> + AsRef<str> + Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -408,21 +482,25 @@ impl Serialize for Array<'_> {
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for Array<'a>
+impl<'de, 'a, S> Deserialize<'de> for Array<S>
 where
     'de: 'a,
+    S: AsRef<str> + Bos<str> + Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
         // Just deserialize as Vec<Data> directly - the Data visitor handles everything
-        let vec: Vec<Data<'a>> = Deserialize::deserialize(deserializer)?;
+        let vec: Vec<Data<S>> = Deserialize::deserialize(deserializer)?;
         Ok(Array(vec))
     }
 }
 
-impl Serialize for Object<'_> {
+impl<D> Serialize for Object<D>
+where
+    D: AsRef<str> + Bos<str> + Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -436,9 +514,10 @@ impl Serialize for Object<'_> {
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for Object<'a>
+impl<'de, 'a, S> Deserialize<'de> for Object<S>
 where
     'de: 'a,
+    S: AsRef<str> + Bos<str> + Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -448,7 +527,7 @@ where
 
         // Deserialize via Data, then extract the Object
         // The Data visitor handles all the type inference and special cases
-        let data: Data<'a> = Data::deserialize(deserializer)?;
+        let data: Data<S> = Data::deserialize(deserializer)?;
         match data {
             Data::Object(obj) => Ok(obj),
             _ => Err(D::Error::custom("expected object, got something else")),
@@ -703,10 +782,13 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for RawDataVisitor {
 
 // In DAG-CBOR, newtype_struct wraps tag 42 (CID)
 // The CidDeserializer will call visit_bytes with the CID bytes
-struct CidAwareVisitor;
+struct CidAwareVisitor<S>(PhantomData<S>);
 
-impl<'de: 'v, 'v> serde::de::Visitor<'v> for CidAwareVisitor {
-    type Value = Data<'v>;
+impl<'de: 'v, 'v, S> serde::de::Visitor<'v> for CidAwareVisitor<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    type Value = Data<S>;
 
     fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str("CID bytes or other newtype content")
@@ -827,7 +909,10 @@ fn apply_raw_type_inference<'s>(
 }
 
 // Deserializer implementation for &Data<'de> - allows deserializing typed data from Data values
-impl<'de> serde::Deserializer<'de> for &'de Data<'de> {
+impl<'de, S> serde::Deserializer<'de> for &'de Data<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     type Error = DataDeserializerError;
 
     fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
@@ -852,8 +937,9 @@ impl<'de> serde::Deserializer<'de> for &'de Data<'de> {
             Data::Object(obj) => visitor.visit_map(ObjectDeserializer::new(&obj.0)),
             Data::Blob(blob) => {
                 // Blob is a root type - deserialize as the Blob itself via map representation
-                visitor.visit_map(BlobDeserializer::new(blob))
+                visitor.visit_map(BlobDeserializer::new(&blob))
             }
+            Data::InvalidNumber(float) => visitor.visit_borrowed_str(float.as_ref()),
         }
     }
 
@@ -875,7 +961,10 @@ impl<'de> serde::Deserializer<'de> for &'de Data<'de> {
 }
 
 // Deserializer implementation for &Data<'de> - allows deserializing typed data from Data values
-impl<'de> serde::Deserializer<'de> for Data<'static> {
+impl<'de, S> serde::Deserializer<'de> for Data<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     type Error = DataDeserializerError;
 
     fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
@@ -895,6 +984,7 @@ impl<'de> serde::Deserializer<'de> for Data<'static> {
                 // Blob is a root type - deserialize as the Blob itself via map representation
                 visitor.visit_map(OwnedBlobDeserializer::new(blob))
             }
+            Data::InvalidNumber(float) => visitor.visit_str(float.as_ref()),
         }
     }
 
@@ -1035,13 +1125,19 @@ impl serde::de::Error for DataDeserializerError {
 }
 
 // MapAccess implementation for Blob - allows borrowing from blob fields
-struct BlobDeserializer<'de> {
-    blob: &'de Blob<CowStr<'de>>,
+struct BlobDeserializer<'de, S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    blob: &'de Blob<S>,
     field_index: usize,
 }
 
-impl<'de> BlobDeserializer<'de> {
-    fn new(blob: &'de Blob<CowStr<'de>>) -> Self {
+impl<'de, S> BlobDeserializer<'de, S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    fn new(blob: &'de Blob<S>) -> Self {
         Self {
             blob,
             field_index: 0,
@@ -1049,7 +1145,10 @@ impl<'de> BlobDeserializer<'de> {
     }
 }
 
-impl<'de> serde::de::MapAccess<'de> for BlobDeserializer<'de> {
+impl<'de, S> serde::de::MapAccess<'de> for BlobDeserializer<'de, S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     type Error = DataDeserializerError;
 
     fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
@@ -1083,21 +1182,30 @@ impl<'de> serde::de::MapAccess<'de> for BlobDeserializer<'de> {
     }
 }
 
-struct OwnedBlobDeserializer {
-    blob: Blob<CowStr<'static>>,
+struct OwnedBlobDeserializer<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    blob: Blob<S>,
     field_index: usize,
 }
 
-impl OwnedBlobDeserializer {
-    fn new(blob: Blob<CowStr<'_>>) -> Self {
+impl<S> OwnedBlobDeserializer<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    fn new(blob: Blob<S>) -> Self {
         Self {
-            blob: blob.into_static(),
+            blob: blob,
             field_index: 0,
         }
     }
 }
 
-impl<'de> serde::de::MapAccess<'de> for OwnedBlobDeserializer {
+impl<'de, S> serde::de::MapAccess<'de> for OwnedBlobDeserializer<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     type Error = DataDeserializerError;
 
     fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
@@ -1192,17 +1300,26 @@ impl<'de> serde::Deserializer<'de> for I64Deserializer {
 }
 
 // SeqAccess implementation for Data::Array
-struct ArrayDeserializer<'de> {
-    iter: core::slice::Iter<'de, Data<'de>>,
+struct ArrayDeserializer<'de, S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    iter: core::slice::Iter<'de, Data<S>>,
 }
 
-impl<'de> ArrayDeserializer<'de> {
-    fn new(slice: &'de [Data<'de>]) -> Self {
+impl<'de, S> ArrayDeserializer<'de, S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    fn new(slice: &'de [Data<S>]) -> Self {
         Self { iter: slice.iter() }
     }
 }
 
-impl<'de> serde::de::SeqAccess<'de> for ArrayDeserializer<'de> {
+impl<'de, S> serde::de::SeqAccess<'de> for ArrayDeserializer<'de, S>
+where
+    S: Bos<str> + AsRef<str>,
+{
     type Error = DataDeserializerError;
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
@@ -1217,19 +1334,28 @@ impl<'de> serde::de::SeqAccess<'de> for ArrayDeserializer<'de> {
 }
 
 // SeqAccess implementation for Data::Array
-struct OwnedArrayDeserializer {
-    iter: alloc::vec::IntoIter<Data<'static>>,
+struct OwnedArrayDeserializer<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    iter: alloc::vec::IntoIter<Data<S>>,
 }
 
-impl OwnedArrayDeserializer {
-    fn new(slice: Vec<Data<'static>>) -> Self {
+impl<S> OwnedArrayDeserializer<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    fn new(slice: Vec<Data<S>>) -> Self {
         Self {
             iter: slice.into_iter(),
         }
     }
 }
 
-impl<'de> serde::de::SeqAccess<'de> for OwnedArrayDeserializer {
+impl<'de, S> serde::de::SeqAccess<'de> for OwnedArrayDeserializer<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
     type Error = DataDeserializerError;
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
@@ -1244,13 +1370,19 @@ impl<'de> serde::de::SeqAccess<'de> for OwnedArrayDeserializer {
 }
 
 // MapAccess implementation for Data::Object
-struct ObjectDeserializer<'de> {
-    iter: alloc::collections::btree_map::Iter<'de, SmolStr, Data<'de>>,
-    value: Option<&'de Data<'de>>,
+struct ObjectDeserializer<'de, S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    iter: alloc::collections::btree_map::Iter<'de, SmolStr, Data<S>>,
+    value: Option<&'de Data<S>>,
 }
 
-impl<'de> ObjectDeserializer<'de> {
-    fn new(map: &'de BTreeMap<SmolStr, Data<'de>>) -> Self {
+impl<'de, S> ObjectDeserializer<'de, S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    fn new(map: &'de BTreeMap<SmolStr, Data<S>>) -> Self {
         Self {
             iter: map.iter(),
             value: None,
@@ -1258,7 +1390,10 @@ impl<'de> ObjectDeserializer<'de> {
     }
 }
 
-impl<'de> serde::de::MapAccess<'de> for ObjectDeserializer<'de> {
+impl<'de, S> serde::de::MapAccess<'de> for ObjectDeserializer<'de, S>
+where
+    S: Bos<str> + AsRef<str>,
+{
     type Error = DataDeserializerError;
 
     fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
@@ -1289,13 +1424,19 @@ impl<'de> serde::de::MapAccess<'de> for ObjectDeserializer<'de> {
 }
 
 // MapAccess implementation for Data::Object
-struct OwnedObjectDeserializer {
-    iter: alloc::collections::btree_map::IntoIter<SmolStr, Data<'static>>,
-    value: Option<Data<'static>>,
+struct OwnedObjectDeserializer<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    iter: alloc::collections::btree_map::IntoIter<SmolStr, Data<S>>,
+    value: Option<Data<S>>,
 }
 
-impl OwnedObjectDeserializer {
-    fn new(map: BTreeMap<SmolStr, Data<'static>>) -> Self {
+impl<S> OwnedObjectDeserializer<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    fn new(map: BTreeMap<SmolStr, Data<S>>) -> Self {
         Self {
             iter: map.into_iter(),
             value: None,
@@ -1303,7 +1444,10 @@ impl OwnedObjectDeserializer {
     }
 }
 
-impl<'de> serde::de::MapAccess<'de> for OwnedObjectDeserializer {
+impl<'de, S> serde::de::MapAccess<'de> for OwnedObjectDeserializer<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
     type Error = DataDeserializerError;
 
     fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>

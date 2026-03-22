@@ -1,5 +1,10 @@
-use crate::cowstr::ToCowStr;
+use crate::Bos;
 use crate::deps::fluent_uri::Uri;
+use crate::types::aturi::validate_and_index;
+use crate::types::cid::IpldCid;
+use crate::types::did::validate_did;
+use crate::types::handle::validate_handle;
+use crate::types::nsid::validate_nsid;
 use crate::{
     IntoStatic,
     types::{
@@ -21,65 +26,64 @@ use ipld_core::ipld::Ipld;
 use smol_str::{SmolStr, ToSmolStr};
 
 /// Insert a string into an at:// `Data<'_>` map, inferring its type.
-pub fn insert_string<'s>(
-    map: &mut BTreeMap<SmolStr, Data<'s>>,
+pub fn insert_string<'s, S>(
+    map: &mut BTreeMap<SmolStr, Data<S>>,
     key: &'s str,
-    value: &'s str,
+    value: S,
     string_type: LexiconStringType,
-) -> Result<(), AtDataError> {
+) -> Result<(), AtDataError>
+where
+    S: AsRef<str> + Bos<str>,
+{
     match string_type {
         LexiconStringType::Datetime => {
-            if let Ok(datetime) = Datetime::from_str(value) {
+            if let Ok(datetime) = Datetime::from_str(value.as_ref()) {
                 map.insert(
                     key.to_smolstr(),
                     Data::String(AtprotoStr::Datetime(datetime)),
                 );
             } else {
-                map.insert(
-                    key.to_smolstr(),
-                    Data::String(AtprotoStr::String(value.into())),
-                );
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::String(value)));
             }
         }
         LexiconStringType::AtUri => {
-            if let Ok(value) = AtUri::new(value.to_cowstr()) {
+            if validate_and_index(value.as_ref()).is_ok() {
                 // AtprotoStr::AtUri stores AtUri<'static>; convert to owned.
                 map.insert(
                     key.to_smolstr(),
-                    Data::String(AtprotoStr::AtUri(value.into_static())),
+                    Data::String(AtprotoStr::AtUri(unsafe { AtUri::unchecked(value) })),
                 );
             } else {
-                map.insert(
-                    key.to_smolstr(),
-                    Data::String(AtprotoStr::String(value.into())),
-                );
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::String(value)));
             }
         }
         LexiconStringType::Did => {
-            if let Ok(value) = Did::new(value.to_cowstr()) {
-                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Did(value)));
-            } else {
+            if validate_did(value.as_ref()).is_ok() {
                 map.insert(
                     key.to_smolstr(),
-                    Data::String(AtprotoStr::String(value.into())),
+                    Data::String(AtprotoStr::Did(unsafe { Did::unchecked(value) })),
                 );
+            } else {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::String(value)));
             }
         }
         LexiconStringType::Handle => {
-            if let Ok(value) = Handle::new(value.to_cowstr()) {
-                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Handle(value)));
-            } else {
+            if validate_handle(value.as_ref()).is_ok() {
                 map.insert(
                     key.to_smolstr(),
-                    Data::String(AtprotoStr::String(value.into())),
+                    Data::String(AtprotoStr::Handle(unsafe { Handle::unchecked(value) })),
                 );
+            } else {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::String(value)));
             }
         }
         LexiconStringType::AtIdentifier => {
-            if let Ok(value) = AtIdentifier::new(value.to_cowstr()) {
+            if validate_handle(value.as_ref()).is_ok() || validate_did(value.as_ref()).is_ok() {
                 map.insert(
                     key.to_smolstr(),
-                    Data::String(AtprotoStr::AtIdentifier(value)),
+                    Data::String(AtprotoStr::AtIdentifier(unsafe {
+                        AtIdentifier::unchecked(value)
+                    })),
                 );
             } else {
                 map.insert(
@@ -89,18 +93,23 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Nsid => {
-            if let Ok(value) = Nsid::new(value.to_cowstr()) {
-                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Nsid(value)));
-            } else {
+            if validate_nsid(value.as_ref()).is_ok() {
                 map.insert(
                     key.to_smolstr(),
-                    Data::String(AtprotoStr::String(value.into())),
+                    Data::String(AtprotoStr::Nsid(unsafe { Nsid::unchecked(value) })),
                 );
+            } else {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::String(value)));
             }
         }
         LexiconStringType::Cid => {
-            if let Ok(value) = Cid::<CowStr<'s>>::new_owned(value.as_bytes()) {
-                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Cid(value)));
+            let s: &str = value.as_ref();
+            // CID: try to parse as IPLD first, otherwise wrap as string CID.
+            if IpldCid::try_from(s).is_ok() || s.starts_with("bafy") {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::Cid(unsafe { Cid::unchecked_str(value) })),
+                );
             } else {
                 map.insert(
                     key.to_smolstr(),
@@ -109,33 +118,27 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Language => {
-            if let Ok(value) = Language::new(value) {
+            if let Ok(value) = Language::new(value.as_ref()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Language(value)));
             } else {
-                map.insert(
-                    key.to_smolstr(),
-                    Data::String(AtprotoStr::String(value.into())),
-                );
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::String(value)));
             }
         }
         LexiconStringType::Tid => {
-            if let Ok(value) = Tid::new(value) {
+            if let Ok(value) = Tid::new(value.as_ref()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Tid(value)));
             } else {
-                map.insert(
-                    key.to_smolstr(),
-                    Data::String(AtprotoStr::String(value.into())),
-                );
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::String(value)));
             }
         }
         LexiconStringType::RecordKey => {
             // Validate the rkey without shadowing the original `value: &'s str`.
-            if Rkey::new(value).is_ok() {
+            if Rkey::new(value.as_ref()).is_ok() {
                 map.insert(
                     key.to_smolstr(),
                     // Rkey already validated above; borrow the original &'s str directly.
                     Data::String(AtprotoStr::RecordKey(
-                        RecordKey::any(CowStr::Borrowed(value)).expect("Rkey validation passed"),
+                        RecordKey::any(value).expect("Rkey validation passed"),
                     )),
                 );
             } else {
@@ -147,8 +150,23 @@ pub fn insert_string<'s>(
         }
         LexiconStringType::Uri(_) => {
             // AtprotoStr::Uri stores UriValue<'static>, so we must produce an owned value.
-            if let Ok(uri) = UriValue::new_owned(value) {
-                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Uri(uri)));
+            if let Ok(uri) = UriValue::new(value.as_ref()) {
+                match uri {
+                    UriValue::Any(_) => {
+                        map.insert(
+                            key.to_smolstr(),
+                            Data::String(AtprotoStr::String(value.into())),
+                        );
+                    }
+                    _ => {
+                        map.insert(
+                            key.to_smolstr(),
+                            Data::String(AtprotoStr::Uri(
+                                UriValue::new(value).expect("already verified"),
+                            )),
+                        );
+                    }
+                }
             } else {
                 map.insert(
                     key.to_smolstr(),
@@ -164,43 +182,46 @@ pub fn insert_string<'s>(
 }
 
 /// smarter parsing to avoid trying as many posibilities.
-pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<CowStr<'s>> {
-    if string.len() < 2048 && string.starts_with("did:") {
-        if let Ok(did) = Did::new(string.to_cowstr()) {
-            return AtprotoStr::Did(did);
+pub fn parse_string<S>(string: S) -> AtprotoStr<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    let s = string.as_ref();
+    if s.len() < 2048 && s.starts_with("did:") {
+        if validate_did(s).is_ok() {
+            return AtprotoStr::Did(unsafe { Did::unchecked(string) });
         }
-    } else if string.starts_with("20") && string.ends_with("Z") {
+    } else if s.starts_with("20") && s.ends_with("Z") {
         // probably a date (for the next 75 years)
-        if let Ok(datetime) = Datetime::from_str(string) {
+        if let Ok(datetime) = Datetime::from_str(s) {
             return AtprotoStr::Datetime(datetime);
         }
-    } else if string.starts_with("at://") {
-        // AtprotoStr::AtUri stores AtUri<'static>; convert to owned.
-        if let Ok(uri) = AtUri::new(string.to_cowstr()) {
-            return AtprotoStr::AtUri(uri);
+    } else if s.starts_with("at://") {
+        if crate::types::aturi::validate_and_index(s).is_ok() {
+            return AtprotoStr::AtUri(unsafe { AtUri::unchecked(string) });
         }
-    } else if string.starts_with("https://") {
-        if let Ok(uri) = Uri::parse(string) {
+    } else if s.starts_with("https://") {
+        if let Ok(uri) = Uri::parse(s) {
             return AtprotoStr::Uri(UriValue::Https(uri.to_owned()));
         }
-    } else if string.starts_with("wss://") {
-        if let Ok(uri) = Uri::parse(string) {
+    } else if s.starts_with("wss://") {
+        if let Ok(uri) = Uri::parse(s) {
             return AtprotoStr::Uri(UriValue::Wss(uri.to_owned()));
         }
-    } else if string.starts_with("ipfs://") {
-        // URI variant must be 'static; convert to an owned CID.
-        return AtprotoStr::Uri(UriValue::Cid(
-            Cid::<CowStr<'static>>::new_owned(string.as_bytes())
-                .unwrap_or_else(|_| Cid::cow_str(CowStr::Owned(string.to_smolstr()))),
-        ));
-    } else if string.contains('.') && !string.contains([' ', '\n']) {
+    } else if s.starts_with("ipfs://") {
+        let s: &str = string.as_ref();
+        // CID: try to parse as IPLD first, otherwise wrap as string CID.
+        if IpldCid::try_from(s).is_ok() || s.starts_with("bafy") {
+            return AtprotoStr::Uri(UriValue::Cid(unsafe { Cid::unchecked_str(string) }));
+        }
+    } else if s.contains('.') && !s.contains([' ', '\n']) {
         // Dotted strings without a scheme could be handles, NSIDs, or URIs.
         // Use TLD lookup and camelCase heuristic to disambiguate.
         // - Handles: domain order with TLD at the end (e.g., "example.com")
         // - NSIDs: reverse domain order with TLD at the start (e.g., "com.example.service")
         // - Tiebreaker: camelCase in the last segment indicates NSID (e.g., "getRecord")
-        let first_segment = string.split('.').next().unwrap_or("");
-        let last_segment = string.rsplit('.').next().unwrap_or("");
+        let first_segment = s.split('.').next().unwrap_or("");
+        let last_segment = s.rsplit('.').next().unwrap_or("");
 
         let first_is_tld = crate::tld::is_tld(first_segment);
         let last_is_tld = crate::tld::is_tld(last_segment);
@@ -208,47 +229,50 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<CowStr<'s>> {
 
         // First segment is a known TLD → reverse domain order → try NSID first.
         if first_is_tld {
-            if let Ok(nsid) = Nsid::new(string.to_cowstr()) {
-                return AtprotoStr::Nsid(nsid);
+            if validate_nsid(s).is_ok() {
+                return AtprotoStr::Nsid(unsafe { Nsid::unchecked(string) });
             }
         }
 
         // Last segment is a known TLD and first is not → normal domain order → handle.
         if last_is_tld && !first_is_tld {
-            if let Ok(handle) = AtIdentifier::new(string.to_cowstr()) {
-                return AtprotoStr::AtIdentifier(handle);
+            if validate_handle(s.as_ref()).is_ok() || validate_did(s.as_ref()).is_ok() {
+                return AtprotoStr::AtIdentifier(unsafe { AtIdentifier::unchecked(string) });
             }
         }
 
         // camelCase in last segment → NSID (e.g., "com.atproto.repo.getRecord").
         if has_upper_last_segment {
-            if let Ok(nsid) = Nsid::new(string.to_cowstr()) {
-                return AtprotoStr::Nsid(nsid);
+            if validate_nsid(s).is_ok() {
+                return AtprotoStr::Nsid(unsafe { Nsid::unchecked(string) });
             }
         }
 
         // Fallback: try both, preferring handle.
-        if let Ok(handle) = AtIdentifier::new(string.to_cowstr()) {
-            return AtprotoStr::AtIdentifier(handle);
-        } else if let Ok(nsid) = Nsid::new(string.to_cowstr()) {
-            return AtprotoStr::Nsid(nsid);
-        } else if string.contains("://") && Uri::<&str>::parse(string).is_ok() {
+        if validate_handle(s.as_ref()).is_ok() {
+            return AtprotoStr::AtIdentifier(AtIdentifier::Handle(unsafe {
+                Handle::unchecked(string)
+            }));
+        } else if validate_nsid(s).is_ok() {
+            return AtprotoStr::Nsid(unsafe { Nsid::unchecked(string) });
+        } else if s.contains("://") && Uri::<&str>::parse(s).is_ok() {
             // AtprotoStr::Uri stores UriValue<'static>; convert to owned.
-            return AtprotoStr::Uri(UriValue::Any(CowStr::Owned(string.to_smolstr())));
+            return AtprotoStr::Uri(UriValue::Any(string));
         }
-    } else if string.len() == 13 {
-        if let Ok(tid) = Tid::new(string) {
+    } else if s.len() == 13 {
+        drop(s);
+        if let Ok(tid) = Tid::new(string.as_ref()) {
             return AtprotoStr::Tid(tid);
         }
-    } else if !string.contains([' ', '\n']) && string.len() > 20 {
-        // CID: must be longer than typical short strings to avoid false positives
-        // Most CIDs are 46+ chars (base32 encoded), minimum realistic is around 30
-        if let Ok(cid) = Cid::<CowStr<'s>>::new_owned(string.as_bytes()) {
-            return AtprotoStr::Cid(cid);
+    } else if !s.contains([' ', '\n']) && s.len() > 20 {
+        // CID: try to parse as IPLD first, otherwise wrap as string CID.
+        if IpldCid::try_from(s).is_ok() || s.starts_with("bafy") {
+            return AtprotoStr::Cid(unsafe { Cid::unchecked_str(string) });
         }
     }
+    drop(s);
 
-    AtprotoStr::String(string.into())
+    AtprotoStr::String(string)
 }
 
 /// First-level guess at what we should parse the corresponding value as
@@ -301,7 +325,7 @@ pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<CowStr<
         if let (Some(mime_type), Some(size)) = (mime_type, size) {
             return Some(Blob {
                 r#ref: CidLink::<CowStr<'b>>::ipld(*value),
-                mime_type: MimeType::new_cow(CowStr::Borrowed(mime_type)),
+                mime_type: MimeType::new(CowStr::Borrowed(mime_type)),
                 size: size as usize,
             });
         }
@@ -309,7 +333,7 @@ pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<CowStr<
         if let Some(mime_type) = mime_type {
             return Some(Blob {
                 r#ref: CidLink::cow_str(CowStr::Borrowed(value.as_str())),
-                mime_type: MimeType::new_cow(CowStr::Borrowed(mime_type)),
+                mime_type: MimeType::new(CowStr::Borrowed(mime_type)),
                 size: 0,
             });
         }
@@ -333,7 +357,7 @@ pub fn json_to_blob<'b>(
             if let (Some(mime_type), Some(size)) = (mime_type, size) {
                 return Some(Blob {
                     r#ref: CidLink::cow_str(CowStr::Borrowed(value)),
-                    mime_type: MimeType::new_cow(CowStr::Borrowed(mime_type)),
+                    mime_type: MimeType::new(CowStr::Borrowed(mime_type)),
                     size: size as usize,
                 });
             }
@@ -342,7 +366,7 @@ pub fn json_to_blob<'b>(
         if let Some(mime_type) = mime_type {
             return Some(Blob {
                 r#ref: CidLink::cow_str(CowStr::Borrowed(value)),
-                mime_type: MimeType::new_cow(CowStr::Borrowed(mime_type)),
+                mime_type: MimeType::new(CowStr::Borrowed(mime_type)),
                 size: 0,
             });
         }
@@ -360,18 +384,21 @@ pub fn infer_from_type(type_field: &str) -> DataModelType {
 }
 
 /// decode a base64 byte string into atproto data
-pub fn decode_bytes<'s>(bytes: &str) -> Data<'s> {
+pub fn decode_bytes<S>(bytes: S) -> Data<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
     // First one should just work. rest are insurance.
-    if let Ok(bytes) = BASE64_STANDARD.decode(bytes) {
+    if let Ok(bytes) = BASE64_STANDARD.decode(bytes.as_ref().as_bytes()) {
         Data::Bytes(Bytes::from_owner(bytes))
-    } else if let Ok(bytes) = BASE64_STANDARD_NO_PAD.decode(bytes) {
+    } else if let Ok(bytes) = BASE64_STANDARD_NO_PAD.decode(bytes.as_ref().as_bytes()) {
         Data::Bytes(Bytes::from_owner(bytes))
-    } else if let Ok(bytes) = BASE64_URL_SAFE.decode(bytes) {
+    } else if let Ok(bytes) = BASE64_URL_SAFE.decode(bytes.as_ref().as_bytes()) {
         Data::Bytes(Bytes::from_owner(bytes))
-    } else if let Ok(bytes) = BASE64_URL_SAFE_NO_PAD.decode(bytes) {
+    } else if let Ok(bytes) = BASE64_URL_SAFE_NO_PAD.decode(bytes.as_ref().as_bytes()) {
         Data::Bytes(Bytes::from_owner(bytes))
     } else {
-        Data::String(AtprotoStr::String(CowStr::Borrowed(bytes).into_static()))
+        Data::String(AtprotoStr::String(S::from(bytes)))
     }
 }
 

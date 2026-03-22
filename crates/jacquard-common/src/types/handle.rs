@@ -232,6 +232,13 @@ where
     }
 }
 
+impl<S: Bos<str>> Handle<S> {
+    /// Convert to a `Handle` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S>>(self) -> Handle<B> {
+        Handle(B::from(self.0))
+    }
+}
+
 impl FromStr for Handle {
     type Err = AtStrError;
 

@@ -131,6 +131,13 @@ where
     }
 }
 
+impl<S: Bos<str>> Nsid<S> {
+    /// Convert to an `Nsid` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S>>(self) -> Nsid<B> {
+        Nsid(B::from(self.0))
+    }
+}
+
 impl FromStr for Nsid {
     type Err = AtStrError;
 

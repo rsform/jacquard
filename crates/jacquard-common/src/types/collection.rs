@@ -1,6 +1,6 @@
 use alloc::string::String;
 use core::fmt;
-use core::str::FromStr;
+use smol_str::SmolStr;
 
 use serde::{Deserialize, Serialize};
 
@@ -8,10 +8,10 @@ use crate::types::value::Data;
 use crate::types::{
     aturi::RepoPath,
     nsid::Nsid,
-    recordkey::{RecordKey, RecordKeyType, Rkey},
+    recordkey::{RecordKey, RecordKeyType},
 };
 use crate::xrpc::XrpcResp;
-use crate::{BorrowOrShare, Bos, CowStr, IntoStatic};
+use crate::{BorrowOrShare, Bos, IntoStatic};
 
 /// Trait for a collection of records that can be stored in a repository.
 ///
@@ -72,7 +72,7 @@ pub trait Collection: fmt::Debug + Serialize {
 )]
 #[serde(tag = "error", content = "message")]
 #[non_exhaustive]
-pub enum RecordError<'a> {
+pub enum RecordError {
     /// The requested record was not found
     #[error("RecordNotFound")]
     #[serde(rename = "RecordNotFound")]
@@ -80,12 +80,11 @@ pub enum RecordError<'a> {
     /// An unknown error occurred
     #[error("Unknown")]
     #[serde(rename = "Unknown")]
-    #[serde(borrow)]
-    Unknown(Data<'a>),
+    Unknown(Data<SmolStr>),
 }
 
-impl IntoStatic for RecordError<'_> {
-    type Output = RecordError<'static>;
+impl IntoStatic for RecordError {
+    type Output = RecordError;
 
     fn into_static(self) -> Self::Output {
         match self {

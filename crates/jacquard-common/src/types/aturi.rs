@@ -20,7 +20,7 @@ use regex_automata::meta::Regex;
 use regex_lite::Regex;
 use serde::Serializer;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
-use smol_str::{SmolStr, ToSmolStr};
+use smol_str::SmolStr;
 
 use super::Lazy;
 
@@ -168,6 +168,16 @@ where
         RepoPath {
             collection: self.collection.into_static(),
             rkey: self.rkey.map(|rkey| rkey.into_static()),
+        }
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> RepoPath<S> {
+    /// Convert to a `RepoPath` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> RepoPath<B> {
+        RepoPath {
+            collection: self.collection.convert(),
+            rkey: self.rkey.map(|rkey| RecordKey(rkey.0.convert())),
         }
     }
 }
@@ -446,6 +456,16 @@ where
     fn into_static(self) -> AtUri<S::Output> {
         AtUri {
             uri: self.uri.into_static(),
+            indices: self.indices,
+        }
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> AtUri<S> {
+    /// Convert to an `AtUri` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> AtUri<B> {
+        AtUri {
+            uri: B::from(self.uri),
             indices: self.indices,
         }
     }

@@ -1,5 +1,5 @@
 use crate::bos::{Bos, DefaultStr};
-use crate::{CowStr, IntoStatic, cowstr::ToCowStr};
+use crate::{CowStr, IntoStatic};
 use alloc::string::{String, ToString};
 pub use cid::Cid as IpldCid;
 use core::{convert::Infallible, fmt, ops::Deref, str::FromStr};
@@ -53,6 +53,10 @@ pub enum Error {
     /// Invalid UTF-8 in CID string.
     #[error("{:?}", 0)]
     Utf8(#[from] core::str::Utf8Error),
+    /// Wraps another error with additional context
+    #[error("converting from a string slice")]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::cid::str_conversion)))]
+    Conversion,
 }
 
 // ---------------------------------------------------------------------------
@@ -117,26 +121,33 @@ impl<'c> Cid<&'c str> {
     pub fn str(cid: &'c str) -> Self {
         Self::Str(cid)
     }
+}
 
+impl<S: Bos<str>> Cid<S> {
     /// Parse a CID from bytes (tries IPLD first, falls back to UTF-8 string).
-    pub fn new(cid: &'c [u8]) -> Result<Self, Error> {
+    pub fn new<'c>(cid: &'c [u8]) -> Result<Cid<S>, Error>
+    where
+        S: From<&'c str>,
+    {
         if let Ok(cid) = IpldCid::try_from(cid.as_ref()) {
-            Ok(Self::ipld(cid))
+            Ok(Cid::ipld(cid))
         } else {
             let cid_str = core::str::from_utf8(cid)?;
-            Ok(Self::Str(cid_str))
+            Ok(Cid::Str(cid_str.into()))
         }
     }
 }
 
-impl<S: Bos<str> + From<SmolStr>> Cid<S> {
+impl<S: Bos<str> + FromStr> Cid<S> {
     /// Parse a CID from bytes into an owned value.
     pub fn new_owned(cid: &[u8]) -> Result<Self, Error> {
         if let Ok(cid) = IpldCid::try_from(cid.as_ref()) {
             Ok(Self::ipld(cid))
         } else {
             let cid_str = core::str::from_utf8(cid)?;
-            Ok(Cid::Str(S::from(cid_str.to_smolstr())))
+            Ok(Cid::Str(
+                S::from_str(cid_str).map_err(|_| Error::Conversion)?,
+            ))
         }
     }
 }
@@ -223,6 +234,16 @@ where
     }
 }
 
+impl<S: Bos<str>> Cid<S> {
+    /// Convert to a `Cid` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S>>(self) -> Cid<B> {
+        match self {
+            Cid::Ipld { cid, s } => Cid::Ipld { cid, s },
+            Cid::Str(s) => Cid::Str(B::from(s)),
+        }
+    }
+}
+
 impl<S: Bos<str> + AsRef<str>> From<Cid<S>> for String {
     fn from(value: Cid<S>) -> Self {
         value.as_str().to_string()
@@ -296,14 +317,17 @@ impl<S: Bos<str>> CidLink<S> {
     pub fn ipld(cid: IpldCid) -> Self {
         CidLink(Cid::ipld(cid))
     }
+
+    /// Parse a CID link from bytes.
+    pub fn new<'c>(cid: &'c [u8]) -> Result<CidLink<S>, Error>
+    where
+        S: Bos<str> + From<&'c str>,
+    {
+        Ok(CidLink(Cid::new(cid)?))
+    }
 }
 
 impl<'c> CidLink<&'c str> {
-    /// Parse a CID link from bytes.
-    pub fn new(cid: &'c [u8]) -> Result<Self, Error> {
-        Ok(Self(Cid::new(cid)?))
-    }
-
     /// Construct a CID link from a string slice.
     pub fn str(cid: &'c str) -> Self {
         Self(Cid::str(cid))
@@ -315,7 +339,7 @@ impl<'c> CidLink<&'c str> {
     }
 }
 
-impl<S: Bos<str> + From<SmolStr>> CidLink<S> {
+impl<S: Bos<str> + FromStr> CidLink<S> {
     /// Parse a CID link from bytes into an owned value.
     pub fn new_owned(cid: &[u8]) -> Result<Self, Error> {
         Ok(CidLink(Cid::new_owned(cid)?))
@@ -405,10 +429,7 @@ where
                     self.visit_bytes(&v)
                 }
 
-                fn visit_newtype_struct<D>(
-                    self,
-                    deserializer: D,
-                ) -> Result<Self::Value, D::Error>
+                fn visit_newtype_struct<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
                 where
                     D: serde::de::Deserializer<'de>,
                 {
@@ -500,6 +521,13 @@ where
 
     fn into_static(self) -> Self::Output {
         CidLink(self.0.into_static())
+    }
+}
+
+impl<S: Bos<str>> CidLink<S> {
+    /// Convert to a `CidLink` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S>>(self) -> CidLink<B> {
+        CidLink(self.0.convert())
     }
 }
 

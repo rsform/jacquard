@@ -14,7 +14,7 @@ use crate::{
 use alloc::string::{String, ToString};
 use core::{fmt::Display, marker::PhantomData, ops::Deref, str::FromStr};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use smol_str::{SmolStr, ToSmolStr};
+use smol_str::SmolStr;
 
 /// Generic URI with type-specific parsing.
 ///
@@ -211,6 +211,20 @@ where
             UriValue::Wss(url) => UriValue::Wss(url),
             UriValue::Cid(cid) => UriValue::Cid(cid.into_static()),
             UriValue::Any(s) => UriValue::Any(s.into_static()),
+        }
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> UriValue<S> {
+    /// Convert to a `UriValue` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> UriValue<B> {
+        match self {
+            UriValue::Did(did) => UriValue::Did(did.convert()),
+            UriValue::At(at_uri) => UriValue::At(at_uri.convert()),
+            UriValue::Https(url) => UriValue::Https(url),
+            UriValue::Wss(url) => UriValue::Wss(url),
+            UriValue::Cid(cid) => UriValue::Cid(cid.convert()),
+            UriValue::Any(s) => UriValue::Any(B::from(s)),
         }
     }
 }

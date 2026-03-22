@@ -5,8 +5,7 @@ use crate::types::{
     string::AtprotoStr,
     value::{Array, Data, Object, RawData, parsing},
 };
-use crate::{CowStr, IntoStatic};
-use alloc::borrow::ToOwned;
+use crate::{Bos, CowStr};
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
@@ -14,6 +13,9 @@ use alloc::string::ToString;
 use alloc::vec::Vec;
 use bytes::Bytes;
 use core::any::TypeId;
+use core::convert::Infallible;
+use core::str::FromStr;
+use serde::Serialize;
 use smol_str::SmolStr;
 use std::borrow::Cow;
 
@@ -45,10 +47,13 @@ pub enum ConversionError {
     },
 }
 
-impl TryFrom<Data<'_>> for () {
+impl<S> TryFrom<Data<S>> for ()
+where
+    S: AsRef<str> + Bos<str>,
+{
     type Error = ConversionError;
 
-    fn try_from(ipld: Data) -> Result<Self, Self::Error> {
+    fn try_from(ipld: Data<S>) -> Result<Self, Self::Error> {
         match ipld {
             Data::Null => Ok(()),
             _ => Err(ConversionError::WrongAtprotoType {
@@ -61,10 +66,13 @@ impl TryFrom<Data<'_>> for () {
 
 macro_rules! derive_try_from_atproto_option {
     ($enum:ident, $ty:ty) => {
-        impl TryFrom<Data<'static>> for Option<$ty> {
+        impl<S: 'static> TryFrom<Data<S>> for Option<$ty>
+        where
+            S: AsRef<str> + Bos<str>,
+        {
             type Error = ConversionError;
 
-            fn try_from(ipld: Data<'static>) -> Result<Self, Self::Error> {
+            fn try_from(ipld: Data<S>) -> Result<Self, Self::Error> {
                 match ipld {
                     Data::Null => Ok(None),
                     Data::$enum(value) => Ok(Some(value.try_into().map_err(|_| {
@@ -85,10 +93,13 @@ macro_rules! derive_try_from_atproto_option {
 
 macro_rules! derive_try_from_atproto {
     ($enum:ident, $ty:ty) => {
-        impl TryFrom<Data<'static>> for $ty {
+        impl<S: 'static> TryFrom<Data<S>> for $ty
+        where
+            S: AsRef<str> + Bos<str>,
+        {
             type Error = ConversionError;
 
-            fn try_from(ipld: Data<'static>) -> Result<Self, Self::Error> {
+            fn try_from(ipld: Data<S>) -> Result<Self, Self::Error> {
                 match ipld {
                     Data::$enum(value) => {
                         Ok(value
@@ -111,7 +122,10 @@ macro_rules! derive_try_from_atproto {
 
 macro_rules! derive_into_atproto_prim {
     ($enum:ident, $ty:ty, $fn:ident) => {
-        impl<'s> From<$ty> for Data<'s> {
+        impl<S> From<$ty> for Data<S>
+        where
+            S: AsRef<str> + Bos<str>,
+        {
             fn from(t: $ty) -> Self {
                 Data::$enum(t.$fn() as _)
             }
@@ -121,7 +135,9 @@ macro_rules! derive_into_atproto_prim {
 
 macro_rules! derive_into_atproto {
     ($enum:ident, $ty:ty, $($fn:ident),*) => {
-        impl<'s> From<$ty> for Data<'s> {
+        impl<S> From<$ty> for Data<S>
+        where
+            S: AsRef<str> + Bos<str>, {
             fn from(t: $ty) -> Self {
                 Data::$enum(t$(.$fn())*)
             }
@@ -129,46 +145,71 @@ macro_rules! derive_into_atproto {
     };
 }
 
-impl From<String> for Data<'_> {
+impl<S> From<String> for Data<S>
+where
+    S: AsRef<str> + Bos<str> + From<String>,
+{
     fn from(t: String) -> Self {
-        Data::String(AtprotoStr::new(CowStr::from(t)))
+        Data::String(AtprotoStr::new(t.into()))
     }
 }
 
-impl<'a> From<&'a str> for Data<'a> {
+impl<'a, S> From<&'a str> for Data<S>
+where
+    S: AsRef<str> + Bos<str> + From<&'a str>,
+{
     fn from(t: &'a str) -> Self {
-        Data::String(AtprotoStr::new(CowStr::Borrowed(t)))
+        Data::String(AtprotoStr::new(S::from(t)))
     }
 }
 
-impl From<&[u8]> for Data<'_> {
+impl<S> From<&[u8]> for Data<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
     fn from(t: &[u8]) -> Self {
         Data::Bytes(Bytes::copy_from_slice(t))
     }
 }
 
-impl<'s> From<CowStr<'s>> for Data<'s> {
+impl<'s, S> From<CowStr<'s>> for Data<S>
+where
+    S: AsRef<str> + Bos<str> + FromStr<Err = Infallible>,
+{
     fn from(t: CowStr<'s>) -> Self {
-        Data::String(AtprotoStr::new(t))
+        Data::String(AtprotoStr::new(
+            S::from_str(t.as_ref()).unwrap_or_else(|_| unreachable!()),
+        ))
     }
 }
 
-impl From<SmolStr> for Data<'_> {
+impl<S> From<SmolStr> for Data<S>
+where
+    S: AsRef<str> + Bos<str> + From<SmolStr>,
+{
     fn from(t: SmolStr) -> Self {
-        Data::String(AtprotoStr::new(CowStr::Owned(t)))
+        Data::String(AtprotoStr::new(S::from(t)))
     }
 }
 
-impl<'s> From<Cow<'s, str>> for Data<'s> {
+impl<'s, S> From<Cow<'s, str>> for Data<S>
+where
+    S: AsRef<str> + Bos<str> + FromStr<Err = Infallible>,
+{
     fn from(t: Cow<'s, str>) -> Self {
-        Data::String(AtprotoStr::new(CowStr::from(t)))
+        Data::String(AtprotoStr::new(
+            S::from_str(t.as_ref()).unwrap_or_else(|_| unreachable!()),
+        ))
     }
 }
 
-impl<'s> TryFrom<Data<'s>> for Option<String> {
+impl<S> TryFrom<Data<S>> for Option<String>
+where
+    S: AsRef<str> + Bos<str> + Clone + Serialize,
+{
     type Error = ConversionError;
 
-    fn try_from(ipld: Data<'s>) -> Result<Self, Self::Error> {
+    fn try_from(ipld: Data<S>) -> Result<Self, Self::Error> {
         match ipld {
             Data::Null => Ok(None),
             Data::String(value) => Ok(Some(value.try_into().map_err(|_| {
@@ -185,10 +226,13 @@ impl<'s> TryFrom<Data<'s>> for Option<String> {
     }
 }
 
-impl<'s> TryFrom<Data<'s>> for String {
+impl<S> TryFrom<Data<S>> for String
+where
+    S: AsRef<str> + Bos<str> + TryFrom<String> + Clone + Serialize,
+{
     type Error = ConversionError;
 
-    fn try_from(ipld: Data<'s>) -> Result<Self, Self::Error> {
+    fn try_from(ipld: Data<S>) -> Result<Self, Self::Error> {
         match ipld {
             Data::String(value) => {
                 Ok(value
@@ -207,14 +251,20 @@ impl<'s> TryFrom<Data<'s>> for String {
     }
 }
 
-impl<'s> From<Vec<Data<'s>>> for Array<'s> {
-    fn from(value: Vec<Data<'s>>) -> Self {
+impl<S> From<Vec<Data<S>>> for Array<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    fn from(value: Vec<Data<S>>) -> Self {
         Array(value)
     }
 }
 
-impl<'s> From<BTreeMap<SmolStr, Data<'s>>> for Object<'s> {
-    fn from(value: BTreeMap<SmolStr, Data<'s>>) -> Self {
+impl<S> From<BTreeMap<SmolStr, Data<S>>> for Object<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    fn from(value: BTreeMap<SmolStr, Data<S>>) -> Self {
         Object(value)
     }
 }
@@ -233,11 +283,39 @@ derive_into_atproto_prim!(Integer, u64, clone);
 derive_into_atproto_prim!(Integer, usize, clone);
 derive_into_atproto!(Bytes, Box<[u8]>, into);
 derive_into_atproto!(Bytes, Vec<u8>, into);
-derive_into_atproto!(Array, Array<'s>, into);
-derive_into_atproto!(Object, Object<'s>, to_owned);
+derive_into_atproto!(Array, Array<S>,);
+derive_into_atproto!(Object, Object<S>,);
 
-derive_into_atproto!(CidLink, Cid<CowStr<'s>>, clone);
-derive_into_atproto!(CidLink, &Cid<CowStr<'s>>, to_owned);
+derive_into_atproto!(CidLink, Cid<S>,);
+derive_into_atproto!(Blob, crate::types::blob::Blob<S>,);
+derive_into_atproto!(String, AtprotoStr<S>,);
+
+impl<S> From<CidLink<S>> for Data<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    fn from(t: CidLink<S>) -> Self {
+        Data::CidLink(t.0)
+    }
+}
+
+impl<S> From<crate::types::blob::BlobRef<S>> for Data<S>
+where
+    S: AsRef<str> + Bos<str>,
+{
+    fn from(t: crate::types::blob::BlobRef<S>) -> Self {
+        Data::Blob(t.into())
+    }
+}
+
+impl<S> From<&Cid<S>> for Data<S>
+where
+    S: AsRef<str> + Bos<str> + Clone,
+{
+    fn from(t: &Cid<S>) -> Self {
+        Data::CidLink(t.clone())
+    }
+}
 
 derive_try_from_atproto!(Boolean, bool);
 derive_try_from_atproto!(Integer, i8);
@@ -253,8 +331,10 @@ derive_try_from_atproto!(Integer, u64);
 derive_try_from_atproto!(Integer, u128);
 derive_try_from_atproto!(Integer, usize);
 derive_try_from_atproto!(Bytes, Vec<u8>);
-derive_try_from_atproto!(Object, Object<'static>);
-derive_try_from_atproto!(CidLink, Cid<CowStr<'static>>);
+derive_try_from_atproto!(Array, Array<S>);
+derive_try_from_atproto!(Object, Object<S>);
+derive_try_from_atproto!(CidLink, Cid<S>);
+derive_try_from_atproto!(Blob, crate::types::blob::Blob<S>);
 
 derive_try_from_atproto_option!(Boolean, bool);
 derive_try_from_atproto_option!(Integer, i8);
@@ -271,12 +351,16 @@ derive_try_from_atproto_option!(Integer, u128);
 derive_try_from_atproto_option!(Integer, usize);
 
 derive_try_from_atproto_option!(Bytes, Vec<u8>);
-derive_try_from_atproto_option!(Array, Array<'static>);
-derive_try_from_atproto_option!(Object, Object<'static>);
-derive_try_from_atproto_option!(CidLink, Cid<CowStr<'static>>);
+derive_try_from_atproto_option!(Array, Array<S>);
+derive_try_from_atproto_option!(Object, Object<S>);
+derive_try_from_atproto_option!(CidLink, Cid<S>);
+derive_try_from_atproto_option!(Blob, crate::types::blob::Blob<S>);
 
 /// Convert RawData to validated Data with type inference
-impl<'s> TryFrom<RawData<'s>> for Data<'s> {
+impl<'s, S> TryFrom<RawData<'s>> for Data<S>
+where
+    S: Bos<str> + AsRef<str> + From<CowStr<'s>>,
+{
     type Error = ConversionError;
 
     fn try_from(raw: RawData<'s>) -> Result<Self, Self::Error> {
@@ -290,11 +374,10 @@ impl<'s> TryFrom<RawData<'s>> for Data<'s> {
             }
             RawData::String(s) => {
                 // Apply string type inference
-                // Need to convert to owned because parse_string borrows from its input
-                Ok(Data::String(parsing::parse_string(&s).into_static()))
+                Ok(Data::String(parsing::parse_string(S::from(s))))
             }
             RawData::Bytes(b) => Ok(Data::Bytes(b)),
-            RawData::CidLink(cid) => Ok(Data::CidLink(cid)),
+            RawData::CidLink(cid) => Ok(Data::CidLink(cid.convert())),
             RawData::Array(arr) => {
                 let mut validated = Vec::with_capacity(arr.len());
                 for item in arr {
@@ -323,8 +406,8 @@ impl<'s> TryFrom<RawData<'s>> for Data<'s> {
                                 }
                             };
                             return Ok(Data::Blob(crate::types::blob::Blob {
-                                r#ref: CidLink(cid.clone()),
-                                mime_type: crate::types::blob::MimeType::from(mime.clone()),
+                                r#ref: CidLink(cid.clone().convert()),
+                                mime_type: crate::types::blob::MimeType::new(S::from(mime.clone())),
                                 size: size_val,
                             }));
                         }
@@ -334,12 +417,12 @@ impl<'s> TryFrom<RawData<'s>> for Data<'s> {
                 // Regular object - convert recursively with type inference based on keys
                 let mut validated = BTreeMap::new();
                 for (key, value) in map {
-                    let data_value: Data = value.try_into()?;
+                    let data_value: Data<S> = value.try_into()?;
                     validated.insert(key, data_value);
                 }
                 Ok(Data::Object(Object(validated)))
             }
-            RawData::Blob(blob) => Ok(Data::Blob(blob)),
+            RawData::Blob(blob) => Ok(Data::Blob(blob.convert())),
             RawData::InvalidBlob(_) => Err(ConversionError::InvalidRawData {
                 message: "invalid blob structure".to_string(),
             }),

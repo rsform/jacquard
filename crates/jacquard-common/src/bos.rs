@@ -32,8 +32,6 @@
 //! }
 //! ```
 
-use core::{fmt, marker::PhantomData, ops::Deref};
-
 use alloc::{
     borrow::{Cow, ToOwned},
     boxed::Box,
@@ -41,10 +39,9 @@ use alloc::{
     vec::Vec,
 };
 
-use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 
-use crate::{CowStr, IntoStatic};
+use crate::CowStr;
 
 mod internal {
     pub trait Ref<T: ?Sized> {

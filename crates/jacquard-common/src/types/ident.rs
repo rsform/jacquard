@@ -12,8 +12,6 @@ use core::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
-use smol_str::SmolStr;
-
 /// AT Protocol identifier (either a DID or handle).
 ///
 /// Represents the union of DIDs and handles, which can both be used to identify
@@ -131,6 +129,16 @@ where
     }
 }
 
+impl<S: Bos<str> + AsRef<str>> AtIdentifier<S> {
+    /// Convert to an `AtIdentifier` with a different backing type.
+    pub fn convert<B: Bos<str> + AsRef<str> + From<S>>(self) -> AtIdentifier<B> {
+        match self {
+            AtIdentifier::Did(did) => AtIdentifier::Did(did.convert()),
+            AtIdentifier::Handle(handle) => AtIdentifier::Handle(handle.convert()),
+        }
+    }
+}
+
 impl<S: Bos<str> + AsRef<str>> From<Did<S>> for AtIdentifier<S> {
     fn from(did: Did<S>) -> Self {
         AtIdentifier::Did(did)
@@ -202,6 +210,8 @@ impl<S: Bos<str> + AsRef<str>> AsRef<str> for AtIdentifier<S> {
 
 #[cfg(test)]
 mod tests {
+    use smol_str::SmolStr;
+
     use super::*;
     use crate::cowstr::ToCowStr;
 
