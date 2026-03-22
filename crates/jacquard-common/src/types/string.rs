@@ -73,12 +73,10 @@ pub enum AtprotoStr<S: Bos<str> + AsRef<str> + Clone + Serialize = DefaultStr> {
     Handle(Handle<S>),
     /// Identifier (DID or handle)
     AtIdentifier(AtIdentifier<S>),
-    // TODO(bos-migration): parameterise on S once AtUri is migrated.
     /// AT URI
-    AtUri(AtUri<'static>),
-    // TODO(bos-migration): parameterise on S once UriValue is migrated.
+    AtUri(AtUri<S>),
     /// Generic URI
-    Uri(UriValue<'static>),
+    Uri(UriValue<S>),
     /// Content identifier
     Cid(Cid<S>),
     /// Record key
@@ -123,18 +121,28 @@ impl<S: Bos<str> + AsRef<str> + Clone + Serialize> AtprotoStr<S> {
         if validate_nsid(s).is_ok() {
             return Self::Nsid(unsafe { Nsid::unchecked(string) });
         }
-        // TODO(bos-migration): AtUri and UriValue still use lifetimes.
-        // For now, construct owned versions for those variants.
-        if let Ok(aturi) = AtUri::new_owned(s) {
-            return Self::AtUri(aturi);
+        if crate::types::aturi::validate_and_index(s).is_ok() {
+            return Self::AtUri(unsafe { AtUri::unchecked(string) });
         }
-        if let Ok(uri) = UriValue::new_owned(s) {
-            return Self::Uri(uri);
+        // URI schemes that UriValue handles - check prefix, wrap S directly.
+        if s.starts_with("https://") || s.starts_with("wss://") || s.starts_with("ipld://") {
+            if let Ok(uri) = UriValue::new(s) {
+                // we don't want to always Any here, it's better to fall back to the String variant.
+                match uri {
+                    UriValue::Any(_) => {}
+                    _ => {
+                        drop(s);
+                        return Self::Uri(UriValue::new(string).expect("already checked"));
+                    }
+                }
+            }
         }
+        let s: &str = string.as_ref();
         // CID: try to parse as IPLD first, otherwise wrap as string CID.
         if IpldCid::try_from(s).is_ok() || s.starts_with("bafy") {
             return Self::Cid(unsafe { Cid::unchecked_str(string) });
         }
+        drop(s);
         // Fallback: plain string.
         Self::String(string)
     }
@@ -227,8 +235,8 @@ where
             AtprotoStr::Handle(handle) => AtprotoStr::Handle(handle.into_static()),
             AtprotoStr::AtIdentifier(ident) => AtprotoStr::AtIdentifier(ident.into_static()),
             // AtUri and UriValue are already 'static in this enum.
-            AtprotoStr::AtUri(at_uri) => AtprotoStr::AtUri(at_uri),
-            AtprotoStr::Uri(uri) => AtprotoStr::Uri(uri),
+            AtprotoStr::AtUri(at_uri) => AtprotoStr::AtUri(at_uri.into_static()),
+            AtprotoStr::Uri(uri) => AtprotoStr::Uri(uri.into_static()),
             AtprotoStr::Cid(cid) => AtprotoStr::Cid(cid.into_static()),
             AtprotoStr::RecordKey(record_key) => AtprotoStr::RecordKey(record_key.into_static()),
             AtprotoStr::String(s) => AtprotoStr::String(s.into_static()),
@@ -480,4 +488,8 @@ pub enum StrParseKind {
         #[source]
         err: Arc<AtStrError>,
     },
+    /// Wraps another error with additional context
+    #[error("converting from a string slice")]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::atstr::conversion)))]
+    Conversion,
 }

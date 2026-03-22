@@ -1,6 +1,6 @@
 use crate::bos::{Bos, DefaultStr};
 use crate::types::recordkey::RecordKeyType;
-use crate::types::string::AtStrError;
+use crate::types::string::{AtStrError, StrParseKind};
 use crate::{CowStr, IntoStatic};
 use alloc::string::{String, ToString};
 use core::fmt;
@@ -74,39 +74,35 @@ impl<S: Bos<str>> Nsid<S> {
     }
 }
 
-impl<'n> Nsid<&'n str> {
-    /// Fallible constructor, validates, borrows from input.
-    pub fn new(nsid: &'n str) -> Result<Self, AtStrError> {
-        validate_nsid(nsid)?;
-        Ok(Self(nsid))
+impl<S: Bos<str> + AsRef<str>> Nsid<S> {
+    /// Fallible constructor, validates, wraps the input directly.
+    pub fn new(s: S) -> Result<Self, AtStrError> {
+        validate_nsid(s.as_ref())?;
+        Ok(Self(s))
     }
 
     /// Infallible constructor. Panics on invalid NSIDs.
-    pub fn raw(nsid: &'n str) -> Self {
-        Self::new(nsid).expect("invalid NSID")
+    pub fn raw(s: S) -> Self {
+        Self::new(s).expect("invalid NSID")
     }
 }
 
-impl<S: Bos<str> + From<SmolStr>> Nsid<S> {
+impl<S: Bos<str> + FromStr> Nsid<S> {
     /// Fallible constructor, validates, takes ownership.
     pub fn new_owned(nsid: impl AsRef<str>) -> Result<Self, AtStrError> {
         let nsid = nsid.as_ref();
         validate_nsid(nsid)?;
-        Ok(Self(S::from(nsid.to_smolstr())))
+        let s = S::from_str(nsid)
+            .map_err(|_| AtStrError::new("nsid", nsid.to_string(), StrParseKind::Conversion))?;
+        Ok(Self(s))
     }
 
-    /// Fallible constructor for static strings. Zero-alloc if possible.
+    /// Fallible constructor for static strings.
     pub fn new_static(nsid: &'static str) -> Result<Self, AtStrError> {
         validate_nsid(nsid)?;
-        Ok(Self(S::from(SmolStr::new_static(nsid))))
-    }
-}
-
-impl<'n> Nsid<CowStr<'n>> {
-    /// Fallible constructor, borrows if possible.
-    pub fn new_cow(nsid: CowStr<'n>) -> Result<Self, AtStrError> {
-        validate_nsid(&nsid)?;
-        Ok(Self(nsid))
+        let s = S::from_str(nsid)
+            .map_err(|_| AtStrError::new("nsid", nsid.to_string(), StrParseKind::Conversion))?;
+        Ok(Self(s))
     }
 }
 
@@ -191,7 +187,7 @@ impl From<String> for Nsid {
 
 impl<'n> From<CowStr<'n>> for Nsid<CowStr<'n>> {
     fn from(value: CowStr<'n>) -> Self {
-        Self::new_cow(value).unwrap()
+        Self::new(value).unwrap()
     }
 }
 

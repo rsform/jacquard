@@ -1,3 +1,5 @@
+use crate::cowstr::ToCowStr;
+
 use super::*;
 use core::str::FromStr;
 
@@ -560,7 +562,7 @@ fn test_aturi_deserialization() {
     #[derive(Debug, Deserialize)]
     struct WithAtUri<'a> {
         #[serde(borrow)]
-        uri: AtUri<'a>,
+        uri: AtUri<CowStr<'a>>,
         did: Did<CowStr<'a>>,
     }
 
@@ -568,7 +570,7 @@ fn test_aturi_deserialization() {
     map.insert(
         SmolStr::new_static("uri"),
         Data::String(AtprotoStr::AtUri(
-            AtUri::new("at://alice.bsky.social/app.bsky.feed.post/3jk5").unwrap(),
+            AtUri::new("at://alice.bsky.social/app.bsky.feed.post/3jk5".to_cowstr()).unwrap(),
         )),
     );
     map.insert(
@@ -586,28 +588,27 @@ fn test_aturi_deserialization() {
 }
 
 #[test]
-fn test_aturi_zero_copy() {
-    use serde::Deserialize;
-
-    #[derive(Debug, Deserialize)]
-    struct WithAtUri<'a> {
-        #[serde(borrow)]
-        uri: AtUri<'a>,
-    }
-
-    // Use borrowed CowStr to create the AtUri
+fn test_aturi_zero_copy_borrowed() {
+    // AtUri<&str> should point at the original buffer.
     let uri_str = "at://alice.bsky.social/app.bsky.feed.post/3jk5";
-    let mut map = BTreeMap::new();
-    map.insert(
-        SmolStr::new_static("uri"),
-        Data::String(AtprotoStr::AtUri(AtUri::new(uri_str).unwrap())),
-    );
-    let data = Data::Object(Object(map));
+    let uri = AtUri::new(uri_str).unwrap();
+    assert_eq!(uri.as_str().as_ptr(), uri_str.as_ptr());
+}
 
-    let result: WithAtUri = from_data(&data).unwrap();
+#[test]
+fn test_aturi_zero_copy_cowstr() {
+    // AtUri<CowStr<'a>> with a borrowed CowStr should point at the original buffer.
+    let uri_str = "at://alice.bsky.social/app.bsky.feed.post/3jk5";
+    let uri = AtUri::new(CowStr::Borrowed(uri_str)).unwrap();
+    assert_eq!(uri.as_str().as_ptr(), uri_str.as_ptr());
+}
 
-    // Check if the AtUri borrowed from the original string
-    assert_eq!(result.uri.as_str().as_ptr(), uri_str.as_ptr());
+#[test]
+fn test_aturi_owned_allocates() {
+    // AtUri<SmolStr> allocates — pointers should NOT match.
+    let uri_str = "at://alice.bsky.social/app.bsky.feed.post/3jk5";
+    let uri: AtUri<SmolStr> = AtUri::new_owned(uri_str).unwrap();
+    assert_ne!(uri.as_str().as_ptr(), uri_str.as_ptr());
 }
 
 #[test]

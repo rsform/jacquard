@@ -1,5 +1,6 @@
 use alloc::string::String;
 use core::fmt;
+use core::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +11,7 @@ use crate::types::{
     recordkey::{RecordKey, RecordKeyType, Rkey},
 };
 use crate::xrpc::XrpcResp;
-use crate::{CowStr, IntoStatic};
+use crate::{BorrowOrShare, Bos, CowStr, IntoStatic};
 
 /// Trait for a collection of records that can be stored in a repository.
 ///
@@ -35,8 +36,8 @@ pub trait Collection: fmt::Debug + Serialize {
     /// Panics if [`Self::NSID`] is not a valid NSID.
     ///
     /// [`Nsid`]: crate::types::string::Nsid
-    fn nsid() -> crate::types::nsid::Nsid<CowStr<'static>> {
-        Nsid::new_static(Self::NSID).expect("should be valid NSID")
+    fn nsid() -> crate::types::nsid::Nsid<&'static str> {
+        unsafe { Nsid::unchecked(Self::NSID) }
     }
 
     /// Returns the repo path for a record in this collection with the given record key.
@@ -48,14 +49,15 @@ pub trait Collection: fmt::Debug + Serialize {
     ///
     /// [Repo Data Structure v3]: https://atproto.com/specs/repository#repo-data-structure-v3
     /// [`Nsid`]: crate::types::string::Nsid
-    fn repo_path<'u, T: RecordKeyType>(
-        rkey: &'u crate::types::recordkey::RecordKey<T>,
-    ) -> RepoPath<'u> {
+    fn repo_path<T>(rkey: &crate::types::recordkey::RecordKey<T>) -> RepoPath<&str>
+    where
+        T: RecordKeyType + Bos<str> + AsRef<str>,
+    {
         RepoPath {
             collection: Self::nsid(),
             // Borrow the record key string with the caller's lifetime via CowStr.
             rkey: Some(
-                RecordKey::any_cow(CowStr::Borrowed(rkey.as_ref()))
+                RecordKey::any(rkey.0.borrow_or_share())
                     .expect("RecordKey implements RecordKeyType, which guarantees a valid rkey"),
             ),
         }

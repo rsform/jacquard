@@ -42,7 +42,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::AtUri => {
-            if let Ok(value) = AtUri::new(value) {
+            if let Ok(value) = AtUri::new(value.to_cowstr()) {
                 // AtprotoStr::AtUri stores AtUri<'static>; convert to owned.
                 map.insert(
                     key.to_smolstr(),
@@ -56,7 +56,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Did => {
-            if let Ok(value) = Did::new_cow(value.to_cowstr()) {
+            if let Ok(value) = Did::new(value.to_cowstr()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Did(value)));
             } else {
                 map.insert(
@@ -66,7 +66,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Handle => {
-            if let Ok(value) = Handle::new_cow(value.into()) {
+            if let Ok(value) = Handle::new(value.to_cowstr()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Handle(value)));
             } else {
                 map.insert(
@@ -76,7 +76,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::AtIdentifier => {
-            if let Ok(value) = AtIdentifier::new_cow(value.to_cowstr()) {
+            if let Ok(value) = AtIdentifier::new(value.to_cowstr()) {
                 map.insert(
                     key.to_smolstr(),
                     Data::String(AtprotoStr::AtIdentifier(value)),
@@ -89,7 +89,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Nsid => {
-            if let Ok(value) = Nsid::new_cow(value.to_cowstr()) {
+            if let Ok(value) = Nsid::new(value.to_cowstr()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Nsid(value)));
             } else {
                 map.insert(
@@ -135,8 +135,7 @@ pub fn insert_string<'s>(
                     key.to_smolstr(),
                     // Rkey already validated above; borrow the original &'s str directly.
                     Data::String(AtprotoStr::RecordKey(
-                        RecordKey::any_cow(CowStr::Borrowed(value))
-                            .expect("Rkey validation passed"),
+                        RecordKey::any(CowStr::Borrowed(value)).expect("Rkey validation passed"),
                     )),
                 );
             } else {
@@ -167,7 +166,7 @@ pub fn insert_string<'s>(
 /// smarter parsing to avoid trying as many posibilities.
 pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<CowStr<'s>> {
     if string.len() < 2048 && string.starts_with("did:") {
-        if let Ok(did) = Did::new_cow(string.to_cowstr()) {
+        if let Ok(did) = Did::new(string.to_cowstr()) {
             return AtprotoStr::Did(did);
         }
     } else if string.starts_with("20") && string.ends_with("Z") {
@@ -177,8 +176,8 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<CowStr<'s>> {
         }
     } else if string.starts_with("at://") {
         // AtprotoStr::AtUri stores AtUri<'static>; convert to owned.
-        if let Ok(uri) = AtUri::new(string) {
-            return AtprotoStr::AtUri(uri.into_static());
+        if let Ok(uri) = AtUri::new(string.to_cowstr()) {
+            return AtprotoStr::AtUri(uri);
         }
     } else if string.starts_with("https://") {
         if let Ok(uri) = Uri::parse(string) {
@@ -209,29 +208,29 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<CowStr<'s>> {
 
         // First segment is a known TLD → reverse domain order → try NSID first.
         if first_is_tld {
-            if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
+            if let Ok(nsid) = Nsid::new(string.to_cowstr()) {
                 return AtprotoStr::Nsid(nsid);
             }
         }
 
         // Last segment is a known TLD and first is not → normal domain order → handle.
         if last_is_tld && !first_is_tld {
-            if let Ok(handle) = AtIdentifier::new_cow(string.to_cowstr()) {
+            if let Ok(handle) = AtIdentifier::new(string.to_cowstr()) {
                 return AtprotoStr::AtIdentifier(handle);
             }
         }
 
         // camelCase in last segment → NSID (e.g., "com.atproto.repo.getRecord").
         if has_upper_last_segment {
-            if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
+            if let Ok(nsid) = Nsid::new(string.to_cowstr()) {
                 return AtprotoStr::Nsid(nsid);
             }
         }
 
         // Fallback: try both, preferring handle.
-        if let Ok(handle) = AtIdentifier::new_cow(string.to_cowstr()) {
+        if let Ok(handle) = AtIdentifier::new(string.to_cowstr()) {
             return AtprotoStr::AtIdentifier(handle);
-        } else if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
+        } else if let Ok(nsid) = Nsid::new(string.to_cowstr()) {
             return AtprotoStr::Nsid(nsid);
         } else if string.contains("://") && Uri::<&str>::parse(string).is_ok() {
             // AtprotoStr::Uri stores UriValue<'static>; convert to owned.

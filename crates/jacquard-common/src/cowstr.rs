@@ -335,6 +335,14 @@ where
     }
 }
 
+impl core::str::FromStr for CowStr<'_> {
+    type Err = core::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(CowStr::copy_from_str(s))
+    }
+}
+
 /// Convert to a CowStr.
 pub trait ToCowStr {
     /// Convert to a CowStr.

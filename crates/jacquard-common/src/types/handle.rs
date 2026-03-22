@@ -1,8 +1,9 @@
 use crate::bos::{Bos, DefaultStr};
-use crate::types::string::AtStrError;
+use crate::types::string::{AtStrError, StrParseKind};
 use crate::types::{DISALLOWED_TLDS, ends_with};
 use crate::{CowStr, IntoStatic};
 use alloc::string::String;
+use alloc::string::ToString;
 use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::ops::Deref;
@@ -100,79 +101,62 @@ impl<S: Bos<str>> Handle<S> {
 // Borrowed construction: Handle<&'h str>
 // ---------------------------------------------------------------------------
 
-impl<'h> Handle<&'h str> {
-    /// Fallible constructor, validates, borrows from input.
+impl<S: Bos<str> + AsRef<str>> Handle<S> {
+    /// Fallible constructor, validates, wraps the input directly.
     ///
-    /// Rejects uppercase input — use `Handle::<SmolStr>::new_owned()` for
-    /// case-insensitive construction.
-    /// Accepts (and strips) preceding '@' or 'at://' if present.
-    pub fn new(handle: &'h str) -> Result<Self, AtStrError> {
-        if handle.contains(|c: char| c.is_ascii_uppercase()) {
+    /// Rejects uppercase input — use `new_owned()` for case-insensitive construction.
+    /// Does NOT strip `@` or `at://` prefix — use `new_owned()` for that.
+    pub fn new(s: S) -> Result<Self, AtStrError> {
+        let r = s.as_ref();
+        if r.contains(|c: char| c.is_ascii_uppercase()) {
             return Err(AtStrError::regex(
                 "handle",
-                handle,
+                r,
                 SmolStr::new_static("contains uppercase (use new_owned for normalisation)"),
             ));
         }
-        let stripped = strip_handle_prefix(handle);
-        validate_handle(stripped)?;
-        Ok(Self(stripped))
+        validate_handle(r)?;
+        Ok(Self(s))
     }
 
     /// Infallible constructor. Panics on invalid handles.
-    pub fn raw(handle: &'h str) -> Self {
-        Self::new(handle).expect("invalid handle")
+    pub fn raw(s: S) -> Self {
+        Self::new(s).expect("invalid handle")
     }
 }
 
 // ---------------------------------------------------------------------------
-// Owned construction: any S that can be built from SmolStr
+// Owned construction (with prefix stripping and normalisation)
 // ---------------------------------------------------------------------------
 
-impl<S: Bos<str> + From<SmolStr>> Handle<S> {
+impl<S: Bos<str> + FromStr> Handle<S> {
     /// Fallible constructor, validates, takes ownership. Normalises to lowercase.
+    ///
+    /// Accepts (and strips) preceding `@` or `at://` if present.
     pub fn new_owned(handle: impl AsRef<str>) -> Result<Self, AtStrError> {
         let handle = handle.as_ref();
         let stripped = strip_handle_prefix(handle);
         let normalized = stripped.to_lowercase_smolstr();
         validate_handle(&normalized)?;
-        Ok(Self(S::from(normalized)))
+        let s = S::from_str(&normalized).map_err(|_| {
+            AtStrError::new("handle", normalized.to_string(), StrParseKind::Conversion)
+        })?;
+        Ok(Self(s))
     }
 
-    /// Fallible constructor for static strings. Zero-alloc if already lowercase.
+    /// Fallible constructor for static strings. Normalises to lowercase.
     pub fn new_static(handle: &'static str) -> Result<Self, AtStrError> {
         let stripped = strip_handle_prefix(handle);
-        let smol = if stripped.contains(|c: char| c.is_ascii_uppercase()) {
+        let normalized = if stripped.contains(|c: char| c.is_ascii_uppercase()) {
             stripped.to_lowercase_smolstr()
         } else {
             SmolStr::new_static(stripped)
         };
-        validate_handle(&smol)?;
-        Ok(Self(S::from(smol)))
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CowStr construction
-// ---------------------------------------------------------------------------
-
-impl<'h> Handle<CowStr<'h>> {
-    /// Fallible constructor, borrows if possible, allocates for uppercase/prefix.
-    pub fn new_cow(handle: CowStr<'h>) -> Result<Self, AtStrError> {
-        if handle.contains(|c: char| c.is_ascii_uppercase()) {
-            return Handle::<CowStr<'h>>::new_owned(handle);
-        }
-        let handle = if handle.starts_with("at://") || handle.starts_with('@') {
-            CowStr::copy_from_str(strip_handle_prefix(&handle))
-        } else {
-            handle
-        };
-        validate_handle(&handle)?;
-        Ok(Self(handle))
-    }
-
-    pub unsafe fn unchecked_cow(handle: CowStr<'h>) -> Self {
-        Self(handle)
+        validate_handle(&normalized)?;
+        let s = S::from_str(&normalized).map_err(|_| {
+            AtStrError::new("handle", normalized.to_string(), StrParseKind::Conversion)
+        })?;
+        Ok(Self(s))
     }
 }
 
@@ -319,7 +303,7 @@ impl From<String> for Handle {
 
 impl<'h> From<CowStr<'h>> for Handle<CowStr<'h>> {
     fn from(value: CowStr<'h>) -> Self {
-        Self::new_cow(value).unwrap()
+        Self::new(value).unwrap()
     }
 }
 
@@ -364,12 +348,15 @@ mod tests {
 
     #[test]
     fn prefix_stripping() {
+        // new() does not strip — use new_owned() for that.
+        assert!(Handle::<&str>::new("@alice.test").is_err());
+        assert!(Handle::<&str>::new("at://alice.test").is_err());
         assert_eq!(
-            Handle::<&str>::new("@alice.test").unwrap().as_str(),
+            Handle::<SmolStr>::new_owned("@alice.test").unwrap().as_str(),
             "alice.test"
         );
         assert_eq!(
-            Handle::<&str>::new("at://alice.test").unwrap().as_str(),
+            Handle::<SmolStr>::new_owned("at://alice.test").unwrap().as_str(),
             "alice.test"
         );
         assert_eq!(

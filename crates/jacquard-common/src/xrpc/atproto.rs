@@ -89,7 +89,7 @@ pub struct ListRecordsRecord<'a> {
     #[serde(borrow)]
     pub cid: Option<Cid<CowStr<'a>>>,
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<CowStr<'a>>,
     #[serde(borrow)]
     pub value: Data<'a>,
 }
@@ -164,7 +164,7 @@ pub struct GetRecordOutput<'a> {
     #[serde(borrow)]
     pub cid: Option<Cid<CowStr<'a>>>,
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<CowStr<'a>>,
     #[serde(borrow)]
     pub value: Data<'a>,
 }
@@ -453,13 +453,13 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::IntoStatic;
+    use crate::{IntoStatic, cowstr::ToCowStr};
 
     #[test]
     fn test_list_records_serializes() {
         let req = ListRecords {
-            repo: AtIdentifier::new_cow("test.bsky.social".into()).unwrap(),
-            collection: Nsid::new_cow("app.bsky.feed.post".into())
+            repo: AtIdentifier::new("test.bsky.social".to_cowstr()).unwrap(),
+            collection: Nsid::new("app.bsky.feed.post".to_cowstr())
                 .unwrap()
                 .into_static(),
             cursor: None,
@@ -552,8 +552,8 @@ mod tests {
     #[test]
     fn test_types_implement_into_static() {
         let list_records = ListRecords {
-            repo: AtIdentifier::new_cow("test.bsky.social".into()).unwrap(),
-            collection: Nsid::new_cow("app.bsky.feed.post".into())
+            repo: AtIdentifier::new("test.bsky.social".to_cowstr()).unwrap(),
+            collection: Nsid::new("app.bsky.feed.post".to_cowstr())
                 .unwrap()
                 .into_static(),
             cursor: None,
@@ -563,8 +563,8 @@ mod tests {
         let _static = list_records.into_static();
 
         let get_record = GetRecord {
-            repo: AtIdentifier::new_cow("test.bsky.social".into()).unwrap(),
-            collection: Nsid::new_cow("app.bsky.feed.post".into())
+            repo: AtIdentifier::new("test.bsky.social".to_cowstr()).unwrap(),
+            collection: Nsid::new("app.bsky.feed.post".to_cowstr())
                 .unwrap()
                 .into_static(),
             rkey: CowStr::from("abc123").into_static(),

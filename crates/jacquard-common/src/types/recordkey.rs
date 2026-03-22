@@ -1,6 +1,6 @@
 use crate::bos::{Bos, DefaultStr};
 use crate::types::Literal;
-use crate::types::string::AtStrError;
+use crate::types::string::{AtStrError, StrParseKind};
 use crate::{CowStr, IntoStatic};
 use alloc::string::{String, ToString};
 use core::fmt;
@@ -27,8 +27,8 @@ use super::Lazy;
 /// # Safety
 /// Implementations must ensure the string representation matches [`RKEY_REGEX`] and
 /// is not "." or "..". Built-in implementations: `Tid`, `Nsid`, `Literal<T>`, `Rkey<'_>`.
-pub unsafe trait RecordKeyType: Clone + Serialize {
-    /// Get the record key as a string slice
+pub unsafe trait RecordKeyType {
+    /// Get the record key as a string slice.
     fn as_str(&self) -> &str;
 }
 
@@ -41,14 +41,7 @@ pub unsafe trait RecordKeyType: Clone + Serialize {
 #[repr(transparent)]
 pub struct RecordKey<T: RecordKeyType>(pub T);
 
-impl<'a> RecordKey<Rkey<&'a str>> {
-    /// Create a new `RecordKey` from a string slice.
-    pub fn any(str: &'a str) -> Result<Self, AtStrError> {
-        Ok(RecordKey(Rkey::new(str)?))
-    }
-}
-
-impl<S: Bos<str> + AsRef<str> + Clone + Serialize + From<SmolStr>> RecordKey<Rkey<S>> {
+impl<S: Bos<str> + AsRef<str> + FromStr> RecordKey<Rkey<S>> {
     /// Create a new `RecordKey` from a static string slice.
     pub fn any_static(str: &'static str) -> Result<Self, AtStrError> {
         Ok(RecordKey(Rkey::new_static(str)?))
@@ -60,10 +53,10 @@ impl<S: Bos<str> + AsRef<str> + Clone + Serialize + From<SmolStr>> RecordKey<Rke
     }
 }
 
-impl<'a> RecordKey<Rkey<CowStr<'a>>> {
-    /// Create a new `RecordKey` from a CowStr.
-    pub fn any_cow(str: CowStr<'a>) -> Result<Self, AtStrError> {
-        Ok(RecordKey(Rkey::new_cow(str)?))
+impl<S: Bos<str> + AsRef<str>> RecordKey<Rkey<S>> {
+    /// Create a new `RecordKey` wrapping a pre-validated Rkey.
+    pub fn any(s: S) -> Result<Self, AtStrError> {
+        Ok(RecordKey(Rkey::new(s)?))
     }
 }
 
@@ -126,7 +119,7 @@ where
 #[repr(transparent)]
 pub struct Rkey<S: Bos<str> = DefaultStr>(pub(crate) S);
 
-unsafe impl<S: Bos<str> + AsRef<str> + Clone + Serialize> RecordKeyType for Rkey<S> {
+unsafe impl<S: Bos<str> + AsRef<str>> RecordKeyType for Rkey<S> {
     fn as_str(&self) -> &str {
         self.0.as_ref()
     }
@@ -166,44 +159,51 @@ impl<S: Bos<str>> Rkey<S> {
     }
 }
 
-impl<'r> Rkey<&'r str> {
-    /// Fallible constructor, validates, borrows from input.
-    pub fn new(rkey: &'r str) -> Result<Self, AtStrError> {
-        validate_rkey(rkey)?;
-        Ok(Self(rkey))
+impl<S: Bos<str> + AsRef<str>> Rkey<S> {
+    /// Fallible constructor, validates, wraps the input directly.
+    pub fn new(s: S) -> Result<Self, AtStrError> {
+        validate_rkey(s.as_ref())?;
+        Ok(Self(s))
     }
 
     /// Infallible constructor. Panics on invalid rkeys.
-    pub fn raw(rkey: &'r str) -> Self {
-        Self::new(rkey).expect("invalid rkey")
+    pub fn raw(s: S) -> Self {
+        Self::new(s).expect("invalid rkey")
     }
 }
 
-impl<S: Bos<str> + From<SmolStr>> Rkey<S> {
+impl<S: Bos<str> + FromStr> Rkey<S> {
     /// Fallible constructor, validates, takes ownership.
     pub fn new_owned(rkey: impl AsRef<str>) -> Result<Self, AtStrError> {
         let rkey = rkey.as_ref();
         validate_rkey(rkey)?;
-        Ok(Self(S::from(rkey.to_smolstr())))
+        let s = S::from_str(rkey).map_err(|_| {
+            AtStrError::new("record-key", rkey.to_string(), StrParseKind::Conversion)
+        })?;
+        Ok(Self(s))
     }
 
     /// Fallible constructor for static strings.
     pub fn new_static(rkey: &'static str) -> Result<Self, AtStrError> {
         validate_rkey(rkey)?;
-        Ok(Self(S::from(SmolStr::new_static(rkey))))
+        let s = S::from_str(rkey).map_err(|_| {
+            AtStrError::new("record-key", rkey.to_string(), StrParseKind::Conversion)
+        })?;
+        Ok(Self(s))
     }
 }
 
-impl<'r> Rkey<CowStr<'r>> {
-    /// Fallible constructor, borrows if possible.
-    pub fn new_cow(rkey: CowStr<'r>) -> Result<Self, AtStrError> {
-        validate_rkey(&rkey)?;
-        Ok(Self(rkey))
-    }
+impl<T> Bos<str> for RecordKey<T>
+where
+    T: RecordKeyType + Bos<str> + AsRef<str>,
+{
+    type Ref<'this>
+        = &'this str
+    where
+        Self: 'this;
 
-    /// Infallible unchecked constructor for CowStr.
-    pub unsafe fn unchecked_cow(rkey: CowStr<'r>) -> Self {
-        Self(rkey)
+    fn borrow_or_share(this: &Self) -> Self::Ref<'_> {
+        this.as_ref()
     }
 }
 
@@ -288,7 +288,7 @@ impl From<String> for Rkey {
 
 impl<'r> From<CowStr<'r>> for Rkey<CowStr<'r>> {
     fn from(value: CowStr<'r>) -> Self {
-        Self::new_cow(value).unwrap()
+        Self::new(value).unwrap()
     }
 }
 
@@ -303,6 +303,20 @@ impl<S: Bos<str> + AsRef<str>> Deref for Rkey<S> {
 
     fn deref(&self) -> &Self::Target {
         self.as_str()
+    }
+}
+
+impl<S> Bos<str> for Rkey<S>
+where
+    S: Bos<str> + AsRef<str>,
+{
+    type Ref<'this>
+        = &'this str
+    where
+        Self: 'this;
+
+    fn borrow_or_share(this: &Self) -> Self::Ref<'_> {
+        this.as_str()
     }
 }
 
@@ -493,11 +507,11 @@ mod tests {
         assert!(Rkey::new("a").is_ok()); // min 1
         let valid_512 = "a".repeat(512);
         assert_eq!(valid_512.len(), 512);
-        assert!(Rkey::new(&valid_512).is_ok());
+        assert!(Rkey::new(valid_512).is_ok());
 
         let too_long_513 = "a".repeat(513);
         assert_eq!(too_long_513.len(), 513);
-        assert!(Rkey::new(&too_long_513).is_err());
+        assert!(Rkey::new(too_long_513).is_err());
     }
 
     #[test]

@@ -1,5 +1,5 @@
 use crate::bos::{Bos, DefaultStr};
-use crate::types::string::AtStrError;
+use crate::types::string::{AtStrError, StrParseKind};
 use crate::{CowStr, IntoStatic};
 use alloc::string::{String, ToString};
 use core::fmt;
@@ -80,63 +80,49 @@ impl<S: Bos<str>> Did<S> {
 }
 
 // ---------------------------------------------------------------------------
-// Borrowed construction
+// Generic construction
 // ---------------------------------------------------------------------------
 
-impl<'d> Did<&'d str> {
-    /// Fallible constructor, validates, borrows from input.
-    /// Accepts (and strips) preceding 'at://' if present.
-    pub fn new(did: &'d str) -> Result<Self, AtStrError> {
-        let stripped = strip_did_prefix(did);
-        validate_did(stripped)?;
-        Ok(Self(stripped))
+impl<S: Bos<str> + AsRef<str>> Did<S> {
+    /// Fallible constructor, validates, wraps the input directly.
+    ///
+    /// Does NOT strip `at://` prefix — use `new_owned()` for that.
+    pub fn new(s: S) -> Result<Self, AtStrError> {
+        validate_did(s.as_ref())?;
+        Ok(Did(s))
     }
 
     /// Infallible constructor. Panics on invalid DIDs.
-    pub fn raw(did: &'d str) -> Self {
-        Self::new(did).expect("invalid DID")
+    pub fn raw(s: S) -> Self {
+        Self::new(s).expect("invalid DID")
     }
 }
 
 // ---------------------------------------------------------------------------
-// Owned construction
+// Owned construction (with prefix stripping)
 // ---------------------------------------------------------------------------
 
-impl<S: Bos<str> + From<SmolStr>> Did<S> {
+impl<S: Bos<str> + FromStr> Did<S> {
     /// Fallible constructor, validates, takes ownership.
+    ///
+    /// Accepts (and strips) preceding `at://` if present.
     pub fn new_owned(did: impl AsRef<str>) -> Result<Self, AtStrError> {
         let did = did.as_ref();
         let stripped = strip_did_prefix(did);
         validate_did(stripped)?;
-        Ok(Self(S::from(stripped.to_smolstr())))
+        // FromStr for backing types (SmolStr, String, CowStr) is infallible.
+        let s = S::from_str(stripped)
+            .map_err(|_| AtStrError::new("did", stripped.to_string(), StrParseKind::Conversion))?;
+        Ok(Self(s))
     }
 
-    /// Fallible constructor for static strings. Zero-alloc if possible.
+    /// Fallible constructor for static strings.
     pub fn new_static(did: &'static str) -> Result<Self, AtStrError> {
         let stripped = strip_did_prefix(did);
         validate_did(stripped)?;
-        Ok(Self(S::from(SmolStr::new_static(stripped))))
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CowStr construction
-// ---------------------------------------------------------------------------
-
-impl<'d> Did<CowStr<'d>> {
-    /// Fallible constructor, borrows if possible.
-    pub fn new_cow(did: CowStr<'d>) -> Result<Self, AtStrError> {
-        let did = if let Some(stripped) = did.strip_prefix("at://") {
-            CowStr::copy_from_str(stripped)
-        } else {
-            did
-        };
-        validate_did(&did)?;
-        Ok(Self(did))
-    }
-
-    pub unsafe fn unchecked_cow(did: CowStr<'d>) -> Self {
-        Self(did)
+        let s = S::from_str(stripped)
+            .map_err(|_| AtStrError::new("did", stripped.to_string(), StrParseKind::Conversion))?;
+        Ok(Self(s))
     }
 }
 
@@ -229,7 +215,7 @@ impl From<String> for Did {
 
 impl<'d> From<CowStr<'d>> for Did<CowStr<'d>> {
     fn from(value: CowStr<'d>) -> Self {
-        Self::new_cow(value).unwrap()
+        Self::new(value).unwrap()
     }
 }
 
@@ -269,8 +255,10 @@ mod tests {
 
     #[test]
     fn prefix_stripping() {
+        // new() does not strip — use new_owned() for that.
+        assert!(Did::<&str>::new("at://did:plc:foo").is_err());
         assert_eq!(
-            Did::<&str>::new("at://did:plc:foo").unwrap().as_str(),
+            Did::<SmolStr>::new_owned("at://did:plc:foo").unwrap().as_str(),
             "did:plc:foo"
         );
         assert_eq!(

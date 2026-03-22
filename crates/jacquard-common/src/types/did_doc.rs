@@ -108,13 +108,15 @@ where
     S: Bos<str> + AsRef<str> + Clone,
 {
     /// Extract validated handles from `alsoKnownAs` entries like `at://\<handle\>`.
-    pub fn handles(&self) -> Vec<Handle> {
+    pub fn handles(&self) -> Vec<Handle<&str>> {
         self.also_known_as
             .as_ref()
             .map(|v| {
                 v.iter()
-                    .filter_map(|h| Handle::new(h.as_ref()).ok())
-                    .map(|h| h.into_static())
+                    .filter_map(|h| {
+                        let s = h.as_ref().strip_prefix("at://").unwrap_or(h.as_ref());
+                        Handle::new(s).ok()
+                    })
                     .collect()
             })
             .unwrap_or_default()
