@@ -43,7 +43,7 @@ fn strip_did_prefix(did: &str) -> &str {
     did.strip_prefix("at://").unwrap_or(did)
 }
 
-fn validate_did(did: &str) -> Result<(), AtStrError> {
+pub(crate) fn validate_did(did: &str) -> Result<(), AtStrError> {
     if did.len() > 2048 {
         Err(AtStrError::too_long("did", did, 2048, did.len()))
     } else if !DID_REGEX.is_match(did) {

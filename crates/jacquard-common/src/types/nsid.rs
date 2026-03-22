@@ -30,7 +30,7 @@ pub static NSID_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z][a-zA-Z0-9]{0,62})$").unwrap()
 });
 
-fn validate_nsid(nsid: &str) -> Result<(), AtStrError> {
+pub(crate) fn validate_nsid(nsid: &str) -> Result<(), AtStrError> {
     if nsid.len() > 317 {
         Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
     } else if !NSID_REGEX.is_match(nsid) {

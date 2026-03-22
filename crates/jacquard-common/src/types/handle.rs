@@ -47,7 +47,7 @@ fn strip_handle_prefix(handle: &str) -> &str {
         .unwrap_or(handle)
 }
 
-fn validate_handle(handle: &str) -> Result<(), AtStrError> {
+pub(crate) fn validate_handle(handle: &str) -> Result<(), AtStrError> {
     if handle.len() > 253 {
         Err(AtStrError::too_long("handle", handle, 253, handle.len()))
     } else if !HANDLE_REGEX.is_match(handle) {

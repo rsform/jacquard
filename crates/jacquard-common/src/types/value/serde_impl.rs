@@ -251,7 +251,7 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
                         continue;
                     } else {
                         // Only key, return CidLink
-                        return Ok(Data::CidLink(Cid::from(cid_str)));
+                        return Ok(Data::CidLink(Cid::cow_str(CowStr::from(cid_str))));
                     }
                 } else if key.as_str() == "$bytes" {
                     // {"$bytes": "base64_string"} pattern
@@ -326,7 +326,8 @@ fn apply_type_inference<'s>(mut map: BTreeMap<SmolStr, Data<'s>>) -> Result<Data
 
             if let (Some(ref_cid), Some(mime_cowstr), Some(size)) = (ref_cid, mime_type, size) {
                 return Ok(Data::Blob(Blob {
-                    r#ref: CidLink::str(ref_cid.as_str()).into_static(),
+                    // ref_cid is already Cid<CowStr<'s>>; wrap directly.
+                    r#ref: CidLink(ref_cid),
                     mime_type: MimeType::from(mime_cowstr),
                     size,
                 }));
@@ -344,9 +345,7 @@ fn apply_type_inference<'s>(mut map: BTreeMap<SmolStr, Data<'s>>) -> Result<Data
                     // Decode base64
                     decode_bytes(&s)
                 }
-                DataModelType::CidLink if key.as_str() == "$link" => {
-                    Data::CidLink(Cid::from_str(&s).unwrap())
-                }
+                DataModelType::CidLink if key.as_str() == "$link" => Data::CidLink(Cid::cow_str(s)),
                 _ => continue, // no refinement needed
             };
             *value = refined;
@@ -376,7 +375,7 @@ fn refine_string_by_type<'s>(s: CowStr<'s>, string_type: LexiconStringType) -> D
         LexiconStringType::Nsid => Nsid::new_owned(s.clone())
             .map(|nsid| Data::String(AtprotoStr::Nsid(nsid)))
             .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::Cid => Cid::new_owned(s.as_bytes())
+        LexiconStringType::Cid => Cid::<CowStr<'s>>::new_owned(s.as_bytes())
             .map(|cid| Data::String(AtprotoStr::Cid(cid)))
             .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.into()))),
         LexiconStringType::Language => Language::new(&s)
@@ -385,8 +384,8 @@ fn refine_string_by_type<'s>(s: CowStr<'s>, string_type: LexiconStringType) -> D
         LexiconStringType::Tid => Tid::new(s.clone())
             .map(|tid| Data::String(AtprotoStr::Tid(tid)))
             .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::RecordKey => Rkey::new_owned(s.clone())
-            .map(|rkey| Data::String(AtprotoStr::RecordKey(RecordKey::from(rkey))))
+        LexiconStringType::RecordKey => Rkey::new_cow(s.clone())
+            .map(|rkey| Data::String(AtprotoStr::RecordKey(RecordKey(rkey))))
             .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
         LexiconStringType::Uri(_) => UriValue::new_owned(s.clone())
             .map(|uri| Data::String(AtprotoStr::Uri(uri)))
@@ -676,7 +675,7 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for RawDataVisitor {
                         continue;
                     } else {
                         // Only key, return CidLink
-                        return Ok(RawData::CidLink(Cid::from(cid_str)));
+                        return Ok(RawData::CidLink(Cid::cow_str(CowStr::from(cid_str))));
                     }
                 } else if key.as_str() == "$bytes" {
                     // {"$bytes": "base64_string"} pattern
@@ -813,7 +812,8 @@ fn apply_raw_type_inference<'s>(
 
             if let (Some(ref_cid), Some(mime_cowstr), Some(size)) = (ref_cid, mime_type, size) {
                 return Ok(RawData::Blob(Blob {
-                    r#ref: CidLink::str(ref_cid.as_str()).into_static(),
+                    // ref_cid is already Cid<CowStr<'s>>; wrap directly.
+                    r#ref: CidLink(ref_cid),
                     mime_type: MimeType::from(mime_cowstr),
                     size,
                 }));
@@ -1036,12 +1036,12 @@ impl serde::de::Error for DataDeserializerError {
 
 // MapAccess implementation for Blob - allows borrowing from blob fields
 struct BlobDeserializer<'de> {
-    blob: &'de Blob<'de>,
+    blob: &'de Blob<CowStr<'de>>,
     field_index: usize,
 }
 
 impl<'de> BlobDeserializer<'de> {
-    fn new(blob: &'de Blob<'de>) -> Self {
+    fn new(blob: &'de Blob<CowStr<'de>>) -> Self {
         Self {
             blob,
             field_index: 0,
@@ -1084,12 +1084,12 @@ impl<'de> serde::de::MapAccess<'de> for BlobDeserializer<'de> {
 }
 
 struct OwnedBlobDeserializer {
-    blob: Blob<'static>,
+    blob: Blob<CowStr<'static>>,
     field_index: usize,
 }
 
 impl OwnedBlobDeserializer {
-    fn new(blob: Blob<'_>) -> Self {
+    fn new(blob: Blob<CowStr<'_>>) -> Self {
         Self {
             blob: blob.into_static(),
             field_index: 0,

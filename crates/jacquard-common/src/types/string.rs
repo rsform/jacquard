@@ -26,6 +26,7 @@ impl From<(usize, usize)> for SourceSpan {
     }
 }
 
+use crate::bos::{Bos, DefaultStr};
 use crate::cowstr::ToCowStr;
 pub use crate::{
     CowStr,
@@ -57,7 +58,7 @@ use crate::{
 /// record keys are intentionally NOT parsed from bare strings as the validation
 /// is too permissive and would catch too many values.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AtprotoStr<'s> {
+pub enum AtprotoStr<S: Bos<str> + AsRef<str> + Clone + Serialize = DefaultStr> {
     /// ISO 8601 datetime
     Datetime(Datetime),
     /// BCP 47 language tag
@@ -65,65 +66,80 @@ pub enum AtprotoStr<'s> {
     /// Timestamp identifier
     Tid(Tid),
     /// Namespaced identifier
-    Nsid(Nsid<CowStr<'s>>),
+    Nsid(Nsid<S>),
     /// Decentralized identifier
-    Did(Did<CowStr<'s>>),
+    Did(Did<S>),
     /// Account handle
-    Handle(Handle<CowStr<'s>>),
+    Handle(Handle<S>),
     /// Identifier (DID or handle)
-    AtIdentifier(AtIdentifier<CowStr<'s>>),
+    AtIdentifier(AtIdentifier<S>),
+    // TODO(bos-migration): parameterise on S once AtUri is migrated.
     /// AT URI
-    AtUri(AtUri<'s>),
+    AtUri(AtUri<'static>),
+    // TODO(bos-migration): parameterise on S once UriValue is migrated.
     /// Generic URI
-    Uri(UriValue<'s>),
+    Uri(UriValue<'static>),
     /// Content identifier
-    Cid(Cid<'s>),
+    Cid(Cid<S>),
     /// Record key
-    RecordKey(RecordKey<Rkey<'s>>),
+    RecordKey(RecordKey<Rkey<S>>),
     /// Plain string (fallback)
-    String(CowStr<'s>),
+    String(S),
 }
 
-impl<'s> AtprotoStr<'s> {
-    /// Borrowing constructor for bare atproto string values
+use crate::types::cid::IpldCid;
+use crate::types::did::validate_did;
+use crate::types::handle::validate_handle;
+use crate::types::nsid::validate_nsid;
+
+impl<S: Bos<str> + AsRef<str> + Clone + Serialize> AtprotoStr<S> {
+    /// Classify and wrap a string value into the appropriate variant.
+    ///
     /// This is fairly exhaustive and potentially **slow**, prefer using anything
     /// that narrows down the search field quicker.
     ///
-    /// Note: We don't construct record keys from bare strings in this because
-    /// the type is too permissive and too many things would be classified as rkeys.
-    ///
-    /// Value object deserialization checks against the field names for common
-    /// names (uri, cid, did, handle, createdAt, indexedAt, etc.) to improve
-    /// performance of the happy path.
-    pub fn new(string: &'s str) -> Self {
-        // TODO: do some quick prefix checks like in Uri to drop through faster
-        if let Ok(datetime) = Datetime::from_str(string) {
-            Self::Datetime(datetime)
-        } else if let Ok(lang) = Language::new(string) {
-            Self::Language(lang)
-        } else if let Ok(tid) = Tid::from_str(string) {
-            Self::Tid(tid)
-        } else if let Ok(did) = Did::new_cow(string.to_cowstr()) {
-            Self::Did(did)
-        } else if let Ok(handle) = Handle::new_cow(string.to_cowstr()) {
-            Self::Handle(handle)
-        } else if let Ok(atid) = AtIdentifier::new_cow(string.to_cowstr()) {
-            Self::AtIdentifier(atid)
-        } else if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
-            Self::Nsid(nsid)
-        } else if let Ok(aturi) = AtUri::new(string) {
-            Self::AtUri(aturi)
-        } else if let Ok(uri) = UriValue::new(string) {
-            Self::Uri(uri)
-        } else if let Ok(cid) = Cid::new(string.as_bytes()) {
-            Self::Cid(cid)
-        } else {
-            // We don't construct record keys from bare strings because the type is too permissive
-            Self::String(CowStr::Borrowed(string))
+    /// Inspects the string content, validates against known AT Protocol types,
+    /// and moves `string` into the matching variant via unchecked constructors
+    /// (safe because we validate first).
+    pub fn new(string: S) -> Self {
+        let s: &str = string.as_ref();
+        // Non-string-backed types first (they don't consume S).
+        if let Ok(datetime) = Datetime::from_str(s) {
+            return Self::Datetime(datetime);
         }
+        if let Ok(lang) = Language::new(s) {
+            return Self::Language(lang);
+        }
+        if let Ok(tid) = Tid::from_str(s) {
+            return Self::Tid(tid);
+        }
+        // String-backed types: validate then wrap S directly.
+        if validate_did(s).is_ok() {
+            return Self::Did(unsafe { Did::unchecked(string) });
+        }
+        if validate_handle(s).is_ok() {
+            return Self::Handle(unsafe { Handle::unchecked(string) });
+        }
+        if validate_nsid(s).is_ok() {
+            return Self::Nsid(unsafe { Nsid::unchecked(string) });
+        }
+        // TODO(bos-migration): AtUri and UriValue still use lifetimes.
+        // For now, construct owned versions for those variants.
+        if let Ok(aturi) = AtUri::new_owned(s) {
+            return Self::AtUri(aturi);
+        }
+        if let Ok(uri) = UriValue::new_owned(s) {
+            return Self::Uri(uri);
+        }
+        // CID: try to parse as IPLD first, otherwise wrap as string CID.
+        if IpldCid::try_from(s).is_ok() || s.starts_with("bafy") {
+            return Self::Cid(unsafe { Cid::unchecked_str(string) });
+        }
+        // Fallback: plain string.
+        Self::String(string)
     }
 
-    /// Get the string value regardless of variant
+    /// Get the string value regardless of variant.
     pub fn as_str(&self) -> &str {
         match self {
             Self::Datetime(datetime) => datetime.as_str(),
@@ -141,7 +157,7 @@ impl<'s> AtprotoStr<'s> {
         }
     }
 
-    /// detailed string type
+    /// Detailed string type classification.
     pub fn string_type(&self) -> LexiconStringType {
         match self {
             Self::Datetime(_) => LexiconStringType::Datetime,
@@ -167,90 +183,39 @@ impl<'s> AtprotoStr<'s> {
     }
 }
 
-impl AtprotoStr<'static> {
-    /// Owned constructor for bare atproto string values
-    /// This is fairly exhaustive and potentially **slow**, prefer using anything
-    /// that narrows down the search field quicker.
-    ///
-    /// Note: We don't construct record keys from bare strings in this because
-    /// the type is too permissive and too many things would be classified as rkeys.
-    ///
-    /// Value object deserialization checks against the field names for common
-    /// names (uri, cid, did, handle, createdAt, indexedAt, etc.) to improve
-    /// performance of the happy path.
-    pub fn new_owned(string: impl AsRef<str>) -> AtprotoStr<'static> {
-        let string = string.as_ref();
-        // TODO: do some quick prefix checks like in Uri to drop through faster
-        if let Ok(datetime) = Datetime::from_str(string) {
-            Self::Datetime(datetime)
-        } else if let Ok(lang) = Language::new(string) {
-            Self::Language(lang)
-        } else if let Ok(tid) = Tid::from_str(string) {
-            Self::Tid(tid)
-        } else if let Ok(did) = Did::new_owned(string) {
-            Self::Did(did)
-        } else if let Ok(handle) = Handle::new_owned(string) {
-            Self::Handle(handle)
-        } else if let Ok(atid) = AtIdentifier::new_owned(string) {
-            Self::AtIdentifier(atid)
-        } else if let Ok(nsid) = Nsid::new_owned(string) {
-            Self::Nsid(nsid)
-        } else if let Ok(aturi) = AtUri::new_owned(string) {
-            Self::AtUri(aturi)
-        } else if let Ok(uri) = UriValue::new_owned(string) {
-            Self::Uri(uri)
-        } else if let Ok(cid) = Cid::new_owned(string.as_bytes()) {
-            Self::Cid(cid)
-        } else {
-            // We don't construct record keys from bare strings because the type is too permissive
-            Self::String(CowStr::Owned(string.to_smolstr()))
-        }
-    }
-}
-
-impl<'s> AsRef<str> for AtprotoStr<'s> {
+impl<S: Bos<str> + AsRef<str> + Clone + Serialize> AsRef<str> for AtprotoStr<S> {
     fn as_ref(&self) -> &str {
-        match self {
-            Self::Datetime(datetime) => datetime.as_str(),
-            Self::Language(lang) => lang.as_ref(),
-            Self::Tid(tid) => tid.as_ref(),
-            Self::Did(did) => did.as_ref(),
-            Self::Handle(handle) => handle.as_ref(),
-            Self::AtIdentifier(atid) => atid.as_ref(),
-            Self::Nsid(nsid) => nsid.as_ref(),
-            Self::AtUri(aturi) => aturi.as_ref(),
-            Self::Uri(uri) => uri.as_str(),
-            Self::Cid(cid) => cid.as_ref(),
-            Self::RecordKey(rkey) => rkey.as_ref(),
-            Self::String(string) => string.as_ref(),
-        }
+        self.as_str()
     }
 }
 
-impl Serialize for AtprotoStr<'_> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str> + Clone + Serialize> Serialize for AtprotoStr<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: Serializer,
+        Ser: Serializer,
     {
-        serializer.serialize_str(self.as_ref())
+        serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for AtprotoStr<'a>
+impl<'de, S> Deserialize<'de> for AtprotoStr<S>
 where
-    'de: 'a,
+    S: Bos<str> + AsRef<str> + Clone + Serialize + Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        let value = Deserialize::deserialize(deserializer)?;
+        let value = S::deserialize(deserializer)?;
         Ok(Self::new(value))
     }
 }
 
-impl IntoStatic for AtprotoStr<'_> {
-    type Output = AtprotoStr<'static>;
+impl<S: Bos<str> + AsRef<str> + Clone + Serialize + IntoStatic> IntoStatic for AtprotoStr<S>
+where
+    S::Output: Bos<str> + AsRef<str> + Clone + Serialize,
+{
+    type Output = AtprotoStr<S::Output>;
 
     fn into_static(self) -> Self::Output {
         match self {
@@ -261,38 +226,19 @@ impl IntoStatic for AtprotoStr<'_> {
             AtprotoStr::Did(did) => AtprotoStr::Did(did.into_static()),
             AtprotoStr::Handle(handle) => AtprotoStr::Handle(handle.into_static()),
             AtprotoStr::AtIdentifier(ident) => AtprotoStr::AtIdentifier(ident.into_static()),
-            AtprotoStr::AtUri(at_uri) => AtprotoStr::AtUri(at_uri.into_static()),
-            AtprotoStr::Uri(uri) => AtprotoStr::Uri(uri.into_static()),
+            // AtUri and UriValue are already 'static in this enum.
+            AtprotoStr::AtUri(at_uri) => AtprotoStr::AtUri(at_uri),
+            AtprotoStr::Uri(uri) => AtprotoStr::Uri(uri),
             AtprotoStr::Cid(cid) => AtprotoStr::Cid(cid.into_static()),
             AtprotoStr::RecordKey(record_key) => AtprotoStr::RecordKey(record_key.into_static()),
-            AtprotoStr::String(cow_str) => AtprotoStr::String(cow_str.into_static()),
+            AtprotoStr::String(s) => AtprotoStr::String(s.into_static()),
         }
     }
 }
 
-impl From<AtprotoStr<'_>> for String {
-    fn from(value: AtprotoStr<'_>) -> Self {
-        match value {
-            AtprotoStr::AtIdentifier(ident) => ident.to_string(),
-            AtprotoStr::AtUri(at_uri) => at_uri.to_string(),
-            AtprotoStr::Uri(uri) => match uri {
-                UriValue::At(at_uri) => at_uri.to_string(),
-                UriValue::Cid(cid) => cid.to_string(),
-                UriValue::Did(did) => did.to_string(),
-                UriValue::Https(url) => url.to_string(),
-                UriValue::Wss(url) => url.to_string(),
-                UriValue::Any(cow_str) => cow_str.to_string(),
-            },
-            AtprotoStr::Cid(cid) => cid.to_string(),
-            AtprotoStr::RecordKey(record_key) => record_key.as_ref().to_string(),
-            AtprotoStr::String(cow_str) => cow_str.to_string(),
-            AtprotoStr::Datetime(datetime) => datetime.to_string(),
-            AtprotoStr::Language(language) => language.to_string(),
-            AtprotoStr::Tid(tid) => tid.to_string(),
-            AtprotoStr::Nsid(nsid) => nsid.to_string(),
-            AtprotoStr::Did(did) => did.to_string(),
-            AtprotoStr::Handle(handle) => handle.to_string(),
-        }
+impl<S: Bos<str> + AsRef<str> + Clone + Serialize> From<AtprotoStr<S>> for String {
+    fn from(value: AtprotoStr<S>) -> Self {
+        value.as_str().to_string()
     }
 }
 

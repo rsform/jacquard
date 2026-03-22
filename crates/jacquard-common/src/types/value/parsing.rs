@@ -43,7 +43,11 @@ pub fn insert_string<'s>(
         }
         LexiconStringType::AtUri => {
             if let Ok(value) = AtUri::new(value) {
-                map.insert(key.to_smolstr(), Data::String(AtprotoStr::AtUri(value)));
+                // AtprotoStr::AtUri stores AtUri<'static>; convert to owned.
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::AtUri(value.into_static())),
+                );
             } else {
                 map.insert(
                     key.to_smolstr(),
@@ -95,7 +99,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Cid => {
-            if let Ok(value) = Cid::new(value.as_bytes()) {
+            if let Ok(value) = Cid::<CowStr<'s>>::new_owned(value.as_bytes()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Cid(value)));
             } else {
                 map.insert(
@@ -125,10 +129,15 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::RecordKey => {
-            if let Ok(value) = Rkey::new(value) {
+            // Validate the rkey without shadowing the original `value: &'s str`.
+            if Rkey::new(value).is_ok() {
                 map.insert(
                     key.to_smolstr(),
-                    Data::String(AtprotoStr::RecordKey(RecordKey::from(value))),
+                    // Rkey already validated above; borrow the original &'s str directly.
+                    Data::String(AtprotoStr::RecordKey(
+                        RecordKey::any_cow(CowStr::Borrowed(value))
+                            .expect("Rkey validation passed"),
+                    )),
                 );
             } else {
                 map.insert(
@@ -138,7 +147,8 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Uri(_) => {
-            if let Ok(uri) = UriValue::new(value) {
+            // AtprotoStr::Uri stores UriValue<'static>, so we must produce an owned value.
+            if let Ok(uri) = UriValue::new_owned(value) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Uri(uri)));
             } else {
                 map.insert(
@@ -155,7 +165,7 @@ pub fn insert_string<'s>(
 }
 
 /// smarter parsing to avoid trying as many posibilities.
-pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<'s> {
+pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<CowStr<'s>> {
     if string.len() < 2048 && string.starts_with("did:") {
         if let Ok(did) = Did::new_cow(string.to_cowstr()) {
             return AtprotoStr::Did(did);
@@ -166,8 +176,9 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<'s> {
             return AtprotoStr::Datetime(datetime);
         }
     } else if string.starts_with("at://") {
+        // AtprotoStr::AtUri stores AtUri<'static>; convert to owned.
         if let Ok(uri) = AtUri::new(string) {
-            return AtprotoStr::AtUri(uri);
+            return AtprotoStr::AtUri(uri.into_static());
         }
     } else if string.starts_with("https://") {
         if let Ok(uri) = Uri::parse(string) {
@@ -178,7 +189,11 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<'s> {
             return AtprotoStr::Uri(UriValue::Wss(uri.to_owned()));
         }
     } else if string.starts_with("ipfs://") {
-        return AtprotoStr::Uri(UriValue::Cid(Cid::str(string)));
+        // URI variant must be 'static; convert to an owned CID.
+        return AtprotoStr::Uri(UriValue::Cid(
+            Cid::<CowStr<'static>>::new_owned(string.as_bytes())
+                .unwrap_or_else(|_| Cid::cow_str(CowStr::Owned(string.to_smolstr()))),
+        ));
     } else if string.contains('.') && !string.contains([' ', '\n']) {
         // Dotted strings without a scheme could be handles, NSIDs, or URIs.
         // Use TLD lookup and camelCase heuristic to disambiguate.
@@ -219,7 +234,8 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<'s> {
         } else if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
             return AtprotoStr::Nsid(nsid);
         } else if string.contains("://") && Uri::<&str>::parse(string).is_ok() {
-            return AtprotoStr::Uri(UriValue::Any(string.into()));
+            // AtprotoStr::Uri stores UriValue<'static>; convert to owned.
+            return AtprotoStr::Uri(UriValue::Any(CowStr::Owned(string.to_smolstr())));
         }
     } else if string.len() == 13 {
         if let Ok(tid) = Tid::new(string) {
@@ -228,7 +244,7 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<'s> {
     } else if !string.contains([' ', '\n']) && string.len() > 20 {
         // CID: must be longer than typical short strings to avoid false positives
         // Most CIDs are 46+ chars (base32 encoded), minimum realistic is around 30
-        if let Ok(cid) = Cid::new(string.as_bytes()) {
+        if let Ok(cid) = Cid::<CowStr<'s>>::new_owned(string.as_bytes()) {
             return AtprotoStr::Cid(cid);
         }
     }
@@ -267,10 +283,10 @@ pub fn string_key_type_guess(key: &str) -> DataModelType {
 }
 
 /// Convert an ipld map to a atproto data model blob if it matches the format
-pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
+pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<CowStr<'b>>> {
     let mime_type = blob.get("mimeType").and_then(|o| {
         if let Ipld::String(string) = o {
-            Some(string)
+            Some(string.as_str())
         } else {
             None
         }
@@ -285,16 +301,16 @@ pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
         });
         if let (Some(mime_type), Some(size)) = (mime_type, size) {
             return Some(Blob {
-                r#ref: CidLink::ipld(*value),
-                mime_type: MimeType::raw(mime_type),
+                r#ref: CidLink::<CowStr<'b>>::ipld(*value),
+                mime_type: MimeType::new_cow(CowStr::Borrowed(mime_type)),
                 size: size as usize,
             });
         }
     } else if let Some(Ipld::String(value)) = blob.get("cid") {
         if let Some(mime_type) = mime_type {
             return Some(Blob {
-                r#ref: CidLink::str(value),
-                mime_type: MimeType::raw(mime_type),
+                r#ref: CidLink::cow_str(CowStr::Borrowed(value.as_str())),
+                mime_type: MimeType::new_cow(CowStr::Borrowed(mime_type)),
                 size: 0,
             });
         }
@@ -304,7 +320,9 @@ pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
 }
 
 /// convert a JSON object to an atproto data model blob if it matches the format
-pub fn json_to_blob<'b>(blob: &'b serde_json::Map<String, serde_json::Value>) -> Option<Blob<'b>> {
+pub fn json_to_blob<'b>(
+    blob: &'b serde_json::Map<String, serde_json::Value>,
+) -> Option<Blob<CowStr<'b>>> {
     let mime_type = blob.get("mimeType").and_then(|v| v.as_str());
     if let Some(value) = blob.get("ref") {
         if let Some(value) = value
@@ -315,8 +333,8 @@ pub fn json_to_blob<'b>(blob: &'b serde_json::Map<String, serde_json::Value>) ->
             let size = blob.get("size").and_then(|v| v.as_u64());
             if let (Some(mime_type), Some(size)) = (mime_type, size) {
                 return Some(Blob {
-                    r#ref: CidLink::str(value),
-                    mime_type: MimeType::raw(mime_type),
+                    r#ref: CidLink::cow_str(CowStr::Borrowed(value)),
+                    mime_type: MimeType::new_cow(CowStr::Borrowed(mime_type)),
                     size: size as usize,
                 });
             }
@@ -324,8 +342,8 @@ pub fn json_to_blob<'b>(blob: &'b serde_json::Map<String, serde_json::Value>) ->
     } else if let Some(value) = blob.get("cid").and_then(|v| v.as_str()) {
         if let Some(mime_type) = mime_type {
             return Some(Blob {
-                r#ref: CidLink::str(value),
-                mime_type: MimeType::raw(mime_type),
+                r#ref: CidLink::cow_str(CowStr::Borrowed(value)),
+                mime_type: MimeType::new_cow(CowStr::Borrowed(mime_type)),
                 size: 0,
             });
         }

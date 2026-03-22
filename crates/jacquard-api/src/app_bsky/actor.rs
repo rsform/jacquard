@@ -15,7 +15,6 @@ pub mod search_actors;
 pub mod search_actors_typeahead;
 pub mod status;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -25,15 +24,13 @@ use jacquard_common::CowStr;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_common::types::string::{Did, Handle, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor;
 use crate::app_bsky::embed::external::View;
 use crate::app_bsky::feed::postgate::DisableRule;
 use crate::app_bsky::feed::threadgate::FollowerRule;
@@ -45,7 +42,9 @@ use crate::app_bsky::graph::StarterPackViewBasic;
 use crate::app_bsky::notification::ActivitySubscription;
 use crate::com_atproto::label::Label;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::app_bsky::actor;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -85,7 +84,6 @@ pub struct BskyAppStatePref<'a> {
     pub queued_nudges: Option<Vec<CowStr<'a>>>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
@@ -99,7 +97,6 @@ pub struct ContentLabelPref<'a> {
     #[serde(borrow)]
     pub visibility: ContentLabelPrefVisibility<'a>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ContentLabelPrefVisibility<'a> {
@@ -218,7 +215,6 @@ pub struct DeclaredAgePref<'a> {
     pub is_over_age18: Option<bool>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
@@ -244,7 +240,6 @@ pub struct FeedViewPref<'a> {
     pub hide_reposts: Option<bool>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -253,7 +248,6 @@ pub struct HiddenPostsPref<'a> {
     #[serde(borrow)]
     pub items: Vec<AtUri<'a>>,
 }
-
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -275,7 +269,6 @@ pub struct KnownFollowers<'a> {
     pub followers: Vec<actor::ProfileViewBasic<'a>>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -283,7 +276,6 @@ pub struct LabelerPrefItem<'a> {
     #[serde(borrow)]
     pub did: Did<'a>,
 }
-
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -417,16 +409,11 @@ impl jacquard_common::IntoStatic for MutedWordActorTarget<'_> {
     fn into_static(self) -> Self::Output {
         match self {
             MutedWordActorTarget::All => MutedWordActorTarget::All,
-            MutedWordActorTarget::ExcludeFollowing => {
-                MutedWordActorTarget::ExcludeFollowing
-            }
-            MutedWordActorTarget::Other(v) => {
-                MutedWordActorTarget::Other(v.into_static())
-            }
+            MutedWordActorTarget::ExcludeFollowing => MutedWordActorTarget::ExcludeFollowing,
+            MutedWordActorTarget::Other(v) => MutedWordActorTarget::Other(v.into_static()),
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MutedWordTarget<'a> {
@@ -510,7 +497,6 @@ impl jacquard_common::IntoStatic for MutedWordTarget<'_> {
     }
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -540,7 +526,6 @@ pub struct Nux<'a> {
     pub id: CowStr<'a>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
@@ -563,11 +548,9 @@ pub struct PostInteractionSettingsPref<'a> {
     ///Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub threadgate_allow_rules: Option<
-        Vec<PostInteractionSettingsPrefThreadgateAllowRulesItem<'a>>,
-    >,
+    pub threadgate_allow_rules:
+        Option<Vec<PostInteractionSettingsPrefThreadgateAllowRulesItem<'a>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -582,7 +565,6 @@ pub enum PostInteractionSettingsPrefThreadgateAllowRulesItem<'a> {
     #[serde(rename = "app.bsky.feed.threadgate#listRule")]
     ThreadgateListRule(Box<ListRule<'a>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -647,7 +629,6 @@ pub struct ProfileAssociated<'a> {
     pub starter_packs: Option<i64>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
@@ -655,7 +636,6 @@ pub struct ProfileAssociatedActivitySubscription<'a> {
     #[serde(borrow)]
     pub allow_subscriptions: ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
@@ -698,8 +678,7 @@ impl<'a> From<String> for ProfileAssociatedActivitySubscriptionAllowSubscription
     }
 }
 
-impl<'a> core::fmt::Display
-for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+impl<'a> core::fmt::Display for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
@@ -711,8 +690,7 @@ impl<'a> AsRef<str> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<
     }
 }
 
-impl<'a> serde::Serialize
-for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+impl<'a> serde::Serialize for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -722,7 +700,7 @@ for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
 }
 
 impl<'de, 'a> serde::Deserialize<'de>
-for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>
+    for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>
 where
     'de: 'a,
 {
@@ -741,8 +719,7 @@ impl<'a> Default for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>
     }
 }
 
-impl jacquard_common::IntoStatic
-for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'_> {
+impl jacquard_common::IntoStatic for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'_> {
     type Output = ProfileAssociatedActivitySubscriptionAllowSubscriptions<'static>;
     fn into_static(self) -> Self::Output {
         match self {
@@ -756,14 +733,11 @@ for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'_> {
                 ProfileAssociatedActivitySubscriptionAllowSubscriptions::None
             }
             ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(v) => {
-                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(
-                    v.into_static(),
-                )
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(v.into_static())
             }
         }
     }
 }
-
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
@@ -772,7 +746,6 @@ pub struct ProfileAssociatedChat<'a> {
     #[serde(borrow)]
     pub allow_incoming: ProfileAssociatedChatAllowIncoming<'a>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileAssociatedChatAllowIncoming<'a> {
@@ -859,12 +832,8 @@ impl jacquard_common::IntoStatic for ProfileAssociatedChatAllowIncoming<'_> {
     type Output = ProfileAssociatedChatAllowIncoming<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            ProfileAssociatedChatAllowIncoming::All => {
-                ProfileAssociatedChatAllowIncoming::All
-            }
-            ProfileAssociatedChatAllowIncoming::None => {
-                ProfileAssociatedChatAllowIncoming::None
-            }
+            ProfileAssociatedChatAllowIncoming::All => ProfileAssociatedChatAllowIncoming::All,
+            ProfileAssociatedChatAllowIncoming::None => ProfileAssociatedChatAllowIncoming::None,
             ProfileAssociatedChatAllowIncoming::Following => {
                 ProfileAssociatedChatAllowIncoming::Following
             }
@@ -875,7 +844,6 @@ impl jacquard_common::IntoStatic for ProfileAssociatedChatAllowIncoming<'_> {
     }
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -885,7 +853,6 @@ pub struct ProfileAssociatedGerm<'a> {
     #[serde(borrow)]
     pub show_button_to: ProfileAssociatedGermShowButtonTo<'a>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileAssociatedGermShowButtonTo<'a> {
@@ -981,7 +948,6 @@ impl jacquard_common::IntoStatic for ProfileAssociatedGermShowButtonTo<'_> {
     }
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -1027,7 +993,6 @@ pub struct ProfileView<'a> {
     pub viewer: Option<actor::ViewerState<'a>>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -1067,7 +1032,6 @@ pub struct ProfileViewBasic<'a> {
     #[serde(borrow)]
     pub viewer: Option<actor::ViewerState<'a>>,
 }
-
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1132,7 +1096,6 @@ pub struct ProfileViewDetailed<'a> {
     pub website: Option<UriValue<'a>>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -1145,7 +1108,6 @@ pub struct SavedFeed<'a> {
     #[serde(borrow)]
     pub value: CowStr<'a>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SavedFeedType<'a> {
@@ -1240,7 +1202,6 @@ impl jacquard_common::IntoStatic for SavedFeedType<'_> {
     }
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -1253,7 +1214,6 @@ pub struct SavedFeedsPref<'a> {
     pub timeline_index: Option<i64>,
 }
 
-
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -1261,7 +1221,6 @@ pub struct SavedFeedsPrefV2<'a> {
     #[serde(borrow)]
     pub items: Vec<actor::SavedFeed<'a>>,
 }
-
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1377,7 +1336,6 @@ impl jacquard_common::IntoStatic for StatusViewStatus<'_> {
         }
     }
 }
-
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
@@ -1713,15 +1671,9 @@ impl jacquard_common::IntoStatic for VerificationStateVerifiedStatus<'_> {
     type Output = VerificationStateVerifiedStatus<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            VerificationStateVerifiedStatus::Valid => {
-                VerificationStateVerifiedStatus::Valid
-            }
-            VerificationStateVerifiedStatus::Invalid => {
-                VerificationStateVerifiedStatus::Invalid
-            }
-            VerificationStateVerifiedStatus::None => {
-                VerificationStateVerifiedStatus::None
-            }
+            VerificationStateVerifiedStatus::Valid => VerificationStateVerifiedStatus::Valid,
+            VerificationStateVerifiedStatus::Invalid => VerificationStateVerifiedStatus::Invalid,
+            VerificationStateVerifiedStatus::None => VerificationStateVerifiedStatus::None,
             VerificationStateVerifiedStatus::Other(v) => {
                 VerificationStateVerifiedStatus::Other(v.into_static())
             }
@@ -2543,7 +2495,7 @@ impl Default for AdultContentPref<'_> {
 
 pub mod adult_content_pref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2642,10 +2594,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.actor.defs"),
@@ -2882,11 +2834,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("items"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "A list of URIs of posts the account owner has hidden.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A list of URIs of posts the account owner has hidden.",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
@@ -2931,17 +2881,13 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("knownFollowers"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "The subject's followers whom you also follow",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("count"),
-                            SmolStr::new_static("followers")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "The subject's followers whom you also follow",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("count"),
+                        SmolStr::new_static("followers"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3012,20 +2958,16 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("liveEventPreferences"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Preferences for live events."),
-                    ),
+                    description: Some(CowStr::new_static("Preferences for live events.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("hiddenFeedIds"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "A list of feed IDs that the user has hidden from live events.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A list of feed IDs that the user has hidden from live events.",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -3135,11 +3077,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("items"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "A list of words the account owner has muted.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A list of words the account owner has muted.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("app.bsky.actor.defs#mutedWord"),
                                     ..Default::default()
@@ -3216,9 +3156,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("birthDate"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The birth date of account owner."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The birth date of account owner.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -3304,7 +3244,7 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                             CowStr::new_static("#labelersPref"),
                             CowStr::new_static("#postInteractionSettingsPref"),
                             CowStr::new_static("#verificationPrefs"),
-                            CowStr::new_static("#liveEventPreferences")
+                            CowStr::new_static("#liveEventPreferences"),
                         ],
                         ..Default::default()
                     }),
@@ -3320,9 +3260,7 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("activitySubscription"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "#profileAssociatedActivitySubscription",
-                                ),
+                                r#ref: CowStr::new_static("#profileAssociatedActivitySubscription"),
                                 ..Default::default()
                             }),
                         );
@@ -3378,7 +3316,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("allowSubscriptions"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3394,7 +3334,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("allowIncoming"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3404,12 +3346,10 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileAssociatedGerm"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("showButtonTo"),
-                            SmolStr::new_static("messageMeUrl")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("showButtonTo"),
+                        SmolStr::new_static("messageMeUrl"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3422,7 +3362,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("showButtonTo"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3432,9 +3374,10 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3514,7 +3457,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("pronouns"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
@@ -3545,9 +3490,10 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileViewBasic"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3612,7 +3558,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("pronouns"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
@@ -3643,9 +3591,10 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileViewDetailed"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3766,7 +3715,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("pronouns"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
@@ -3804,18 +3755,20 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("savedFeed"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("type"),
-                            SmolStr::new_static("value"), SmolStr::new_static("pinned")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("pinned"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("pinned"),
@@ -3825,11 +3778,15 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3839,9 +3796,10 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("savedFeedsPref"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("pinned"), SmolStr::new_static("saved")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("pinned"),
+                        SmolStr::new_static("saved"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3990,9 +3948,7 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sort"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Sorting mode for threads."),
-                                ),
+                                description: Some(CowStr::new_static("Sorting mode for threads.")),
                                 ..Default::default()
                             }),
                         );
@@ -4004,11 +3960,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("verificationPrefs"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Preferences for how verified accounts appear in the app.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Preferences for how verified accounts appear in the app.",
+                    )),
                     required: Some(vec![]),
                     properties: {
                         #[allow(unused_mut)]
@@ -4087,29 +4041,24 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("verificationView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "An individual verification for an associated subject.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("issuer"), SmolStr::new_static("uri"),
-                            SmolStr::new_static("isValid"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "An individual verification for an associated subject.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("issuer"),
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("isValid"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Timestamp when the verification was created.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the verification was created.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -4123,9 +4072,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("issuer"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The user who issued this verification."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The user who issued this verification.",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -4133,9 +4082,9 @@ fn lexicon_doc_app_bsky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The AT-URI of the verification record."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The AT-URI of the verification record.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -4240,7 +4189,7 @@ fn _default_feed_view_pref_hide_replies_by_unfollowed() -> Option<bool> {
 
 pub mod hidden_posts_pref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4340,7 +4289,7 @@ where
 
 pub mod interests_pref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4440,7 +4389,7 @@ where
 
 pub mod known_followers_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4574,7 +4523,7 @@ where
 
 pub mod labeler_pref_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4674,7 +4623,7 @@ where
 
 pub mod labelers_pref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4788,7 +4737,7 @@ impl Default for LiveEventPreferences<'_> {
 
 pub mod muted_word_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4863,18 +4812,12 @@ impl<'a> MutedWordBuilder<'a, muted_word_state::Empty> {
 
 impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
     /// Set the `actorTarget` field (optional)
-    pub fn actor_target(
-        mut self,
-        value: impl Into<Option<MutedWordActorTarget<'a>>>,
-    ) -> Self {
+    pub fn actor_target(mut self, value: impl Into<Option<MutedWordActorTarget<'a>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `actorTarget` field to an Option value (optional)
-    pub fn maybe_actor_target(
-        mut self,
-        value: Option<MutedWordActorTarget<'a>>,
-    ) -> Self {
+    pub fn maybe_actor_target(mut self, value: Option<MutedWordActorTarget<'a>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -4979,7 +4922,7 @@ where
 
 pub mod muted_words_pref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5083,7 +5026,7 @@ fn _default_nux_completed() -> bool {
 
 pub mod nux_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5128,7 +5071,12 @@ pub mod nux_state {
 /// Builder for constructing an instance of this type
 pub struct NuxBuilder<'a, S: nux_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<CowStr<'a>>, Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (
+        Option<bool>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+    ),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -5201,10 +5149,7 @@ where
     S::Id: nux_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> NuxBuilder<'a, nux_state::SetId<S>> {
+    pub fn id(mut self, value: impl Into<CowStr<'a>>) -> NuxBuilder<'a, nux_state::SetId<S>> {
         self._fields.3 = Option::Some(value.into());
         NuxBuilder {
             _state: PhantomData,
@@ -5247,7 +5192,7 @@ where
 
 pub mod profile_associated_germ_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5292,16 +5237,16 @@ pub mod profile_associated_germ_state {
 /// Builder for constructing an instance of this type
 pub struct ProfileAssociatedGermBuilder<'a, S: profile_associated_germ_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<UriValue<'a>>, Option<ProfileAssociatedGermShowButtonTo<'a>>),
+    _fields: (
+        Option<UriValue<'a>>,
+        Option<ProfileAssociatedGermShowButtonTo<'a>>,
+    ),
     _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileAssociatedGerm<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ProfileAssociatedGermBuilder<
-        'a,
-        profile_associated_germ_state::Empty,
-    > {
+    pub fn new() -> ProfileAssociatedGermBuilder<'a, profile_associated_germ_state::Empty> {
         ProfileAssociatedGermBuilder::new()
     }
 }
@@ -5326,10 +5271,7 @@ where
     pub fn message_me_url(
         mut self,
         value: impl Into<UriValue<'a>>,
-    ) -> ProfileAssociatedGermBuilder<
-        'a,
-        profile_associated_germ_state::SetMessageMeUrl<S>,
-    > {
+    ) -> ProfileAssociatedGermBuilder<'a, profile_associated_germ_state::SetMessageMeUrl<S>> {
         self._fields.0 = Option::Some(value.into());
         ProfileAssociatedGermBuilder {
             _state: PhantomData,
@@ -5348,10 +5290,7 @@ where
     pub fn show_button_to(
         mut self,
         value: impl Into<ProfileAssociatedGermShowButtonTo<'a>>,
-    ) -> ProfileAssociatedGermBuilder<
-        'a,
-        profile_associated_germ_state::SetShowButtonTo<S>,
-    > {
+    ) -> ProfileAssociatedGermBuilder<'a, profile_associated_germ_state::SetShowButtonTo<S>> {
         self._fields.1 = Option::Some(value.into());
         ProfileAssociatedGermBuilder {
             _state: PhantomData,
@@ -5390,7 +5329,7 @@ where
 
 pub mod profile_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5467,20 +5406,7 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
         ProfileViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _lifetime: PhantomData,
         }
@@ -5489,18 +5415,12 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `associated` field (optional)
-    pub fn associated(
-        mut self,
-        value: impl Into<Option<actor::ProfileAssociated<'a>>>,
-    ) -> Self {
+    pub fn associated(mut self, value: impl Into<Option<actor::ProfileAssociated<'a>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `associated` field to an Option value (optional)
-    pub fn maybe_associated(
-        mut self,
-        value: Option<actor::ProfileAssociated<'a>>,
-    ) -> Self {
+    pub fn maybe_associated(mut self, value: Option<actor::ProfileAssociated<'a>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -5663,18 +5583,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `verification` field (optional)
-    pub fn verification(
-        mut self,
-        value: impl Into<Option<actor::VerificationState<'a>>>,
-    ) -> Self {
+    pub fn verification(mut self, value: impl Into<Option<actor::VerificationState<'a>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
-    pub fn maybe_verification(
-        mut self,
-        value: Option<actor::VerificationState<'a>>,
-    ) -> Self {
+    pub fn maybe_verification(mut self, value: Option<actor::VerificationState<'a>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -5746,7 +5660,7 @@ where
 
 pub mod profile_view_basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5821,18 +5735,7 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
         ProfileViewBasicBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _lifetime: PhantomData,
         }
@@ -5841,18 +5744,12 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
 
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `associated` field (optional)
-    pub fn associated(
-        mut self,
-        value: impl Into<Option<actor::ProfileAssociated<'a>>>,
-    ) -> Self {
+    pub fn associated(mut self, value: impl Into<Option<actor::ProfileAssociated<'a>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `associated` field to an Option value (optional)
-    pub fn maybe_associated(
-        mut self,
-        value: Option<actor::ProfileAssociated<'a>>,
-    ) -> Self {
+    pub fn maybe_associated(mut self, value: Option<actor::ProfileAssociated<'a>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -5989,18 +5886,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `verification` field (optional)
-    pub fn verification(
-        mut self,
-        value: impl Into<Option<actor::VerificationState<'a>>>,
-    ) -> Self {
+    pub fn verification(mut self, value: impl Into<Option<actor::VerificationState<'a>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
-    pub fn maybe_verification(
-        mut self,
-        value: Option<actor::VerificationState<'a>>,
-    ) -> Self {
+    pub fn maybe_verification(mut self, value: Option<actor::VerificationState<'a>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -6068,7 +5959,7 @@ where
 
 pub mod profile_view_detailed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6152,27 +6043,8 @@ impl<'a> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::Empty> {
         ProfileViewDetailedBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None,
             ),
             _lifetime: PhantomData,
         }
@@ -6181,18 +6053,12 @@ impl<'a> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::Empty> {
 
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `associated` field (optional)
-    pub fn associated(
-        mut self,
-        value: impl Into<Option<actor::ProfileAssociated<'a>>>,
-    ) -> Self {
+    pub fn associated(mut self, value: impl Into<Option<actor::ProfileAssociated<'a>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `associated` field to an Option value (optional)
-    pub fn maybe_associated(
-        mut self,
-        value: Option<actor::ProfileAssociated<'a>>,
-    ) -> Self {
+    pub fn maybe_associated(mut self, value: Option<actor::ProfileAssociated<'a>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -6439,18 +6305,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `verification` field (optional)
-    pub fn verification(
-        mut self,
-        value: impl Into<Option<actor::VerificationState<'a>>>,
-    ) -> Self {
+    pub fn verification(mut self, value: impl Into<Option<actor::VerificationState<'a>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
-    pub fn maybe_verification(
-        mut self,
-        value: Option<actor::VerificationState<'a>>,
-    ) -> Self {
+    pub fn maybe_verification(mut self, value: Option<actor::VerificationState<'a>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -6549,7 +6409,7 @@ where
 
 pub mod saved_feed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6762,7 +6622,7 @@ where
 
 pub mod saved_feeds_pref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6911,7 +6771,7 @@ where
 
 pub mod saved_feeds_pref_v2_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7011,7 +6871,7 @@ where
 
 pub mod status_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7257,7 +7117,7 @@ impl Default for VerificationPrefs<'_> {
 
 pub mod verification_state_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7351,10 +7211,7 @@ where
     pub fn trusted_verifier_status(
         mut self,
         value: impl Into<VerificationStateTrustedVerifierStatus<'a>>,
-    ) -> VerificationStateBuilder<
-        'a,
-        verification_state_state::SetTrustedVerifierStatus<S>,
-    > {
+    ) -> VerificationStateBuilder<'a, verification_state_state::SetTrustedVerifierStatus<S>> {
         self._fields.0 = Option::Some(value.into());
         VerificationStateBuilder {
             _state: PhantomData,
@@ -7434,7 +7291,7 @@ where
 
 pub mod verification_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7509,7 +7366,12 @@ pub mod verification_view_state {
 /// Builder for constructing an instance of this type
 pub struct VerificationViewBuilder<'a, S: verification_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<bool>, Option<Did<'a>>, Option<AtUri<'a>>),
+    _fields: (
+        Option<Datetime>,
+        Option<bool>,
+        Option<Did<'a>>,
+        Option<AtUri<'a>>,
+    ),
     _lifetime: PhantomData<&'a ()>,
 }
 

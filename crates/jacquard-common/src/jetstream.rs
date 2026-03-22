@@ -95,7 +95,7 @@ pub struct JetstreamCommit<'a> {
     pub collection: Nsid<CowStr<'a>>,
     /// Record key
     #[serde(borrow)]
-    pub rkey: Rkey<'a>,
+    pub rkey: Rkey<CowStr<'a>>,
     /// Record data (present for create/update)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -103,7 +103,7 @@ pub struct JetstreamCommit<'a> {
     /// Content identifier
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<CowStr<'a>>>,
 }
 
 /// Identity event details

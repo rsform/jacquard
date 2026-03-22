@@ -39,17 +39,17 @@ pub enum Data<'s> {
     /// Integer value (no floats in AT Protocol)
     Integer(i64),
     /// String value (parsed into specific AT Protocol types when possible)
-    String(AtprotoStr<'s>),
+    String(AtprotoStr<CowStr<'s>>),
     /// Raw bytes
     Bytes(Bytes),
     /// CID link reference
-    CidLink(Cid<'s>),
+    CidLink(Cid<CowStr<'s>>),
     /// Array of values
     Array(Array<'s>),
     /// Object/map of values
     Object(Object<'s>),
     /// Blob reference with metadata
-    Blob(Blob<'s>),
+    Blob(Blob<CowStr<'s>>),
 }
 
 /// Errors that can occur when working with AT Protocol data
@@ -170,7 +170,7 @@ impl<'s> Data<'s> {
     }
 
     /// Get as string if this is a String variant
-    pub fn as_str_mut(&'s mut self) -> Option<&'s mut AtprotoStr<'s>> {
+    pub fn as_str_mut(&'s mut self) -> Option<&'s mut AtprotoStr<CowStr<'s>>> {
         if let Data::String(s) = self {
             Some(s)
         } else {
@@ -609,13 +609,13 @@ pub enum RawData<'s> {
     /// Raw bytes
     Bytes(Bytes),
     /// CID link reference
-    CidLink(Cid<'s>),
+    CidLink(Cid<CowStr<'s>>),
     /// Array of raw values
     Array(Vec<RawData<'s>>),
     /// Object/map of raw values
     Object(BTreeMap<SmolStr, RawData<'s>>),
     /// Valid blob reference
-    Blob(Blob<'s>),
+    Blob(Blob<CowStr<'s>>),
     /// Invalid blob structure (captured for debugging)
     InvalidBlob(Box<RawData<'s>>),
     /// Invalid number format, generally a floating point number (captured as bytes)

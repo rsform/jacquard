@@ -28,7 +28,7 @@ pub enum UriValue<'u> {
     /// WebSocket Secure URL
     Wss(Uri<String>),
     /// IPLD CID URI
-    Cid(Cid<'u>),
+    Cid(Cid<CowStr<'u>>),
     /// Unrecognized URI scheme (catch-all)
     Any(CowStr<'u>),
 }
@@ -60,9 +60,12 @@ impl<'u> UriValue<'u> {
         } else if uri.starts_with("wss://") {
             Ok(UriValue::Wss(Uri::parse(uri)?.to_owned()))
         } else if uri.starts_with("ipld://") {
-            match Cid::from_str(&uri[7..]) {
-                Ok(cid) => Ok(UriValue::Cid(cid)),
-                Err(_) => Ok(UriValue::Any(CowStr::Borrowed(uri))),
+            // Borrow the slice after "ipld://" prefix (7 bytes) from the input &'u str.
+            let cid_part = &uri[7..];
+            if cid_part.is_empty() {
+                Ok(UriValue::Any(CowStr::Borrowed(uri)))
+            } else {
+                Ok(UriValue::Cid(Cid::cow_str(CowStr::Borrowed(cid_part))))
             }
         } else {
             Ok(UriValue::Any(CowStr::Borrowed(uri)))
@@ -81,9 +84,12 @@ impl<'u> UriValue<'u> {
         } else if uri.starts_with("wss://") {
             Ok(UriValue::Wss(Uri::parse(uri)?.to_owned()))
         } else if uri.starts_with("ipld://") {
-            match Cid::from_str(&uri[7..]) {
-                Ok(cid) => Ok(UriValue::Cid(cid)),
-                Err(_) => Ok(UriValue::Any(CowStr::Owned(uri.to_smolstr()))),
+            // Owned context: use SmolStr via CowStr::Owned.
+            let cid_part = &uri[7..];
+            if cid_part.is_empty() {
+                Ok(UriValue::Any(CowStr::Owned(uri.to_smolstr())))
+            } else {
+                Ok(UriValue::Cid(Cid::cow_str(CowStr::Owned(cid_part.to_smolstr()))))
             }
         } else {
             Ok(UriValue::Any(CowStr::Owned(uri.to_smolstr())))
@@ -101,9 +107,16 @@ impl<'u> UriValue<'u> {
         } else if uri.starts_with("wss://") {
             Ok(UriValue::Wss(Uri::parse(uri.as_ref())?.to_owned()))
         } else if uri.starts_with("ipld://") {
-            match Cid::from_str(&uri.as_str()[7..]) {
-                Ok(cid) => Ok(UriValue::Cid(cid)),
-                Err(_) => Ok(UriValue::Any(uri)),
+            // Determine whether the CID part (after "ipld://") is non-empty before consuming uri.
+            if uri.as_ref()[7..].is_empty() {
+                Ok(UriValue::Any(uri))
+            } else {
+                // Build a CowStr for the CID part, preserving the ownership variant.
+                let cid_cow: CowStr<'u> = match uri {
+                    CowStr::Borrowed(s) => CowStr::Borrowed(&s[7..]),
+                    CowStr::Owned(ref s) => CowStr::Owned(s[7..].to_smolstr()),
+                };
+                Ok(UriValue::Cid(Cid::cow_str(cid_cow)))
             }
         } else {
             Ok(UriValue::Any(uri))

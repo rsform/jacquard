@@ -77,9 +77,9 @@ fn serialize_deserialize_bytes_json() {
 
 #[test]
 fn serialize_deserialize_cid_link_json() {
-    let data = Data::CidLink(Cid::str(
+    let data = Data::CidLink(Cid::cow_str(CowStr::Borrowed(
         "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha",
-    ));
+    )));
 
     // JSON: should be {"$link": "cid_string"}
     let json = serde_json::to_string(&data).unwrap();
@@ -470,7 +470,7 @@ fn test_atproto_types_deserialization() {
         #[serde(borrow)]
         did: Did<CowStr<'a>>,
         handle: Handle<CowStr<'a>>,
-        cid: Cid<'a>,
+        cid: Cid<CowStr<'a>>,
     }
 
     let mut map = BTreeMap::new();
@@ -486,9 +486,9 @@ fn test_atproto_types_deserialization() {
     );
     map.insert(
         SmolStr::new_static("cid"),
-        Data::String(AtprotoStr::Cid(Cid::str(
+        Data::String(AtprotoStr::Cid(Cid::cow_str(CowStr::Borrowed(
             "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha",
-        ))),
+        )))),
     );
     let data = Data::Object(Object(map));
 

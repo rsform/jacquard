@@ -131,13 +131,13 @@ macro_rules! derive_into_atproto {
 
 impl From<String> for Data<'_> {
     fn from(t: String) -> Self {
-        Data::String(AtprotoStr::new_owned(t))
+        Data::String(AtprotoStr::new(CowStr::from(t)))
     }
 }
 
 impl<'a> From<&'a str> for Data<'a> {
     fn from(t: &'a str) -> Self {
-        Data::String(AtprotoStr::new(t))
+        Data::String(AtprotoStr::new(CowStr::Borrowed(t)))
     }
 }
 
@@ -149,25 +149,19 @@ impl From<&[u8]> for Data<'_> {
 
 impl<'s> From<CowStr<'s>> for Data<'s> {
     fn from(t: CowStr<'s>) -> Self {
-        match t {
-            CowStr::Borrowed(s) => Data::String(AtprotoStr::new(s)),
-            CowStr::Owned(s) => Data::String(AtprotoStr::new_owned(s)),
-        }
+        Data::String(AtprotoStr::new(t))
     }
 }
 
 impl From<SmolStr> for Data<'_> {
     fn from(t: SmolStr) -> Self {
-        Data::String(AtprotoStr::new_owned(t))
+        Data::String(AtprotoStr::new(CowStr::Owned(t)))
     }
 }
 
 impl<'s> From<Cow<'s, str>> for Data<'s> {
     fn from(t: Cow<'s, str>) -> Self {
-        match t {
-            Cow::Borrowed(s) => Data::String(AtprotoStr::new(s)),
-            Cow::Owned(s) => Data::String(AtprotoStr::new_owned(s)),
-        }
+        Data::String(AtprotoStr::new(CowStr::from(t)))
     }
 }
 
@@ -242,8 +236,8 @@ derive_into_atproto!(Bytes, Vec<u8>, into);
 derive_into_atproto!(Array, Array<'s>, into);
 derive_into_atproto!(Object, Object<'s>, to_owned);
 
-derive_into_atproto!(CidLink, Cid<'s>, clone);
-derive_into_atproto!(CidLink, &Cid<'s>, to_owned);
+derive_into_atproto!(CidLink, Cid<CowStr<'s>>, clone);
+derive_into_atproto!(CidLink, &Cid<CowStr<'s>>, to_owned);
 
 derive_try_from_atproto!(Boolean, bool);
 derive_try_from_atproto!(Integer, i8);
@@ -260,7 +254,7 @@ derive_try_from_atproto!(Integer, u128);
 derive_try_from_atproto!(Integer, usize);
 derive_try_from_atproto!(Bytes, Vec<u8>);
 derive_try_from_atproto!(Object, Object<'static>);
-derive_try_from_atproto!(CidLink, Cid<'static>);
+derive_try_from_atproto!(CidLink, Cid<CowStr<'static>>);
 
 derive_try_from_atproto_option!(Boolean, bool);
 derive_try_from_atproto_option!(Integer, i8);
@@ -279,7 +273,7 @@ derive_try_from_atproto_option!(Integer, usize);
 derive_try_from_atproto_option!(Bytes, Vec<u8>);
 derive_try_from_atproto_option!(Array, Array<'static>);
 derive_try_from_atproto_option!(Object, Object<'static>);
-derive_try_from_atproto_option!(CidLink, Cid<'static>);
+derive_try_from_atproto_option!(CidLink, Cid<CowStr<'static>>);
 
 /// Convert RawData to validated Data with type inference
 impl<'s> TryFrom<RawData<'s>> for Data<'s> {
@@ -329,7 +323,7 @@ impl<'s> TryFrom<RawData<'s>> for Data<'s> {
                                 }
                             };
                             return Ok(Data::Blob(crate::types::blob::Blob {
-                                r#ref: CidLink::str(cid).into_static(),
+                                r#ref: CidLink(cid.clone()),
                                 mime_type: crate::types::blob::MimeType::from(mime.clone()),
                                 size: size_val,
                             }));

@@ -1,3 +1,4 @@
+use crate::bos::{Bos, DefaultStr};
 use crate::types::Literal;
 use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
@@ -40,33 +41,42 @@ pub unsafe trait RecordKeyType: Clone + Serialize {
 #[repr(transparent)]
 pub struct RecordKey<T: RecordKeyType>(pub T);
 
-impl<'a> RecordKey<Rkey<'a>> {
-    /// Create a new `RecordKey` from a string slice
+impl<'a> RecordKey<Rkey<&'a str>> {
+    /// Create a new `RecordKey` from a string slice.
     pub fn any(str: &'a str) -> Result<Self, AtStrError> {
         Ok(RecordKey(Rkey::new(str)?))
     }
+}
 
-    /// Create a new `RecordKey` from a CowStr
-    pub fn any_cow(str: CowStr<'a>) -> Result<Self, AtStrError> {
-        Ok(RecordKey(Rkey::new_cow(str)?))
-    }
-
-    /// Create a new `RecordKey` from a static string slice
+impl<S: Bos<str> + AsRef<str> + Clone + Serialize + From<SmolStr>> RecordKey<Rkey<S>> {
+    /// Create a new `RecordKey` from a static string slice.
     pub fn any_static(str: &'static str) -> Result<Self, AtStrError> {
         Ok(RecordKey(Rkey::new_static(str)?))
     }
+
+    /// Create a new `RecordKey` from an owned string.
+    pub fn any_owned(str: impl AsRef<str>) -> Result<Self, AtStrError> {
+        Ok(RecordKey(Rkey::new_owned(str)?))
+    }
 }
 
-impl<T> From<T> for RecordKey<Rkey<'_>>
+impl<'a> RecordKey<Rkey<CowStr<'a>>> {
+    /// Create a new `RecordKey` from a CowStr.
+    pub fn any_cow(str: CowStr<'a>) -> Result<Self, AtStrError> {
+        Ok(RecordKey(Rkey::new_cow(str)?))
+    }
+}
+
+impl<T> From<T> for RecordKey<Rkey>
 where
     T: RecordKeyType,
 {
     fn from(value: T) -> Self {
-        RecordKey(Rkey::from_str(value.as_str()).expect("Invalid rkey"))
+        RecordKey(Rkey::new_owned(value.as_str()).expect("Invalid rkey"))
     }
 }
 
-impl FromStr for RecordKey<Rkey<'_>> {
+impl FromStr for RecordKey<Rkey> {
     type Err = AtStrError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -108,216 +118,191 @@ where
 /// - Any: flexible strings matching the validation rules
 ///
 /// See: <https://atproto.com/specs/record-key>
-#[derive(Clone, PartialEq, Eq, Serialize, Hash)]
+/// AT Protocol record key (generic "any" type).
+///
+/// See: <https://atproto.com/specs/record-key>
+#[derive(Clone, PartialEq, Eq, Hash, Serialize)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct Rkey<'r>(pub(crate) CowStr<'r>);
+pub struct Rkey<S: Bos<str> = DefaultStr>(pub(crate) S);
 
-unsafe impl<'r> RecordKeyType for Rkey<'r> {
+unsafe impl<S: Bos<str> + AsRef<str> + Clone + Serialize> RecordKeyType for Rkey<S> {
     fn as_str(&self) -> &str {
         self.0.as_ref()
     }
 }
 
-/// Regex for record key validation per AT Protocol spec
+/// Regex for record key validation per AT Protocol spec.
 pub static RKEY_REGEX: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^[a-zA-Z0-9.\-_:~]{1,512}$").unwrap());
 
-impl<'r> Rkey<'r> {
-    /// Fallible constructor, validates, borrows from input
+pub(crate) fn validate_rkey(rkey: &str) -> Result<(), AtStrError> {
+    if [".", ".."].contains(&rkey) {
+        Err(AtStrError::disallowed("record-key", rkey, &[".", ".."]))
+    } else if !RKEY_REGEX.is_match(rkey) {
+        Err(AtStrError::regex(
+            "record-key",
+            rkey,
+            SmolStr::new_static("doesn't match 'any' schema"),
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> Rkey<S> {
+    /// Get the record key as a string slice.
+    pub fn as_str(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
+impl<S: Bos<str>> Rkey<S> {
+    /// # Safety
+    ///
+    /// The caller must ensure the rkey is valid.
+    pub unsafe fn unchecked(rkey: S) -> Self {
+        Rkey(rkey)
+    }
+}
+
+impl<'r> Rkey<&'r str> {
+    /// Fallible constructor, validates, borrows from input.
     pub fn new(rkey: &'r str) -> Result<Self, AtStrError> {
-        if [".", ".."].contains(&rkey) {
-            Err(AtStrError::disallowed("record-key", rkey, &[".", ".."]))
-        } else if !RKEY_REGEX.is_match(rkey) {
-            Err(AtStrError::regex(
-                "record-key",
-                rkey,
-                SmolStr::new_static("doesn't match 'any' schema"),
-            ))
-        } else {
-            Ok(Self(CowStr::Borrowed(rkey)))
-        }
+        validate_rkey(rkey)?;
+        Ok(Self(rkey))
     }
 
-    /// Fallible constructor, validates, takes ownership
+    /// Infallible constructor. Panics on invalid rkeys.
+    pub fn raw(rkey: &'r str) -> Self {
+        Self::new(rkey).expect("invalid rkey")
+    }
+}
+
+impl<S: Bos<str> + From<SmolStr>> Rkey<S> {
+    /// Fallible constructor, validates, takes ownership.
     pub fn new_owned(rkey: impl AsRef<str>) -> Result<Self, AtStrError> {
         let rkey = rkey.as_ref();
-        if [".", ".."].contains(&rkey) {
-            Err(AtStrError::disallowed("record-key", rkey, &[".", ".."]))
-        } else if !RKEY_REGEX.is_match(rkey) {
-            Err(AtStrError::regex(
-                "record-key",
-                rkey,
-                SmolStr::new_static("doesn't match 'any' schema"),
-            ))
-        } else {
-            Ok(Self(CowStr::Owned(rkey.to_smolstr())))
-        }
+        validate_rkey(rkey)?;
+        Ok(Self(S::from(rkey.to_smolstr())))
     }
 
-    /// Fallible constructor, validates, doesn't allocate
+    /// Fallible constructor for static strings.
     pub fn new_static(rkey: &'static str) -> Result<Self, AtStrError> {
-        if [".", ".."].contains(&rkey) {
-            Err(AtStrError::disallowed("record-key", rkey, &[".", ".."]))
-        } else if !RKEY_REGEX.is_match(rkey) {
-            Err(AtStrError::regex(
-                "record-key",
-                rkey,
-                SmolStr::new_static("doesn't match 'any' schema"),
-            ))
-        } else {
-            Ok(Self(CowStr::new_static(rkey)))
-        }
+        validate_rkey(rkey)?;
+        Ok(Self(S::from(SmolStr::new_static(rkey))))
     }
+}
 
-    /// Fallible constructor, validates, borrows from input if possible
+impl<'r> Rkey<CowStr<'r>> {
+    /// Fallible constructor, borrows if possible.
     pub fn new_cow(rkey: CowStr<'r>) -> Result<Self, AtStrError> {
-        if [".", ".."].contains(&rkey.as_ref()) {
-            Err(AtStrError::disallowed("record-key", &rkey, &[".", ".."]))
-        } else if !RKEY_REGEX.is_match(&rkey) {
-            Err(AtStrError::regex(
-                "record-key",
-                &rkey,
-                SmolStr::new_static("doesn't match 'any' schema"),
-            ))
-        } else {
-            Ok(Self(rkey))
-        }
+        validate_rkey(&rkey)?;
+        Ok(Self(rkey))
     }
 
-    /// Infallible constructor for when you *know* the string is a valid rkey.
-    /// Will panic on invalid rkeys. If you're manually decoding atproto records
-    /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The From impls use the same logic.
-    pub fn raw(rkey: &'r str) -> Self {
-        if [".", ".."].contains(&rkey) {
-            panic!("Disallowed rkey")
-        } else if !RKEY_REGEX.is_match(rkey) {
-            panic!("Invalid rkey")
-        } else {
-            Self(CowStr::Borrowed(rkey))
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid rkey.
-    /// Marked unsafe because responsibility for upholding the invariant is on the developer.
-    pub unsafe fn unchecked(rkey: &'r str) -> Self {
-        Self(CowStr::Borrowed(rkey))
-    }
-
-    /// Get the record key as a string slice
-    pub fn as_str(&self) -> &str {
-        {
-            let this = &self.0;
-            this
-        }
+    /// Infallible unchecked constructor for CowStr.
+    pub unsafe fn unchecked_cow(rkey: CowStr<'r>) -> Self {
+        Self(rkey)
     }
 }
 
-impl<'r> FromStr for Rkey<'r> {
-    type Err = AtStrError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if [".", ".."].contains(&s) {
-            Err(AtStrError::disallowed("record-key", s, &[".", ".."]))
-        } else if !RKEY_REGEX.is_match(s) {
-            Err(AtStrError::regex(
-                "record-key",
-                s,
-                SmolStr::new_static("doesn't match 'any' schema"),
-            ))
-        } else {
-            Ok(Self(CowStr::Owned(s.to_smolstr())))
-        }
+impl<'de, S> Deserialize<'de> for Rkey<S>
+where
+    S: Bos<str> + AsRef<str> + Deserialize<'de>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        validate_rkey(s.as_ref()).map_err(D::Error::custom)?;
+        Ok(Rkey(s))
     }
 }
 
-impl IntoStatic for Rkey<'_> {
-    type Output = Rkey<'static>;
+impl<S: Bos<str> + IntoStatic> IntoStatic for Rkey<S>
+where
+    S::Output: Bos<str>,
+{
+    type Output = Rkey<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Rkey(self.0.into_static())
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for Rkey<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let value = Deserialize::deserialize(deserializer)?;
-        Self::new_cow(value).map_err(D::Error::custom)
+impl FromStr for Rkey {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
     }
 }
 
-impl fmt::Display for Rkey<'_> {
+impl FromStr for Rkey<CowStr<'static>> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl FromStr for Rkey<String> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> fmt::Display for Rkey<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.0)
+        f.write_str(self.as_str())
     }
 }
 
-impl fmt::Debug for Rkey<'_> {
+impl<S: Bos<str> + AsRef<str>> fmt::Debug for Rkey<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "record-key:{}", self.0)
+        write!(f, "record-key:{}", self.as_str())
     }
 }
 
-impl From<Rkey<'_>> for String {
-    fn from(value: Rkey<'_>) -> Self {
-        value.0.to_string()
+impl<S: Bos<str> + AsRef<str>> From<Rkey<S>> for String {
+    fn from(value: Rkey<S>) -> Self {
+        value.as_str().to_string()
     }
 }
 
-impl<'r> From<Rkey<'r>> for CowStr<'r> {
-    fn from(value: Rkey<'r>) -> Self {
-        value.0
+impl<S: Bos<str> + AsRef<str>> From<Rkey<S>> for SmolStr {
+    fn from(value: Rkey<S>) -> Self {
+        value.as_str().to_smolstr()
     }
 }
 
-impl<'r> From<Rkey<'r>> for SmolStr {
-    fn from(value: Rkey) -> Self {
-        value.0.to_smolstr()
-    }
-}
-
-impl<'r> From<String> for Rkey<'r> {
+impl From<String> for Rkey {
     fn from(value: String) -> Self {
-        if [".", ".."].contains(&value.as_str()) {
-            panic!("Disallowed rkey")
-        } else if !RKEY_REGEX.is_match(&value) {
-            panic!("Invalid rkey")
-        } else {
-            Self(CowStr::Owned(value.to_smolstr()))
-        }
+        Self::new_owned(value).unwrap()
     }
 }
 
-impl<'r> From<CowStr<'r>> for Rkey<'r> {
+impl<'r> From<CowStr<'r>> for Rkey<CowStr<'r>> {
     fn from(value: CowStr<'r>) -> Self {
-        if [".", ".."].contains(&value.as_ref()) {
-            panic!("Disallowed rkey")
-        } else if !RKEY_REGEX.is_match(&value) {
-            panic!("Invalid rkey")
-        } else {
-            Self(value)
-        }
+        Self::new_cow(value).unwrap()
     }
 }
 
-impl AsRef<str> for Rkey<'_> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Rkey<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl Deref for Rkey<'_> {
+impl<S: Bos<str> + AsRef<str>> Deref for Rkey<S> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        self.0.as_ref()
+        self.as_str()
     }
 }
 

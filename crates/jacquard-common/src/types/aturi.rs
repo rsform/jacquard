@@ -76,7 +76,7 @@ impl Clone for AtUri<'_> {
                         let collection =
                             unsafe { Nsid::unchecked(CowStr::Borrowed(collection.as_str())) };
                         let rkey = if let Some(rkey) = parts.name("rkey") {
-                            let rkey = unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };
+                            let rkey = unsafe { RecordKey(Rkey::unchecked_cow(CowStr::Borrowed(rkey.as_str()))) };
                             Some(rkey)
                         } else {
                             None
@@ -112,7 +112,7 @@ pub struct RepoPath<'u> {
     /// Collection NSID (e.g., `app.bsky.feed.post`)
     pub collection: Nsid<CowStr<'u>>,
     /// Optional record key identifying a specific record
-    pub rkey: Option<RecordKey<Rkey<'u>>>,
+    pub rkey: Option<RecordKey<Rkey<CowStr<'u>>>>,
 }
 
 impl fmt::Display for RepoPath<'_> {
@@ -157,7 +157,7 @@ impl<'u> AtUri<'u> {
                         .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey =
-                            RecordKey::from(Rkey::new(rkey.as_str()).map_err(|e| {
+                            RecordKey(Rkey::new_cow(CowStr::Borrowed(rkey.as_str())).map_err(|e| {
                                 AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
                             })?);
                         Some(rkey)
@@ -203,7 +203,7 @@ impl<'u> AtUri<'u> {
                 let path = if let Some(collection) = parts.name("collection") {
                     let collection = Nsid::new_cow(CowStr::Borrowed(collection.as_str())).unwrap();
                     let rkey = if let Some(rkey) = parts.name("rkey") {
-                        let rkey = RecordKey::from(Rkey::raw(rkey.as_str()));
+                        let rkey = RecordKey(Rkey::new_cow(CowStr::Borrowed(rkey.as_str())).unwrap());
                         Some(rkey)
                     } else {
                         None
@@ -246,7 +246,7 @@ impl<'u> AtUri<'u> {
                     let collection =
                         unsafe { Nsid::unchecked(CowStr::Borrowed(collection.as_str())) };
                     let rkey = if let Some(rkey) = parts.name("rkey") {
-                        let rkey = RecordKey::from(unsafe { Rkey::unchecked(rkey.as_str()) });
+                        let rkey = unsafe { RecordKey(Rkey::unchecked_cow(CowStr::Borrowed(rkey.as_str()))) };
                         Some(rkey)
                     } else {
                         None
@@ -350,7 +350,7 @@ impl<'u> AtUri<'u> {
     }
 
     /// Get the record key from the path, if present
-    pub fn rkey(&self) -> Option<&RecordKey<Rkey<'_>>> {
+    pub fn rkey(&self) -> Option<&RecordKey<Rkey<CowStr<'_>>>> {
         self.inner
             .borrow_path()
             .as_ref()
@@ -414,7 +414,7 @@ impl AtUri<'static> {
                         AtStrError::wrap("at-uri-scheme", uri.as_ref().to_string(), e)
                     })?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
-                        let rkey = RecordKey::from(Rkey::new(rkey.as_str()).map_err(|e| {
+                        let rkey = RecordKey(Rkey::new_cow(CowStr::Borrowed(rkey.as_str())).map_err(|e| {
                             AtStrError::wrap("at-uri-scheme", uri.as_ref().to_string(), e)
                         })?);
                         Some(rkey)
@@ -446,7 +446,7 @@ impl AtUri<'static> {
                                     };
                                     let rkey = if let Some(rkey) = parts.name("rkey") {
                                         let rkey = unsafe {
-                                            RecordKey::from(Rkey::unchecked(rkey.as_str()))
+                                            RecordKey(Rkey::unchecked_cow(CowStr::Borrowed(rkey.as_str())))
                                         };
                                         Some(rkey)
                                     } else {
@@ -497,7 +497,7 @@ impl AtUri<'static> {
                         .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey =
-                            RecordKey::from(Rkey::new_static(rkey.as_str()).map_err(|e| {
+                            RecordKey(Rkey::new_cow(CowStr::Borrowed(rkey.as_str())).map_err(|e| {
                                 AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
                             })?);
                         Some(rkey)
@@ -549,7 +549,7 @@ impl FromStr for AtUri<'_> {
                         .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey =
-                            RecordKey::from(Rkey::new(rkey.as_str()).map_err(|e| {
+                            RecordKey(Rkey::new_cow(CowStr::Borrowed(rkey.as_str())).map_err(|e| {
                                 AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
                             })?);
                         Some(rkey)
@@ -581,7 +581,7 @@ impl FromStr for AtUri<'_> {
                                     };
                                     let rkey = if let Some(rkey) = parts.name("rkey") {
                                         let rkey = unsafe {
-                                            RecordKey::from(Rkey::unchecked(rkey.as_str()))
+                                            RecordKey(Rkey::unchecked_cow(CowStr::Borrowed(rkey.as_str())))
                                         };
                                         Some(rkey)
                                     } else {
@@ -644,7 +644,7 @@ impl IntoStatic for AtUri<'_> {
                                 unsafe { Nsid::unchecked(CowStr::Borrowed(collection.as_str())) };
                             let rkey = if let Some(rkey) = parts.name("rkey") {
                                 let rkey =
-                                    unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };
+                                    unsafe { RecordKey(Rkey::unchecked_cow(CowStr::Borrowed(rkey.as_str()))) };
                                 Some(rkey)
                             } else {
                                 None
@@ -733,7 +733,7 @@ impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
                         .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey =
-                            RecordKey::from(Rkey::new(rkey.as_str()).map_err(|e| {
+                            RecordKey(Rkey::new_cow(CowStr::Borrowed(rkey.as_str())).map_err(|e| {
                                 AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
                             })?);
                         Some(rkey)
@@ -765,7 +765,7 @@ impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
                                 };
                                 let rkey = if let Some(rkey) = parts.name("rkey") {
                                     let rkey =
-                                        unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };
+                                        unsafe { RecordKey(Rkey::unchecked_cow(CowStr::Borrowed(rkey.as_str()))) };
                                     Some(rkey)
                                 } else {
                                     None

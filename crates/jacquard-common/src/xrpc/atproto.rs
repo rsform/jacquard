@@ -87,7 +87,7 @@ impl IntoStatic for ListRecordsOutput<'_> {
 pub struct ListRecordsRecord<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<CowStr<'a>>>,
     #[serde(borrow)]
     pub uri: AtUri<'a>,
     #[serde(borrow)]
@@ -133,7 +133,7 @@ impl<'a> XrpcRequest for ListRecords<'a> {
 pub struct GetRecord<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<CowStr<'a>>>,
     #[serde(borrow)]
     pub collection: Nsid<CowStr<'a>>,
     #[serde(borrow)]
@@ -162,7 +162,7 @@ impl IntoStatic for GetRecord<'_> {
 pub struct GetRecordOutput<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<CowStr<'a>>>,
     #[serde(borrow)]
     pub uri: AtUri<'a>,
     #[serde(borrow)]

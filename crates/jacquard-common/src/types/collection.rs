@@ -53,7 +53,11 @@ pub trait Collection: fmt::Debug + Serialize {
     ) -> RepoPath<'u> {
         RepoPath {
             collection: Self::nsid(),
-            rkey: Some(RecordKey::from(Rkey::raw(rkey.as_ref()))),
+            // Borrow the record key string with the caller's lifetime via CowStr.
+            rkey: Some(
+                RecordKey::any_cow(CowStr::Borrowed(rkey.as_ref()))
+                    .expect("RecordKey implements RecordKeyType, which guarantees a valid rkey"),
+            ),
         }
     }
 }
