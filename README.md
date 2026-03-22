@@ -91,6 +91,15 @@ If you have `just` installed, you can run the [examples](https://tangled.org/non
 
 [CHANGELOG.md](./CHANGELOG.md)
 
+#### 0.11 Release Highlights:
+
+- `jacquard-lexgen` and `jacquard-identity` no longer depend on the generated API crate. This is mostly for my own benefit.
+
+**Code generation pipeline overhaul** (`jacquard-lexicon`, `jacquard-lexgen`)
+- Jacquard's codegen output already was nice to *use*. now it's going to be nice to read.
+- New code generation tracks the types used, makes an import block for the file, and then organizes the file with stuff you care about at the top and internal stuff, like the builders, at the bottom.
+- Import resolution pass now conditionally generates short paths when types are unambiguous within a module, falling back to fully-qualified paths when collisions exist
+
 #### 0.10 Release Highlights:
 
 **URL type migration**

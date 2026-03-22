@@ -1,12 +1,40 @@
 # Changelog
 
-## [0.10.1] - 2026-03-20 (`jacquard-common`)
+## [0.11.0] - 2026-03-21
+
+### Breaking changes
+
+**Code generation pipeline overhaul** (`jacquard-lexicon`, `jacquard-lexgen`)
+- Jacquard's codegen output already was nice to *use*. now it's going to be nice to read.
+- New code generation tracks the types used, makes an import block for the file, and then organizes the file with stuff you care about at the top and internal stuff, like the builders, at the bottom.
+- Import resolution pass now conditionally generates short paths when types are unambiguous within a module, falling back to fully-qualified paths when collisions exist
+- Improved default value handling in generated code, reducing unnecessary boilerplate
+
+### Added
+
+**Hand-written XRPC bootstrap types** (`jacquard-common`)
+- Added minimal XRPC endpoint types for `com.atproto.repo.listRecords`, `com.atproto.repo.getRecord`, `com.atproto.identity.resolveHandle`, and `com.atproto.identity.resolveDid`
+- These types break circular dependencies between `jacquard-lexgen`/`jacquard-identity` and `jacquard-api`, allowing the codegen tooling and identity resolver to function without depending on the generated API crate
+
+### Changed
+
+**Regenerated API crate** (`jacquard-api`)
+- All generated code regenerated with the new codegen pipeline
+- Shorter import paths where unambiguous, cleaner builder output, better formatting throughout
+
+## [0.10.1] - 2026-03-20
 
 ### Fixed
 
 **CID deserialization** (`jacquard-common`)
 - Fixed `CidLink` deserialization from CBOR tag-42 bytes through internally-tagged enums (reported by @natalie.sh, fixed by adorable robot)
 - `serde_ipld_dagcbor` buffers tag-42 CIDs as a newtype struct wrapping raw bytes when deserializing through `Content`; the visitor now handles `visit_bytes`, `visit_byte_buf`, and `visit_newtype_struct` to cover this path
+
+**Lexicon code generation** (`jacquard-lexicon`, `jacquard-api`)
+- Fixed `BlobRef` generation producing incorrect code in certain lexicon schemas
+
+**Identity resolution** (`jacquard-identity`)
+- Error message when handle resolution exhausts all resolution methods no longer misleading
 
 ## [0.10.0] - 2026-03-20
 
