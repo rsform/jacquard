@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,13 +29,7 @@ use crate::science_alt::dataset::storage_blobs;
 /// A single PDS blob shard with optional integrity checksum
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobEntry<S: BosStr = DefaultStr> {
     ///Blob reference to a WebDataset tar archive
     pub blob: BlobRef<S>,
@@ -49,13 +43,7 @@ pub struct BlobEntry<S: BosStr = DefaultStr> {
 /// Storage via ATProto PDS blobs for WebDataset tar archives. Used in science.alt.dataset.entry storage union for maximum decentralization.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StorageBlobs<S: BosStr = DefaultStr> {
     ///Array of blob entries for WebDataset tar files
     pub blobs: Vec<storage_blobs::BlobEntry<S>>,

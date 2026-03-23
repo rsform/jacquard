@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Store<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional: Option<S>,
@@ -38,13 +32,7 @@ pub struct Store<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StoreOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
@@ -91,51 +79,51 @@ pub mod store_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Visibility;
         type Uri;
         type Text;
-        type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Visibility = Unset;
         type Uri = Unset;
         type Text = Unset;
-        type Visibility = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Text = St::Text;
-        type Visibility = St::Visibility;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Uri = St::Uri;
-        type Text = Set<members::text>;
-        type Visibility = St::Visibility;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVisibility<St> {}
     impl<St: State> State for SetVisibility<St> {
+        type Visibility = Set<members::visibility>;
         type Uri = St::Uri;
         type Text = St::Text;
-        type Visibility = Set<members::visibility>;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Visibility = St::Visibility;
+        type Uri = Set<members::uri>;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Visibility = St::Visibility;
+        type Uri = St::Uri;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
     }
 }
 
@@ -237,9 +225,9 @@ where
 impl<S: BosStr, St> StoreBuilder<S, St>
 where
     St: store_state::State,
+    St::Visibility: store_state::IsSet,
     St::Uri: store_state::IsSet,
     St::Text: store_state::IsSet,
-    St::Visibility: store_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Store<S> {

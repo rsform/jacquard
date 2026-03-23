@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,13 +29,7 @@ use crate::science_alt::dataset::storage_s3;
 /// S3 or S3-compatible storage for WebDataset tar archives. Supports custom endpoints for MinIO, Cloudflare R2, and other S3-compatible services.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StorageS3<S: BosStr = DefaultStr> {
     ///S3 bucket name
     pub bucket: S,
@@ -54,13 +48,7 @@ pub struct StorageS3<S: BosStr = DefaultStr> {
 /// A single S3 object shard with integrity checksum
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ShardEntry<S: BosStr = DefaultStr> {
     ///Content hash for integrity verification
     pub checksum: ShardChecksum<S>,
@@ -163,37 +151,37 @@ pub mod storage_s3_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bucket;
         type Shards;
+        type Bucket;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bucket = Unset;
         type Shards = Unset;
-    }
-    ///State transition - sets the `bucket` field to Set
-    pub struct SetBucket<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBucket<St> {}
-    impl<St: State> State for SetBucket<St> {
-        type Bucket = Set<members::bucket>;
-        type Shards = St::Shards;
+        type Bucket = Unset;
     }
     ///State transition - sets the `shards` field to Set
     pub struct SetShards<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetShards<St> {}
     impl<St: State> State for SetShards<St> {
-        type Bucket = St::Bucket;
         type Shards = Set<members::shards>;
+        type Bucket = St::Bucket;
+    }
+    ///State transition - sets the `bucket` field to Set
+    pub struct SetBucket<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBucket<St> {}
+    impl<St: State> State for SetBucket<St> {
+        type Shards = St::Shards;
+        type Bucket = Set<members::bucket>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bucket` field
-        pub struct bucket(());
         ///Marker type for the `shards` field
         pub struct shards(());
+        ///Marker type for the `bucket` field
+        pub struct bucket(());
     }
 }
 
@@ -294,8 +282,8 @@ where
 impl<S: BosStr, St> StorageS3Builder<S, St>
 where
     St: storage_s3_state::State,
-    St::Bucket: storage_s3_state::IsSet,
     St::Shards: storage_s3_state::IsSet,
+    St::Bucket: storage_s3_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> StorageS3<S> {
@@ -458,37 +446,37 @@ pub mod shard_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Checksum;
         type Key;
+        type Checksum;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Checksum = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `checksum` field to Set
-    pub struct SetChecksum<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetChecksum<St> {}
-    impl<St: State> State for SetChecksum<St> {
-        type Checksum = Set<members::checksum>;
-        type Key = St::Key;
+        type Checksum = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
-        type Checksum = St::Checksum;
         type Key = Set<members::key>;
+        type Checksum = St::Checksum;
+    }
+    ///State transition - sets the `checksum` field to Set
+    pub struct SetChecksum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChecksum<St> {}
+    impl<St: State> State for SetChecksum<St> {
+        type Key = St::Key;
+        type Checksum = Set<members::checksum>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `checksum` field
-        pub struct checksum(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `checksum` field
+        pub struct checksum(());
     }
 }
 
@@ -558,8 +546,8 @@ where
 impl<S: BosStr, St> ShardEntryBuilder<S, St>
 where
     St: shard_entry_state::State,
-    St::Checksum: shard_entry_state::IsSet,
     St::Key: shard_entry_state::IsSet,
+    St::Checksum: shard_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ShardEntry<S> {

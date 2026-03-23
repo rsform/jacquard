@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,13 +26,7 @@ use serde::{Serialize, Deserialize};
 use crate::io_atcr::hold::complete_upload;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CompleteUpload<S: BosStr = DefaultStr> {
     ///Final blob digest (e.g., sha256:abc123...)
     pub digest: S,
@@ -46,13 +40,7 @@ pub struct CompleteUpload<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CompleteUploadOutput<S: BosStr = DefaultStr> {
     ///The digest of the completed blob
     pub digest: S,
@@ -134,13 +122,7 @@ impl core::fmt::Display for CompleteUploadError {
 /// Information about a completed upload part
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PartInfo<S: BosStr = DefaultStr> {
     ///ETag returned when the part was uploaded
     pub etag: S,
@@ -224,49 +206,49 @@ pub mod complete_upload_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
         type Parts;
+        type Digest;
         type UploadId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
         type Parts = Unset;
+        type Digest = Unset;
         type UploadId = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDigest<St> {}
-    impl<St: State> State for SetDigest<St> {
-        type Digest = Set<members::digest>;
-        type Parts = St::Parts;
-        type UploadId = St::UploadId;
     }
     ///State transition - sets the `parts` field to Set
     pub struct SetParts<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetParts<St> {}
     impl<St: State> State for SetParts<St> {
-        type Digest = St::Digest;
         type Parts = Set<members::parts>;
+        type Digest = St::Digest;
+        type UploadId = St::UploadId;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type Parts = St::Parts;
+        type Digest = Set<members::digest>;
         type UploadId = St::UploadId;
     }
     ///State transition - sets the `upload_id` field to Set
     pub struct SetUploadId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUploadId<St> {}
     impl<St: State> State for SetUploadId<St> {
-        type Digest = St::Digest;
         type Parts = St::Parts;
+        type Digest = St::Digest;
         type UploadId = Set<members::upload_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `parts` field
         pub struct parts(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
         ///Marker type for the `upload_id` field
         pub struct upload_id(());
     }
@@ -357,8 +339,8 @@ where
 impl<S: BosStr, St> CompleteUploadBuilder<S, St>
 where
     St: complete_upload_state::State,
-    St::Digest: complete_upload_state::IsSet,
     St::Parts: complete_upload_state::IsSet,
+    St::Digest: complete_upload_state::IsSet,
     St::UploadId: complete_upload_state::IsSet,
 {
     /// Build the final struct.

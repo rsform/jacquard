@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_shinolabs::pinksea::oekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///The actual atproto image blob.
     pub blob: BlobRef<S>,
@@ -50,13 +44,7 @@ pub struct Image<S: BosStr = DefaultStr> {
 /// A link to the image, it can be either directly to the PDS or to a CDN.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageLink<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -72,10 +60,7 @@ pub struct ImageLink<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "com.shinolabs.pinksea.oekaki",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Oekaki<S: BosStr = DefaultStr> {
     ///The timestamp of creation.
@@ -97,13 +82,7 @@ pub struct Oekaki<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct OekakiGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,

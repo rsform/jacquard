@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::app_chavatar::settings;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AvatarItem<S: BosStr = DefaultStr> {
     pub id: S,
     pub image: StrongRef<S>,
@@ -52,10 +46,7 @@ pub struct AvatarItem<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "app.chavatar.settings",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Settings<S: BosStr = DefaultStr> {
     pub avatars: Vec<settings::AvatarItem<S>>,
@@ -245,13 +236,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -598,67 +583,67 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Avatars;
-        type Mode;
-        type Enabled;
         type Interval;
+        type Avatars;
+        type Enabled;
+        type Mode;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Avatars = Unset;
-        type Mode = Unset;
-        type Enabled = Unset;
         type Interval = Unset;
-    }
-    ///State transition - sets the `avatars` field to Set
-    pub struct SetAvatars<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAvatars<St> {}
-    impl<St: State> State for SetAvatars<St> {
-        type Avatars = Set<members::avatars>;
-        type Mode = St::Mode;
-        type Enabled = St::Enabled;
-        type Interval = St::Interval;
-    }
-    ///State transition - sets the `mode` field to Set
-    pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMode<St> {}
-    impl<St: State> State for SetMode<St> {
-        type Avatars = St::Avatars;
-        type Mode = Set<members::mode>;
-        type Enabled = St::Enabled;
-        type Interval = St::Interval;
-    }
-    ///State transition - sets the `enabled` field to Set
-    pub struct SetEnabled<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEnabled<St> {}
-    impl<St: State> State for SetEnabled<St> {
-        type Avatars = St::Avatars;
-        type Mode = St::Mode;
-        type Enabled = Set<members::enabled>;
-        type Interval = St::Interval;
+        type Avatars = Unset;
+        type Enabled = Unset;
+        type Mode = Unset;
     }
     ///State transition - sets the `interval` field to Set
     pub struct SetInterval<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetInterval<St> {}
     impl<St: State> State for SetInterval<St> {
-        type Avatars = St::Avatars;
-        type Mode = St::Mode;
-        type Enabled = St::Enabled;
         type Interval = Set<members::interval>;
+        type Avatars = St::Avatars;
+        type Enabled = St::Enabled;
+        type Mode = St::Mode;
+    }
+    ///State transition - sets the `avatars` field to Set
+    pub struct SetAvatars<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAvatars<St> {}
+    impl<St: State> State for SetAvatars<St> {
+        type Interval = St::Interval;
+        type Avatars = Set<members::avatars>;
+        type Enabled = St::Enabled;
+        type Mode = St::Mode;
+    }
+    ///State transition - sets the `enabled` field to Set
+    pub struct SetEnabled<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEnabled<St> {}
+    impl<St: State> State for SetEnabled<St> {
+        type Interval = St::Interval;
+        type Avatars = St::Avatars;
+        type Enabled = Set<members::enabled>;
+        type Mode = St::Mode;
+    }
+    ///State transition - sets the `mode` field to Set
+    pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMode<St> {}
+    impl<St: State> State for SetMode<St> {
+        type Interval = St::Interval;
+        type Avatars = St::Avatars;
+        type Enabled = St::Enabled;
+        type Mode = Set<members::mode>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `avatars` field
-        pub struct avatars(());
-        ///Marker type for the `mode` field
-        pub struct mode(());
-        ///Marker type for the `enabled` field
-        pub struct enabled(());
         ///Marker type for the `interval` field
         pub struct interval(());
+        ///Marker type for the `avatars` field
+        pub struct avatars(());
+        ///Marker type for the `enabled` field
+        pub struct enabled(());
+        ///Marker type for the `mode` field
+        pub struct mode(());
     }
 }
 
@@ -771,10 +756,10 @@ where
 impl<S: BosStr, St> SettingsBuilder<S, St>
 where
     St: settings_state::State,
-    St::Avatars: settings_state::IsSet,
-    St::Mode: settings_state::IsSet,
-    St::Enabled: settings_state::IsSet,
     St::Interval: settings_state::IsSet,
+    St::Avatars: settings_state::IsSet,
+    St::Enabled: settings_state::IsSet,
+    St::Mode: settings_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Settings<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "io.atcr.hold.crew",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Crew<S: BosStr = DefaultStr> {
     ///RFC3339 timestamp of when the member was added
@@ -145,13 +142,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CrewGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -238,65 +229,65 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Member;
         type AddedAt;
         type Role;
+        type Member;
         type Permissions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Member = Unset;
         type AddedAt = Unset;
         type Role = Unset;
+        type Member = Unset;
         type Permissions = Unset;
-    }
-    ///State transition - sets the `member` field to Set
-    pub struct SetMember<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMember<St> {}
-    impl<St: State> State for SetMember<St> {
-        type Member = Set<members::member>;
-        type AddedAt = St::AddedAt;
-        type Role = St::Role;
-        type Permissions = St::Permissions;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAddedAt<St> {}
     impl<St: State> State for SetAddedAt<St> {
-        type Member = St::Member;
         type AddedAt = Set<members::added_at>;
         type Role = St::Role;
+        type Member = St::Member;
         type Permissions = St::Permissions;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRole<St> {}
     impl<St: State> State for SetRole<St> {
-        type Member = St::Member;
         type AddedAt = St::AddedAt;
         type Role = Set<members::role>;
+        type Member = St::Member;
+        type Permissions = St::Permissions;
+    }
+    ///State transition - sets the `member` field to Set
+    pub struct SetMember<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMember<St> {}
+    impl<St: State> State for SetMember<St> {
+        type AddedAt = St::AddedAt;
+        type Role = St::Role;
+        type Member = Set<members::member>;
         type Permissions = St::Permissions;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPermissions<St> {}
     impl<St: State> State for SetPermissions<St> {
-        type Member = St::Member;
         type AddedAt = St::AddedAt;
         type Role = St::Role;
+        type Member = St::Member;
         type Permissions = Set<members::permissions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `member` field
-        pub struct member(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `member` field
+        pub struct member(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
     }
@@ -425,9 +416,9 @@ impl<S: BosStr, St: crew_state::State> CrewBuilder<S, St> {
 impl<S: BosStr, St> CrewBuilder<S, St>
 where
     St: crew_state::State,
-    St::Member: crew_state::IsSet,
     St::AddedAt: crew_state::IsSet,
     St::Role: crew_state::IsSet,
+    St::Member: crew_state::IsSet,
     St::Permissions: crew_state::IsSet,
 {
     /// Build the final struct.

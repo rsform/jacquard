@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::search_slugs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchSlugs<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Max: 100.
     #[serde(default = "_default_limit")]
@@ -44,13 +38,7 @@ pub struct SearchSlugs<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchSlugsOutput<S: BosStr = DefaultStr> {
     pub slugs: Vec<search_slugs::SlugResult<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -59,13 +47,7 @@ pub struct SearchSlugsOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SlugResult<S: BosStr = DefaultStr> {
     pub r#ref: AtUri<S>,
     pub slug: S,
@@ -229,37 +211,37 @@ pub mod slug_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Ref;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlug<St> {}
-    impl<St: State> State for SetSlug<St> {
-        type Slug = Set<members::slug>;
-        type Ref = St::Ref;
+        type Slug = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRef<St> {}
     impl<St: State> State for SetRef<St> {
-        type Slug = St::Slug;
         type Ref = Set<members::r#ref>;
+        type Slug = St::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type Ref = St::Ref;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
@@ -329,8 +311,8 @@ where
 impl<S: BosStr, St> SlugResultBuilder<S, St>
 where
     St: slug_result_state::State,
-    St::Slug: slug_result_state::IsSet,
     St::Ref: slug_result_state::IsSet,
+    St::Slug: slug_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SlugResult<S> {

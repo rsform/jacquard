@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,10 +37,7 @@ use crate::media_ionosphere::Membership;
     rename_all = "camelCase",
     rename = "media.ionosphere.group",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Group<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -168,13 +165,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -310,51 +301,51 @@ pub mod group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ionosphere;
         type Name;
         type Language;
+        type Ionosphere;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ionosphere = Unset;
         type Name = Unset;
         type Language = Unset;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIonosphere<St> {}
-    impl<St: State> State for SetIonosphere<St> {
-        type Ionosphere = Set<members::ionosphere>;
-        type Name = St::Name;
-        type Language = St::Language;
+        type Ionosphere = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Ionosphere = St::Ionosphere;
         type Name = Set<members::name>;
         type Language = St::Language;
+        type Ionosphere = St::Ionosphere;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLanguage<St> {}
     impl<St: State> State for SetLanguage<St> {
-        type Ionosphere = St::Ionosphere;
         type Name = St::Name;
         type Language = Set<members::language>;
+        type Ionosphere = St::Ionosphere;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIonosphere<St> {}
+    impl<St: State> State for SetIonosphere<St> {
+        type Name = St::Name;
+        type Language = St::Language;
+        type Ionosphere = Set<members::ionosphere>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ionosphere` field
-        pub struct ionosphere(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `language` field
         pub struct language(());
+        ///Marker type for the `ionosphere` field
+        pub struct ionosphere(());
     }
 }
 
@@ -531,9 +522,9 @@ where
 impl<S: BosStr, St> GroupBuilder<S, St>
 where
     St: group_state::State,
-    St::Ionosphere: group_state::IsSet,
     St::Name: group_state::IsSet,
     St::Language: group_state::IsSet,
+    St::Ionosphere: group_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Group<S> {

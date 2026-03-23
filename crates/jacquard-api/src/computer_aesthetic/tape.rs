@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "computer.aesthetic.tape",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Tape<S: BosStr = DefaultStr> {
     ///Permanent link to view on aesthetic.computer (e.g., https://aesthetic.computer/!a3x)
@@ -68,13 +65,7 @@ pub struct Tape<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct TapeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -218,51 +209,51 @@ pub mod tape_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Code;
         type Slug;
         type When;
-        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Code = Unset;
         type Slug = Unset;
         type When = Unset;
-        type Code = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlug<St> {}
-    impl<St: State> State for SetSlug<St> {
-        type Slug = Set<members::slug>;
-        type When = St::When;
-        type Code = St::Code;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWhen<St> {}
-    impl<St: State> State for SetWhen<St> {
-        type Slug = St::Slug;
-        type When = Set<members::when>;
-        type Code = St::Code;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCode<St> {}
     impl<St: State> State for SetCode<St> {
+        type Code = Set<members::code>;
         type Slug = St::Slug;
         type When = St::When;
-        type Code = Set<members::code>;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type Code = St::Code;
+        type Slug = Set<members::slug>;
+        type When = St::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
+        type Code = St::Code;
+        type Slug = St::Slug;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `code` field
+        pub struct code(());
         ///Marker type for the `slug` field
         pub struct slug(());
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `code` field
-        pub struct code(());
     }
 }
 
@@ -425,9 +416,9 @@ impl<S: BosStr, St: tape_state::State> TapeBuilder<S, St> {
 impl<S: BosStr, St> TapeBuilder<S, St>
 where
     St: tape_state::State,
+    St::Code: tape_state::IsSet,
     St::Slug: tape_state::IsSet,
     St::When: tape_state::IsSet,
-    St::Code: tape_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tape<S> {

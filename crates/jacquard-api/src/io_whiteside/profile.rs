@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "io.whiteside.profile",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
     ///Profile content in plain text or markdown format
@@ -53,13 +50,7 @@ pub struct Profile<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -148,50 +139,50 @@ pub mod profile_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Content;
-        type Heading;
         type UpdatedAt;
+        type Heading;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Content = Unset;
-        type Heading = Unset;
         type UpdatedAt = Unset;
+        type Heading = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
+        type UpdatedAt = St::UpdatedAt;
         type Heading = St::Heading;
-        type UpdatedAt = St::UpdatedAt;
-    }
-    ///State transition - sets the `heading` field to Set
-    pub struct SetHeading<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHeading<St> {}
-    impl<St: State> State for SetHeading<St> {
-        type Content = St::Content;
-        type Heading = Set<members::heading>;
-        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
         type Content = St::Content;
-        type Heading = St::Heading;
         type UpdatedAt = Set<members::updated_at>;
+        type Heading = St::Heading;
+    }
+    ///State transition - sets the `heading` field to Set
+    pub struct SetHeading<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeading<St> {}
+    impl<St: State> State for SetHeading<St> {
+        type Content = St::Content;
+        type UpdatedAt = St::UpdatedAt;
+        type Heading = Set<members::heading>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `heading` field
-        pub struct heading(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `heading` field
+        pub struct heading(());
     }
 }
 
@@ -281,8 +272,8 @@ impl<S: BosStr, St> ProfileBuilder<S, St>
 where
     St: profile_state::State,
     St::Content: profile_state::IsSet,
-    St::Heading: profile_state::IsSet,
     St::UpdatedAt: profile_state::IsSet,
+    St::Heading: profile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Profile<S> {

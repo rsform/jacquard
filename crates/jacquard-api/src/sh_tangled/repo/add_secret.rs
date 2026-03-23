@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AddSecret<S: BosStr = DefaultStr> {
     pub key: S,
     pub repo: AtUri<S>,
@@ -71,51 +65,51 @@ pub mod add_secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Value;
         type Repo;
         type Key;
-        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Value = Unset;
         type Repo = Unset;
         type Key = Unset;
-        type Value = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Key = St::Key;
-        type Value = St::Value;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Repo = St::Repo;
-        type Key = Set<members::key>;
-        type Value = St::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
+        type Value = Set<members::value>;
         type Repo = St::Repo;
         type Key = St::Key;
-        type Value = Set<members::value>;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Value = St::Value;
+        type Repo = Set<members::repo>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Value = St::Value;
+        type Repo = St::Repo;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `value` field
-        pub struct value(());
     }
 }
 
@@ -204,9 +198,9 @@ where
 impl<S: BosStr, St> AddSecretBuilder<S, St>
 where
     St: add_secret_state::State,
+    St::Value: add_secret_state::IsSet,
     St::Repo: add_secret_state::IsSet,
     St::Key: add_secret_state::IsSet,
-    St::Value: add_secret_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AddSecret<S> {

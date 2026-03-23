@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "computer.aesthetic.piece",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Piece<S: BosStr = DefaultStr> {
     ///MongoDB ObjectId reference for bidirectional sync
@@ -53,13 +50,7 @@ pub struct Piece<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PieceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -147,51 +138,51 @@ pub mod piece_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Ref;
         type Slug;
         type When;
-        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Ref = Unset;
         type Slug = Unset;
         type When = Unset;
-        type Ref = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlug<St> {}
-    impl<St: State> State for SetSlug<St> {
-        type Slug = Set<members::slug>;
-        type When = St::When;
-        type Ref = St::Ref;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWhen<St> {}
-    impl<St: State> State for SetWhen<St> {
-        type Slug = St::Slug;
-        type When = Set<members::when>;
-        type Ref = St::Ref;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRef<St> {}
     impl<St: State> State for SetRef<St> {
+        type Ref = Set<members::r#ref>;
         type Slug = St::Slug;
         type When = St::When;
-        type Ref = Set<members::r#ref>;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type Ref = St::Ref;
+        type Slug = Set<members::slug>;
+        type When = St::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
+        type Ref = St::Ref;
+        type Slug = St::Slug;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
         ///Marker type for the `slug` field
         pub struct slug(());
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
     }
 }
 
@@ -280,9 +271,9 @@ where
 impl<S: BosStr, St> PieceBuilder<S, St>
 where
     St: piece_state::State,
+    St::Ref: piece_state::IsSet,
     St::Slug: piece_state::IsSet,
     St::When: piece_state::IsSet,
-    St::Ref: piece_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Piece<S> {

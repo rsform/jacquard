@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,13 +34,7 @@ use serde::{Serialize, Deserialize};
 use crate::sh_tangled::pipeline;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CloneOpts<S: BosStr = DefaultStr> {
     pub depth: i64,
     pub skip: bool,
@@ -55,10 +49,7 @@ pub struct CloneOpts<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "sh.tangled.pipeline",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Pipeline<S: BosStr = DefaultStr> {
     pub trigger_metadata: pipeline::TriggerMetadata<S>,
@@ -70,13 +61,7 @@ pub struct Pipeline<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PipelineGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -86,13 +71,7 @@ pub struct PipelineGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ManualTriggerData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inputs: Option<Vec<pipeline::Pair<S>>>,
@@ -102,13 +81,7 @@ pub struct ManualTriggerData<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Pair<S: BosStr = DefaultStr> {
     pub key: S,
     pub value: S,
@@ -118,13 +91,7 @@ pub struct Pair<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PullRequestTriggerData<S: BosStr = DefaultStr> {
     pub action: S,
     pub source_branch: S,
@@ -136,13 +103,7 @@ pub struct PullRequestTriggerData<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PushTriggerData<S: BosStr = DefaultStr> {
     pub new_sha: S,
     pub old_sha: S,
@@ -153,13 +114,7 @@ pub struct PushTriggerData<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TriggerMetadata<S: BosStr = DefaultStr> {
     pub kind: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -175,13 +130,7 @@ pub struct TriggerMetadata<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TriggerRepo<S: BosStr = DefaultStr> {
     pub default_branch: S,
     pub did: Did<S>,
@@ -193,13 +142,7 @@ pub struct TriggerRepo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Workflow<S: BosStr = DefaultStr> {
     pub clone: pipeline::CloneOpts<S>,
     pub engine: S,
@@ -453,51 +396,51 @@ pub mod clone_opts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Skip;
-        type Submodules;
         type Depth;
+        type Submodules;
+        type Skip;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Skip = Unset;
-        type Submodules = Unset;
         type Depth = Unset;
-    }
-    ///State transition - sets the `skip` field to Set
-    pub struct SetSkip<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSkip<St> {}
-    impl<St: State> State for SetSkip<St> {
-        type Skip = Set<members::skip>;
-        type Submodules = St::Submodules;
-        type Depth = St::Depth;
-    }
-    ///State transition - sets the `submodules` field to Set
-    pub struct SetSubmodules<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubmodules<St> {}
-    impl<St: State> State for SetSubmodules<St> {
-        type Skip = St::Skip;
-        type Submodules = Set<members::submodules>;
-        type Depth = St::Depth;
+        type Submodules = Unset;
+        type Skip = Unset;
     }
     ///State transition - sets the `depth` field to Set
     pub struct SetDepth<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDepth<St> {}
     impl<St: State> State for SetDepth<St> {
-        type Skip = St::Skip;
-        type Submodules = St::Submodules;
         type Depth = Set<members::depth>;
+        type Submodules = St::Submodules;
+        type Skip = St::Skip;
+    }
+    ///State transition - sets the `submodules` field to Set
+    pub struct SetSubmodules<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubmodules<St> {}
+    impl<St: State> State for SetSubmodules<St> {
+        type Depth = St::Depth;
+        type Submodules = Set<members::submodules>;
+        type Skip = St::Skip;
+    }
+    ///State transition - sets the `skip` field to Set
+    pub struct SetSkip<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSkip<St> {}
+    impl<St: State> State for SetSkip<St> {
+        type Depth = St::Depth;
+        type Submodules = St::Submodules;
+        type Skip = Set<members::skip>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `skip` field
-        pub struct skip(());
-        ///Marker type for the `submodules` field
-        pub struct submodules(());
         ///Marker type for the `depth` field
         pub struct depth(());
+        ///Marker type for the `submodules` field
+        pub struct submodules(());
+        ///Marker type for the `skip` field
+        pub struct skip(());
     }
 }
 
@@ -586,9 +529,9 @@ where
 impl<S: BosStr, St> CloneOptsBuilder<S, St>
 where
     St: clone_opts_state::State,
-    St::Skip: clone_opts_state::IsSet,
-    St::Submodules: clone_opts_state::IsSet,
     St::Depth: clone_opts_state::IsSet,
+    St::Submodules: clone_opts_state::IsSet,
+    St::Skip: clone_opts_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CloneOpts<S> {
@@ -1281,65 +1224,65 @@ pub mod trigger_repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Knot;
         type Did;
         type Repo;
-        type Knot;
         type DefaultBranch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Knot = Unset;
         type Did = Unset;
         type Repo = Unset;
-        type Knot = Unset;
         type DefaultBranch = Unset;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKnot<St> {}
+    impl<St: State> State for SetKnot<St> {
+        type Knot = Set<members::knot>;
+        type Did = St::Did;
+        type Repo = St::Repo;
+        type DefaultBranch = St::DefaultBranch;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
+        type Knot = St::Knot;
         type Did = Set<members::did>;
         type Repo = St::Repo;
-        type Knot = St::Knot;
         type DefaultBranch = St::DefaultBranch;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
+        type Knot = St::Knot;
         type Did = St::Did;
         type Repo = Set<members::repo>;
-        type Knot = St::Knot;
-        type DefaultBranch = St::DefaultBranch;
-    }
-    ///State transition - sets the `knot` field to Set
-    pub struct SetKnot<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKnot<St> {}
-    impl<St: State> State for SetKnot<St> {
-        type Did = St::Did;
-        type Repo = St::Repo;
-        type Knot = Set<members::knot>;
         type DefaultBranch = St::DefaultBranch;
     }
     ///State transition - sets the `default_branch` field to Set
     pub struct SetDefaultBranch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDefaultBranch<St> {}
     impl<St: State> State for SetDefaultBranch<St> {
+        type Knot = St::Knot;
         type Did = St::Did;
         type Repo = St::Repo;
-        type Knot = St::Knot;
         type DefaultBranch = Set<members::default_branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `knot` field
+        pub struct knot(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `knot` field
-        pub struct knot(());
         ///Marker type for the `default_branch` field
         pub struct default_branch(());
     }
@@ -1449,9 +1392,9 @@ where
 impl<S: BosStr, St> TriggerRepoBuilder<S, St>
 where
     St: trigger_repo_state::State,
+    St::Knot: trigger_repo_state::IsSet,
     St::Did: trigger_repo_state::IsSet,
     St::Repo: trigger_repo_state::IsSet,
-    St::Knot: trigger_repo_state::IsSet,
     St::DefaultBranch: trigger_repo_state::IsSet,
 {
     /// Build the final struct.
@@ -1489,8 +1432,8 @@ pub mod workflow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Engine;
         type Clone;
+        type Engine;
         type Raw;
         type Name;
     }
@@ -1498,26 +1441,26 @@ pub mod workflow_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Engine = Unset;
         type Clone = Unset;
+        type Engine = Unset;
         type Raw = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEngine<St> {}
-    impl<St: State> State for SetEngine<St> {
-        type Engine = Set<members::engine>;
-        type Clone = St::Clone;
-        type Raw = St::Raw;
-        type Name = St::Name;
     }
     ///State transition - sets the `clone` field to Set
     pub struct SetClone<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClone<St> {}
     impl<St: State> State for SetClone<St> {
-        type Engine = St::Engine;
         type Clone = Set<members::clone>;
+        type Engine = St::Engine;
+        type Raw = St::Raw;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEngine<St> {}
+    impl<St: State> State for SetEngine<St> {
+        type Clone = St::Clone;
+        type Engine = Set<members::engine>;
         type Raw = St::Raw;
         type Name = St::Name;
     }
@@ -1525,8 +1468,8 @@ pub mod workflow_state {
     pub struct SetRaw<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRaw<St> {}
     impl<St: State> State for SetRaw<St> {
-        type Engine = St::Engine;
         type Clone = St::Clone;
+        type Engine = St::Engine;
         type Raw = Set<members::raw>;
         type Name = St::Name;
     }
@@ -1534,18 +1477,18 @@ pub mod workflow_state {
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Engine = St::Engine;
         type Clone = St::Clone;
+        type Engine = St::Engine;
         type Raw = St::Raw;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `engine` field
-        pub struct engine(());
         ///Marker type for the `clone` field
         pub struct clone(());
+        ///Marker type for the `engine` field
+        pub struct engine(());
         ///Marker type for the `raw` field
         pub struct raw(());
         ///Marker type for the `name` field
@@ -1657,8 +1600,8 @@ where
 impl<S: BosStr, St> WorkflowBuilder<S, St>
 where
     St: workflow_state::State,
-    St::Engine: workflow_state::IsSet,
     St::Clone: workflow_state::IsSet,
+    St::Engine: workflow_state::IsSet,
     St::Raw: workflow_state::IsSet,
     St::Name: workflow_state::IsSet,
 {

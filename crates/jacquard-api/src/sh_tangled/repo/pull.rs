@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,10 +39,7 @@ use crate::sh_tangled::repo::pull;
     rename_all = "camelCase",
     rename = "sh.tangled.repo.pull",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Pull<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,13 +65,7 @@ pub struct Pull<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PullGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -84,13 +75,7 @@ pub struct PullGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Source<S: BosStr = DefaultStr> {
     pub branch: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -102,13 +87,7 @@ pub struct Source<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Target<S: BosStr = DefaultStr> {
     pub branch: S,
     pub repo: AtUri<S>,
@@ -253,67 +232,67 @@ pub mod pull_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type PatchBlob;
-        type Title;
         type Target;
+        type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type PatchBlob = Unset;
-        type Title = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type PatchBlob = St::PatchBlob;
-        type Title = St::Title;
-        type Target = St::Target;
+        type Title = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `patch_blob` field to Set
     pub struct SetPatchBlob<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPatchBlob<St> {}
     impl<St: State> State for SetPatchBlob<St> {
-        type CreatedAt = St::CreatedAt;
         type PatchBlob = Set<members::patch_blob>;
+        type Target = St::Target;
         type Title = St::Title;
-        type Target = St::Target;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
         type CreatedAt = St::CreatedAt;
-        type PatchBlob = St::PatchBlob;
-        type Title = Set<members::title>;
-        type Target = St::Target;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTarget<St> {}
     impl<St: State> State for SetTarget<St> {
-        type CreatedAt = St::CreatedAt;
         type PatchBlob = St::PatchBlob;
-        type Title = St::Title;
         type Target = Set<members::target>;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type PatchBlob = St::PatchBlob;
+        type Target = St::Target;
+        type Title = Set<members::title>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type PatchBlob = St::PatchBlob;
+        type Target = St::Target;
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `patch_blob` field
         pub struct patch_blob(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -496,10 +475,10 @@ where
 impl<S: BosStr, St> PullBuilder<S, St>
 where
     St: pull_state::State,
-    St::CreatedAt: pull_state::IsSet,
     St::PatchBlob: pull_state::IsSet,
-    St::Title: pull_state::IsSet,
     St::Target: pull_state::IsSet,
+    St::Title: pull_state::IsSet,
+    St::CreatedAt: pull_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pull<S> {

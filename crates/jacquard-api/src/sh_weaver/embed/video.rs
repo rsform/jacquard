@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::sh_weaver::embed::PixelSize;
 use crate::sh_weaver::embed::video;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Caption<S: BosStr = DefaultStr> {
     pub file: BlobRef<S>,
     pub lang: Language,
@@ -47,13 +41,7 @@ pub struct Caption<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VideoRecord<S: BosStr = DefaultStr> {
     pub videos: Vec<video::Video<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -62,13 +50,7 @@ pub struct VideoRecord<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Video<S: BosStr = DefaultStr> {
     ///Alt text description of the video, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -88,13 +70,7 @@ pub struct Video<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum VideoDimensions<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
     AspectRatio(Box<AspectRatio<S>>),
@@ -106,13 +82,7 @@ pub enum VideoDimensions<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -131,13 +101,7 @@ pub struct View<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ViewDimensions<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
     AspectRatio(Box<AspectRatio<S>>),
@@ -947,37 +911,37 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Playlist;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Playlist = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Playlist = St::Playlist;
+        type Cid = Unset;
     }
     ///State transition - sets the `playlist` field to Set
     pub struct SetPlaylist<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlaylist<St> {}
     impl<St: State> State for SetPlaylist<St> {
-        type Cid = St::Cid;
         type Playlist = Set<members::playlist>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Playlist = St::Playlist;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `playlist` field
         pub struct playlist(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -1106,8 +1070,8 @@ impl<S: BosStr, St: view_state::State> ViewBuilder<S, St> {
 impl<S: BosStr, St> ViewBuilder<S, St>
 where
     St: view_state::State,
-    St::Cid: view_state::IsSet,
     St::Playlist: view_state::IsSet,
+    St::Cid: view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> View<S> {

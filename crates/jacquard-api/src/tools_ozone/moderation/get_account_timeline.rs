@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,26 +27,14 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::get_account_timeline;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAccountTimeline<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAccountTimelineOutput<S: BosStr = DefaultStr> {
     pub timeline: Vec<get_account_timeline::TimelineItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -97,13 +85,7 @@ impl core::fmt::Display for GetAccountTimelineError {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TimelineItem<S: BosStr = DefaultStr> {
     pub day: S,
     pub summary: Vec<get_account_timeline::TimelineItemSummary<S>>,
@@ -113,13 +95,7 @@ pub struct TimelineItem<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TimelineItemSummary<S: BosStr = DefaultStr> {
     pub count: i64,
     pub event_subject_type: TimelineItemSummaryEventSubjectType<S>,
@@ -929,49 +905,49 @@ pub mod timeline_item_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EventSubjectType;
         type Count;
+        type EventSubjectType;
         type EventType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EventSubjectType = Unset;
         type Count = Unset;
+        type EventSubjectType = Unset;
         type EventType = Unset;
-    }
-    ///State transition - sets the `event_subject_type` field to Set
-    pub struct SetEventSubjectType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEventSubjectType<St> {}
-    impl<St: State> State for SetEventSubjectType<St> {
-        type EventSubjectType = Set<members::event_subject_type>;
-        type Count = St::Count;
-        type EventType = St::EventType;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCount<St> {}
     impl<St: State> State for SetCount<St> {
-        type EventSubjectType = St::EventSubjectType;
         type Count = Set<members::count>;
+        type EventSubjectType = St::EventSubjectType;
+        type EventType = St::EventType;
+    }
+    ///State transition - sets the `event_subject_type` field to Set
+    pub struct SetEventSubjectType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEventSubjectType<St> {}
+    impl<St: State> State for SetEventSubjectType<St> {
+        type Count = St::Count;
+        type EventSubjectType = Set<members::event_subject_type>;
         type EventType = St::EventType;
     }
     ///State transition - sets the `event_type` field to Set
     pub struct SetEventType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEventType<St> {}
     impl<St: State> State for SetEventType<St> {
-        type EventSubjectType = St::EventSubjectType;
         type Count = St::Count;
+        type EventSubjectType = St::EventSubjectType;
         type EventType = Set<members::event_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event_subject_type` field
-        pub struct event_subject_type(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `event_subject_type` field
+        pub struct event_subject_type(());
         ///Marker type for the `event_type` field
         pub struct event_type(());
     }
@@ -1072,8 +1048,8 @@ where
 impl<S: BosStr, St> TimelineItemSummaryBuilder<S, St>
 where
     St: timeline_item_summary_state::State,
-    St::EventSubjectType: timeline_item_summary_state::IsSet,
     St::Count: timeline_item_summary_state::IsSet,
+    St::EventSubjectType: timeline_item_summary_state::IsSet,
     St::EventType: timeline_item_summary_state::IsSet,
 {
     /// Build the final struct.

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,10 +41,7 @@ use crate::pub_leaflet::publication::Theme;
     rename_all = "camelCase",
     rename = "pub.leaflet.document",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Document<S: BosStr = DefaultStr> {
     pub author: AtIdentifier<S>,
@@ -73,13 +70,7 @@ pub struct Document<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum DocumentPagesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "pub.leaflet.pages.linearDocument")]
     LinearDocument(Box<LinearDocument<S>>),
@@ -90,13 +81,7 @@ pub enum DocumentPagesItem<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct DocumentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -250,50 +235,50 @@ pub mod document_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Pages;
-        type Title;
         type Author;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Pages = Unset;
-        type Title = Unset;
         type Author = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `pages` field to Set
     pub struct SetPages<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPages<St> {}
     impl<St: State> State for SetPages<St> {
         type Pages = Set<members::pages>;
+        type Author = St::Author;
         type Title = St::Title;
-        type Author = St::Author;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Pages = St::Pages;
-        type Title = Set<members::title>;
-        type Author = St::Author;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthor<St> {}
     impl<St: State> State for SetAuthor<St> {
         type Pages = St::Pages;
-        type Title = St::Title;
         type Author = Set<members::author>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Pages = St::Pages;
+        type Author = St::Author;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `pages` field
         pub struct pages(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -499,8 +484,8 @@ impl<S: BosStr, St> DocumentBuilder<S, St>
 where
     St: document_state::State,
     St::Pages: document_state::IsSet,
-    St::Title: document_state::IsSet,
     St::Author: document_state::IsSet,
+    St::Title: document_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Document<S> {

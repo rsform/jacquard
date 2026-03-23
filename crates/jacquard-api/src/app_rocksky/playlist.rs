@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,10 +41,7 @@ use crate::app_rocksky::song::SongViewBasic;
     rename_all = "camelCase",
     rename = "app.rocksky.playlist",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Playlist<S: BosStr = DefaultStr> {
     ///The Apple Music link of the playlist.
@@ -79,13 +76,7 @@ pub struct Playlist<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PlaylistGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -96,13 +87,7 @@ pub struct PlaylistGetRecordOutput<S: BosStr = DefaultStr> {
 /// Basic view of a playlist, including its metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlaylistViewBasic<S: BosStr = DefaultStr> {
     ///The URL of the cover image for the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -144,13 +129,7 @@ pub struct PlaylistViewBasic<S: BosStr = DefaultStr> {
 /// Detailed view of a playlist, including its tracks and metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlaylistViewDetailed<S: BosStr = DefaultStr> {
     ///The URL of the cover image for the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]

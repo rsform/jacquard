@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,13 +25,7 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Heading<S: BosStr = DefaultStr> {
     ///Facets for text formatting
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,37 +86,37 @@ pub mod heading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Plaintext;
         type Level;
+        type Plaintext;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Plaintext = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `plaintext` field to Set
-    pub struct SetPlaintext<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlaintext<St> {}
-    impl<St: State> State for SetPlaintext<St> {
-        type Plaintext = Set<members::plaintext>;
-        type Level = St::Level;
+        type Plaintext = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLevel<St> {}
     impl<St: State> State for SetLevel<St> {
-        type Plaintext = St::Plaintext;
         type Level = Set<members::level>;
+        type Plaintext = St::Plaintext;
+    }
+    ///State transition - sets the `plaintext` field to Set
+    pub struct SetPlaintext<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlaintext<St> {}
+    impl<St: State> State for SetPlaintext<St> {
+        type Level = St::Level;
+        type Plaintext = Set<members::plaintext>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `plaintext` field
-        pub struct plaintext(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `plaintext` field
+        pub struct plaintext(());
     }
 }
 
@@ -218,8 +212,8 @@ impl<S: BosStr, St: heading_state::State> HeadingBuilder<S, St> {
 impl<S: BosStr, St> HeadingBuilder<S, St>
 where
     St: heading_state::State,
-    St::Plaintext: heading_state::IsSet,
     St::Level: heading_state::IsSet,
+    St::Plaintext: heading_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Heading<S> {

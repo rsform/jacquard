@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,10 +37,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "sh.tangled.repo.issue.state",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct State<S: BosStr = DefaultStr> {
     pub issue: AtUri<S>,
@@ -136,13 +133,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct StateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -208,37 +199,37 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type State;
         type Issue;
+        type State;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type State = Unset;
         type Issue = Unset;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetState<St> {}
-    impl<St: State> State for SetState<St> {
-        type State = Set<members::state>;
-        type Issue = St::Issue;
+        type State = Unset;
     }
     ///State transition - sets the `issue` field to Set
     pub struct SetIssue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIssue<St> {}
     impl<St: State> State for SetIssue<St> {
-        type State = St::State;
         type Issue = Set<members::issue>;
+        type State = St::State;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetState<St> {}
+    impl<St: State> State for SetState<St> {
+        type Issue = St::Issue;
+        type State = Set<members::state>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `state` field
-        pub struct state(());
         ///Marker type for the `issue` field
         pub struct issue(());
+        ///Marker type for the `state` field
+        pub struct state(());
     }
 }
 
@@ -308,8 +299,8 @@ where
 impl<S: BosStr, St> StateBuilder<S, St>
 where
     St: state_state::State,
-    St::State: state_state::IsSet,
     St::Issue: state_state::IsSet,
+    St::State: state_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> State<S> {

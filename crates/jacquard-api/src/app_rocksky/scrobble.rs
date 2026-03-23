@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -42,10 +42,7 @@ use crate::app_rocksky::artist::ArtistViewBasic;
     rename_all = "camelCase",
     rename = "app.rocksky.scrobble",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Scrobble<S: BosStr = DefaultStr> {
     ///The album of the song.
@@ -124,13 +121,7 @@ pub struct Scrobble<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ScrobbleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -140,13 +131,7 @@ pub struct ScrobbleGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScrobbleViewBasic<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -197,13 +182,7 @@ pub struct ScrobbleViewBasic<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScrobbleViewDetailed<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -554,105 +533,105 @@ pub mod scrobble_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Duration;
-        type AlbumArtist;
-        type Artist;
-        type Album;
         type Title;
+        type Duration;
         type CreatedAt;
+        type Album;
+        type Artist;
+        type AlbumArtist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Duration = Unset;
-        type AlbumArtist = Unset;
-        type Artist = Unset;
-        type Album = Unset;
         type Title = Unset;
+        type Duration = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDuration<St> {}
-    impl<St: State> State for SetDuration<St> {
-        type Duration = Set<members::duration>;
-        type AlbumArtist = St::AlbumArtist;
-        type Artist = St::Artist;
-        type Album = St::Album;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `album_artist` field to Set
-    pub struct SetAlbumArtist<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAlbumArtist<St> {}
-    impl<St: State> State for SetAlbumArtist<St> {
-        type Duration = St::Duration;
-        type AlbumArtist = Set<members::album_artist>;
-        type Artist = St::Artist;
-        type Album = St::Album;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetArtist<St> {}
-    impl<St: State> State for SetArtist<St> {
-        type Duration = St::Duration;
-        type AlbumArtist = St::AlbumArtist;
-        type Artist = Set<members::artist>;
-        type Album = St::Album;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAlbum<St> {}
-    impl<St: State> State for SetAlbum<St> {
-        type Duration = St::Duration;
-        type AlbumArtist = St::AlbumArtist;
-        type Artist = St::Artist;
-        type Album = Set<members::album>;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
+        type Album = Unset;
+        type Artist = Unset;
+        type AlbumArtist = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Duration = St::Duration;
-        type AlbumArtist = St::AlbumArtist;
-        type Artist = St::Artist;
-        type Album = St::Album;
         type Title = Set<members::title>;
+        type Duration = St::Duration;
         type CreatedAt = St::CreatedAt;
+        type Album = St::Album;
+        type Artist = St::Artist;
+        type AlbumArtist = St::AlbumArtist;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
+        type Title = St::Title;
+        type Duration = Set<members::duration>;
+        type CreatedAt = St::CreatedAt;
+        type Album = St::Album;
+        type Artist = St::Artist;
+        type AlbumArtist = St::AlbumArtist;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Duration = St::Duration;
-        type AlbumArtist = St::AlbumArtist;
-        type Artist = St::Artist;
-        type Album = St::Album;
         type Title = St::Title;
+        type Duration = St::Duration;
         type CreatedAt = Set<members::created_at>;
+        type Album = St::Album;
+        type Artist = St::Artist;
+        type AlbumArtist = St::AlbumArtist;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbum<St> {}
+    impl<St: State> State for SetAlbum<St> {
+        type Title = St::Title;
+        type Duration = St::Duration;
+        type CreatedAt = St::CreatedAt;
+        type Album = Set<members::album>;
+        type Artist = St::Artist;
+        type AlbumArtist = St::AlbumArtist;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
+        type Title = St::Title;
+        type Duration = St::Duration;
+        type CreatedAt = St::CreatedAt;
+        type Album = St::Album;
+        type Artist = Set<members::artist>;
+        type AlbumArtist = St::AlbumArtist;
+    }
+    ///State transition - sets the `album_artist` field to Set
+    pub struct SetAlbumArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbumArtist<St> {}
+    impl<St: State> State for SetAlbumArtist<St> {
+        type Title = St::Title;
+        type Duration = St::Duration;
+        type CreatedAt = St::CreatedAt;
+        type Album = St::Album;
+        type Artist = St::Artist;
+        type AlbumArtist = Set<members::album_artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `duration` field
-        pub struct duration(());
-        ///Marker type for the `album_artist` field
-        pub struct album_artist(());
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `album` field
-        pub struct album(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `album` field
+        pub struct album(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `album_artist` field
+        pub struct album_artist(());
     }
 }
 
@@ -1097,12 +1076,12 @@ impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
 impl<S: BosStr, St> ScrobbleBuilder<S, St>
 where
     St: scrobble_state::State,
-    St::Duration: scrobble_state::IsSet,
-    St::AlbumArtist: scrobble_state::IsSet,
-    St::Artist: scrobble_state::IsSet,
-    St::Album: scrobble_state::IsSet,
     St::Title: scrobble_state::IsSet,
+    St::Duration: scrobble_state::IsSet,
     St::CreatedAt: scrobble_state::IsSet,
+    St::Album: scrobble_state::IsSet,
+    St::Artist: scrobble_state::IsSet,
+    St::AlbumArtist: scrobble_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Scrobble<S> {

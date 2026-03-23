@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "app.fitsky.blueskyPost",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct BlueskyPost<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -50,13 +47,7 @@ pub struct BlueskyPost<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct BlueskyPostGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -123,50 +114,50 @@ pub mod bluesky_post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type WorkoutUri;
-        type PostUri;
         type CreatedAt;
+        type PostUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type WorkoutUri = Unset;
-        type PostUri = Unset;
         type CreatedAt = Unset;
+        type PostUri = Unset;
     }
     ///State transition - sets the `workout_uri` field to Set
     pub struct SetWorkoutUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWorkoutUri<St> {}
     impl<St: State> State for SetWorkoutUri<St> {
         type WorkoutUri = Set<members::workout_uri>;
+        type CreatedAt = St::CreatedAt;
         type PostUri = St::PostUri;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `post_uri` field to Set
-    pub struct SetPostUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPostUri<St> {}
-    impl<St: State> State for SetPostUri<St> {
-        type WorkoutUri = St::WorkoutUri;
-        type PostUri = Set<members::post_uri>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type WorkoutUri = St::WorkoutUri;
-        type PostUri = St::PostUri;
         type CreatedAt = Set<members::created_at>;
+        type PostUri = St::PostUri;
+    }
+    ///State transition - sets the `post_uri` field to Set
+    pub struct SetPostUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPostUri<St> {}
+    impl<St: State> State for SetPostUri<St> {
+        type WorkoutUri = St::WorkoutUri;
+        type CreatedAt = St::CreatedAt;
+        type PostUri = Set<members::post_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `workout_uri` field
         pub struct workout_uri(());
-        ///Marker type for the `post_uri` field
-        pub struct post_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `post_uri` field
+        pub struct post_uri(());
     }
 }
 
@@ -256,8 +247,8 @@ impl<S: BosStr, St> BlueskyPostBuilder<S, St>
 where
     St: bluesky_post_state::State,
     St::WorkoutUri: bluesky_post_state::IsSet,
-    St::PostUri: bluesky_post_state::IsSet,
     St::CreatedAt: bluesky_post_state::IsSet,
+    St::PostUri: bluesky_post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BlueskyPost<S> {

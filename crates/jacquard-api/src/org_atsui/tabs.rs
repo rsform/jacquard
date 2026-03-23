@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,13 +28,7 @@ use crate::at_inlay::Response;
 use crate::org_atsui::tabs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Tabs<S: BosStr = DefaultStr> {
     ///Tabs to display.
     pub items: Vec<tabs::Tab<S>>,
@@ -44,13 +38,7 @@ pub struct Tabs<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TabsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -60,13 +48,7 @@ pub struct TabsOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Tab<S: BosStr = DefaultStr> {
     ///Element to render as tab content.
     pub content: Element<S>,
@@ -250,51 +232,51 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Label;
         type Content;
         type Key;
-        type Label;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Label = Unset;
         type Content = Unset;
         type Key = Unset;
-        type Label = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Content = Set<members::content>;
-        type Key = St::Key;
-        type Label = St::Label;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Content = St::Content;
-        type Key = Set<members::key>;
-        type Label = St::Label;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLabel<St> {}
     impl<St: State> State for SetLabel<St> {
+        type Label = Set<members::label>;
         type Content = St::Content;
         type Key = St::Key;
-        type Label = Set<members::label>;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Label = St::Label;
+        type Content = Set<members::content>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Label = St::Label;
+        type Content = St::Content;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `label` field
+        pub struct label(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `label` field
-        pub struct label(());
     }
 }
 
@@ -380,9 +362,9 @@ where
 impl<S: BosStr, St> TabBuilder<S, St>
 where
     St: tab_state::State,
+    St::Label: tab_state::IsSet,
     St::Content: tab_state::IsSet,
     St::Key: tab_state::IsSet,
-    St::Label: tab_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tab<S> {

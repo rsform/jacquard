@@ -22,7 +22,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -40,13 +40,7 @@ use crate::at_inlay;
 /// Cache lifetime and invalidation tags returned by XRPC components.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CachePolicy<S: BosStr = DefaultStr> {
     ///How frequently the underlying data changes
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -148,13 +142,7 @@ where
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum CachePolicyTagsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "at.inlay.defs#tagRecord")]
     TagRecord(Box<at_inlay::TagRecord<S>>),
@@ -165,13 +153,7 @@ pub enum CachePolicyTagsItem<S: BosStr = DefaultStr> {
 /// A renderable Inlay element.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Element<S: BosStr = DefaultStr> {
     ///Stable key that identifies the component among its siblings.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -188,13 +170,7 @@ pub struct Element<S: BosStr = DefaultStr> {
 /// Standard response from a component render call.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Response<S: BosStr = DefaultStr> {
     ///Cache lifetime and invalidation tags
     pub cache: at_inlay::CachePolicy<S>,
@@ -207,13 +183,7 @@ pub struct Response<S: BosStr = DefaultStr> {
 /// Cache tag: depend on backlink relationships to a subject.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TagLink<S: BosStr = DefaultStr> {
     ///Collection NSID of the linking records. Omit for any collection.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -227,13 +197,7 @@ pub struct TagLink<S: BosStr = DefaultStr> {
 /// Cache tag: depend on a specific record, collection, or identity.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TagRecord<S: BosStr = DefaultStr> {
     ///AT URI at record, collection, or identity granularity
     pub uri: AtUri<S>,
@@ -243,13 +207,7 @@ pub struct TagRecord<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViaValtown<S: BosStr = DefaultStr> {
     ///Val Town val UUID
     pub val_id: S,

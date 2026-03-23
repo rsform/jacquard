@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "tech.tokimeki.kaku.collectionItem",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct CollectionItem<S: BosStr = DefaultStr> {
     ///Reference to the collection
@@ -56,13 +53,7 @@ pub struct CollectionItem<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CollectionItemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -137,51 +128,51 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Collection;
         type Post;
+        type Collection;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Collection = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Collection = St::Collection;
-        type Post = St::Post;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCollection<St> {}
-    impl<St: State> State for SetCollection<St> {
-        type CreatedAt = St::CreatedAt;
-        type Collection = Set<members::collection>;
-        type Post = St::Post;
+        type Collection = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPost<St> {}
     impl<St: State> State for SetPost<St> {
-        type CreatedAt = St::CreatedAt;
-        type Collection = St::Collection;
         type Post = Set<members::post>;
+        type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type Post = St::Post;
+        type Collection = Set<members::collection>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Post = St::Post;
+        type Collection = St::Collection;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `post` field
         pub struct post(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -283,9 +274,9 @@ where
 impl<S: BosStr, St> CollectionItemBuilder<S, St>
 where
     St: collection_item_state::State,
-    St::CreatedAt: collection_item_state::IsSet,
-    St::Collection: collection_item_state::IsSet,
     St::Post: collection_item_state::IsSet,
+    St::Collection: collection_item_state::IsSet,
+    St::CreatedAt: collection_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionItem<S> {

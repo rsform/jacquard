@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -35,13 +35,7 @@ use crate::science_alt::dataset::entry;
 /// Information about dataset size
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DatasetSize<S: BosStr = DefaultStr> {
     ///Total size in bytes
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,10 +57,7 @@ pub struct DatasetSize<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "science.alt.dataset.entry",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Entry<S: BosStr = DefaultStr> {
     ///Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object.
@@ -106,13 +97,7 @@ pub struct Entry<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum EntryStorage<S: BosStr = DefaultStr> {
     #[serde(rename = "science.alt.dataset.storageHttp")]
     StorageHttp(Box<StorageHttp<S>>),
@@ -125,13 +110,7 @@ pub enum EntryStorage<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -142,13 +121,7 @@ pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
 /// Content hash for shard integrity verification. Algorithm is flexible to allow SHA-256, BLAKE3, or other hash functions.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ShardChecksum<S: BosStr = DefaultStr> {
     ///Hash algorithm identifier (e.g., 'sha256', 'blake3')
     pub algorithm: S,
@@ -604,67 +577,67 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type Name;
         type SchemaRef;
         type Storage;
-        type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type Name = Unset;
         type SchemaRef = Unset;
         type Storage = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type SchemaRef = St::SchemaRef;
-        type Storage = St::Storage;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `schema_ref` field to Set
-    pub struct SetSchemaRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSchemaRef<St> {}
-    impl<St: State> State for SetSchemaRef<St> {
-        type CreatedAt = St::CreatedAt;
-        type SchemaRef = Set<members::schema_ref>;
-        type Storage = St::Storage;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `storage` field to Set
-    pub struct SetStorage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStorage<St> {}
-    impl<St: State> State for SetStorage<St> {
-        type CreatedAt = St::CreatedAt;
-        type SchemaRef = St::SchemaRef;
-        type Storage = Set<members::storage>;
-        type Name = St::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
         type SchemaRef = St::SchemaRef;
         type Storage = St::Storage;
-        type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `schema_ref` field to Set
+    pub struct SetSchemaRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSchemaRef<St> {}
+    impl<St: State> State for SetSchemaRef<St> {
+        type Name = St::Name;
+        type SchemaRef = Set<members::schema_ref>;
+        type Storage = St::Storage;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `storage` field to Set
+    pub struct SetStorage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStorage<St> {}
+    impl<St: State> State for SetStorage<St> {
+        type Name = St::Name;
+        type SchemaRef = St::SchemaRef;
+        type Storage = Set<members::storage>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type SchemaRef = St::SchemaRef;
+        type Storage = St::Storage;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `schema_ref` field
         pub struct schema_ref(());
         ///Marker type for the `storage` field
         pub struct storage(());
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -875,10 +848,10 @@ impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
 impl<S: BosStr, St> EntryBuilder<S, St>
 where
     St: entry_state::State,
-    St::CreatedAt: entry_state::IsSet,
+    St::Name: entry_state::IsSet,
     St::SchemaRef: entry_state::IsSet,
     St::Storage: entry_state::IsSet,
-    St::Name: entry_state::IsSet,
+    St::CreatedAt: entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Entry<S> {

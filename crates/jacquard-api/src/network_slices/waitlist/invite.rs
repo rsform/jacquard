@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "network.slices.waitlist.invite",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Invite<S: BosStr = DefaultStr> {
     ///When this invitation was created
@@ -56,13 +53,7 @@ pub struct Invite<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct InviteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -128,51 +119,51 @@ pub mod invite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slice;
-        type CreatedAt;
         type Did;
+        type CreatedAt;
+        type Slice;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slice = Unset;
-        type CreatedAt = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlice<St> {}
-    impl<St: State> State for SetSlice<St> {
-        type Slice = Set<members::slice>;
-        type CreatedAt = St::CreatedAt;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Slice = St::Slice;
-        type CreatedAt = Set<members::created_at>;
-        type Did = St::Did;
+        type CreatedAt = Unset;
+        type Slice = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Slice = St::Slice;
-        type CreatedAt = St::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = St::CreatedAt;
+        type Slice = St::Slice;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Did = St::Did;
+        type CreatedAt = Set<members::created_at>;
+        type Slice = St::Slice;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlice<St> {}
+    impl<St: State> State for SetSlice<St> {
+        type Did = St::Did;
+        type CreatedAt = St::CreatedAt;
+        type Slice = Set<members::slice>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice` field
-        pub struct slice(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
     }
 }
 
@@ -274,9 +265,9 @@ where
 impl<S: BosStr, St> InviteBuilder<S, St>
 where
     St: invite_state::State,
-    St::Slice: invite_state::IsSet,
-    St::CreatedAt: invite_state::IsSet,
     St::Did: invite_state::IsSet,
+    St::CreatedAt: invite_state::IsSet,
+    St::Slice: invite_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Invite<S> {

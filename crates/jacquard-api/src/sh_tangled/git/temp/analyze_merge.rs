@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::temp::analyze_merge;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConflictInfo<S: BosStr = DefaultStr> {
     ///Name of the conflicted file
     pub filename: S,
@@ -45,13 +39,7 @@ pub struct ConflictInfo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AnalyzeMerge<S: BosStr = DefaultStr> {
     pub branch: S,
     pub patch: S,
@@ -60,13 +48,7 @@ pub struct AnalyzeMerge<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AnalyzeMergeOutput<S: BosStr = DefaultStr> {
     ///List of files with merge conflicts
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -230,50 +212,50 @@ pub mod analyze_merge_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Branch;
         type Patch;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Branch = Unset;
         type Patch = Unset;
+        type Branch = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
+        type Patch = St::Patch;
         type Branch = St::Branch;
-        type Patch = St::Patch;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBranch<St> {}
-    impl<St: State> State for SetBranch<St> {
-        type Repo = St::Repo;
-        type Branch = Set<members::branch>;
-        type Patch = St::Patch;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPatch<St> {}
     impl<St: State> State for SetPatch<St> {
         type Repo = St::Repo;
-        type Branch = St::Branch;
         type Patch = Set<members::patch>;
+        type Branch = St::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBranch<St> {}
+    impl<St: State> State for SetBranch<St> {
+        type Repo = St::Repo;
+        type Patch = St::Patch;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `branch` field
-        pub struct branch(());
         ///Marker type for the `patch` field
         pub struct patch(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
@@ -363,8 +345,8 @@ impl<S: BosStr, St> AnalyzeMergeBuilder<S, St>
 where
     St: analyze_merge_state::State,
     St::Repo: analyze_merge_state::IsSet,
-    St::Branch: analyze_merge_state::IsSet,
     St::Patch: analyze_merge_state::IsSet,
+    St::Branch: analyze_merge_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AnalyzeMerge<S> {

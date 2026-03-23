@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::app_bsky::embed::images::Image;
     rename_all = "camelCase",
     rename = "us.polhem.blog.post",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Post<S: BosStr = DefaultStr> {
     pub content: S,
@@ -64,13 +61,7 @@ pub struct Post<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -183,67 +174,67 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Content;
-        type Slug;
         type Title;
+        type Slug;
+        type Content;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Content = Unset;
-        type Slug = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = St::Content;
-        type Slug = St::Slug;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type CreatedAt = St::CreatedAt;
-        type Content = Set<members::content>;
-        type Slug = St::Slug;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlug<St> {}
-    impl<St: State> State for SetSlug<St> {
-        type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
-        type Slug = Set<members::slug>;
-        type Title = St::Title;
+        type Slug = Unset;
+        type Content = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
-        type Slug = St::Slug;
         type Title = Set<members::title>;
+        type Slug = St::Slug;
+        type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type Title = St::Title;
+        type Slug = Set<members::slug>;
+        type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Title = St::Title;
+        type Slug = St::Slug;
+        type Content = Set<members::content>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
+        type Slug = St::Slug;
+        type Content = St::Content;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -426,10 +417,10 @@ impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
 impl<S: BosStr, St> PostBuilder<S, St>
 where
     St: post_state::State,
-    St::CreatedAt: post_state::IsSet,
-    St::Content: post_state::IsSet,
-    St::Slug: post_state::IsSet,
     St::Title: post_state::IsSet,
+    St::Slug: post_state::IsSet,
+    St::Content: post_state::IsSet,
+    St::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {
@@ -442,7 +433,7 @@ where
             slug: self._fields.5.unwrap(),
             tags: self._fields.6,
             title: self._fields.7.unwrap(),
-            visibility: self._fields.8.or_else(|| Some(SmolStr::from("public"))),
+            visibility: self._fields.8.or_else(|| Some(S::from_static("public"))),
             extra_data: Default::default(),
         }
     }
@@ -457,7 +448,7 @@ where
             slug: self._fields.5.unwrap(),
             tags: self._fields.6,
             title: self._fields.7.unwrap(),
-            visibility: self._fields.8.or_else(|| Some(SmolStr::from("public"))),
+            visibility: self._fields.8.or_else(|| Some(S::from_static("public"))),
             extra_data: Some(extra_data),
         }
     }

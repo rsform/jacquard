@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,13 +36,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Object used to store bookmark data in stash.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Bookmark<S: BosStr = DefaultStr> {
     ///A strong ref to the record to be bookmarked. Currently, only `app.bsky.feed.post` records are supported.
     pub subject: StrongRef<S>,
@@ -52,13 +46,7 @@ pub struct Bookmark<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BookmarkView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -72,13 +60,7 @@ pub struct BookmarkView<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum BookmarkViewItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
     BlockedPost(Box<BlockedPost<S>>),
@@ -304,37 +286,37 @@ pub mod bookmark_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Item;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Item = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type Item = St::Item;
+        type Subject = Unset;
     }
     ///State transition - sets the `item` field to Set
     pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetItem<St> {}
     impl<St: State> State for SetItem<St> {
-        type Subject = St::Subject;
         type Item = Set<members::item>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Item = St::Item;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `item` field
         pub struct item(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -417,8 +399,8 @@ where
 impl<S: BosStr, St> BookmarkViewBuilder<S, St>
 where
     St: bookmark_view_state::State,
-    St::Subject: bookmark_view_state::IsSet,
     St::Item: bookmark_view_state::IsSet,
+    St::Subject: bookmark_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BookmarkView<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "pink.vase.pod.playlist",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Playlist<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -137,13 +134,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PlaylistGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -241,51 +232,51 @@ pub mod playlist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
         type Items;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
         type Items = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
-        type Items = St::Items;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
         type Items = St::Items;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `items` field to Set
     pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetItems<St> {}
     impl<St: State> State for SetItems<St> {
-        type CreatedAt = St::CreatedAt;
         type Name = St::Name;
         type Items = Set<members::items>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type Items = St::Items;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `items` field
         pub struct items(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -409,9 +400,9 @@ impl<S: BosStr, St: playlist_state::State> PlaylistBuilder<S, St> {
 impl<S: BosStr, St> PlaylistBuilder<S, St>
 where
     St: playlist_state::State,
-    St::CreatedAt: playlist_state::IsSet,
     St::Name: playlist_state::IsSet,
     St::Items: playlist_state::IsSet,
+    St::CreatedAt: playlist_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Playlist<S> {

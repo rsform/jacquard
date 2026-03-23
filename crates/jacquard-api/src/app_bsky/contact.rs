@@ -20,7 +20,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,13 +38,7 @@ use crate::app_bsky::actor::ProfileView;
 /// Associates a profile with the positional index of the contact import input in the call to `app.bsky.contact.importContacts`, so clients can know which phone caused a particular match.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MatchAndContactIndex<S: BosStr = DefaultStr> {
     ///The index of this match in the import contact input.
     pub contact_index: i64,
@@ -57,13 +51,7 @@ pub struct MatchAndContactIndex<S: BosStr = DefaultStr> {
 /// A stash object to be sent via bsync representing a notification to be created.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Notification<S: BosStr = DefaultStr> {
     ///The DID of who this notification comes from.
     pub from: Did<S>,
@@ -75,13 +63,7 @@ pub struct Notification<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SyncStatus<S: BosStr = DefaultStr> {
     ///Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
     pub matches_count: i64,
@@ -453,37 +435,37 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type From;
         type To;
+        type From;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type From = Unset;
         type To = Unset;
-    }
-    ///State transition - sets the `from` field to Set
-    pub struct SetFrom<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFrom<St> {}
-    impl<St: State> State for SetFrom<St> {
-        type From = Set<members::from>;
-        type To = St::To;
+        type From = Unset;
     }
     ///State transition - sets the `to` field to Set
     pub struct SetTo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTo<St> {}
     impl<St: State> State for SetTo<St> {
-        type From = St::From;
         type To = Set<members::to>;
+        type From = St::From;
+    }
+    ///State transition - sets the `from` field to Set
+    pub struct SetFrom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFrom<St> {}
+    impl<St: State> State for SetFrom<St> {
+        type To = St::To;
+        type From = Set<members::from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `from` field
-        pub struct from(());
         ///Marker type for the `to` field
         pub struct to(());
+        ///Marker type for the `from` field
+        pub struct from(());
     }
 }
 
@@ -553,8 +535,8 @@ where
 impl<S: BosStr, St> NotificationBuilder<S, St>
 where
     St: notification_state::State,
-    St::From: notification_state::IsSet,
     St::To: notification_state::IsSet,
+    St::From: notification_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Notification<S> {
@@ -587,37 +569,37 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SyncedAt;
         type MatchesCount;
+        type SyncedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SyncedAt = Unset;
         type MatchesCount = Unset;
-    }
-    ///State transition - sets the `synced_at` field to Set
-    pub struct SetSyncedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSyncedAt<St> {}
-    impl<St: State> State for SetSyncedAt<St> {
-        type SyncedAt = Set<members::synced_at>;
-        type MatchesCount = St::MatchesCount;
+        type SyncedAt = Unset;
     }
     ///State transition - sets the `matches_count` field to Set
     pub struct SetMatchesCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMatchesCount<St> {}
     impl<St: State> State for SetMatchesCount<St> {
-        type SyncedAt = St::SyncedAt;
         type MatchesCount = Set<members::matches_count>;
+        type SyncedAt = St::SyncedAt;
+    }
+    ///State transition - sets the `synced_at` field to Set
+    pub struct SetSyncedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSyncedAt<St> {}
+    impl<St: State> State for SetSyncedAt<St> {
+        type MatchesCount = St::MatchesCount;
+        type SyncedAt = Set<members::synced_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `synced_at` field
-        pub struct synced_at(());
         ///Marker type for the `matches_count` field
         pub struct matches_count(());
+        ///Marker type for the `synced_at` field
+        pub struct synced_at(());
     }
 }
 
@@ -687,8 +669,8 @@ where
 impl<S: BosStr, St> SyncStatusBuilder<S, St>
 where
     St: sync_status_state::State,
-    St::SyncedAt: sync_status_state::IsSet,
     St::MatchesCount: sync_status_state::IsSet,
+    St::SyncedAt: sync_status_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SyncStatus<S> {

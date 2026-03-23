@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,10 +33,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "sh.tangled.repo.collaborator",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Collaborator<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -50,13 +47,7 @@ pub struct Collaborator<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CollaboratorGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -122,49 +113,49 @@ pub mod collaborator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type CreatedAt;
+        type Repo;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type CreatedAt = Unset;
+        type Repo = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Repo = St::Repo;
         type CreatedAt = Set<members::created_at>;
+        type Repo = St::Repo;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type CreatedAt = St::CreatedAt;
+        type Repo = Set<members::repo>;
         type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type Repo = St::Repo;
         type CreatedAt = St::CreatedAt;
+        type Repo = St::Repo;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -255,8 +246,8 @@ where
 impl<S: BosStr, St> CollaboratorBuilder<S, St>
 where
     St: collaborator_state::State,
-    St::Repo: collaborator_state::IsSet,
     St::CreatedAt: collaborator_state::IsSet,
+    St::Repo: collaborator_state::IsSet,
     St::Subject: collaborator_state::IsSet,
 {
     /// Build the final struct.

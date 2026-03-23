@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::net_anisota::beta::game::collection;
     rename_all = "camelCase",
     rename = "net.anisota.beta.game.collection",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Collection<S: BosStr = DefaultStr> {
     ///When the specimen was first acquired
@@ -93,13 +90,7 @@ pub struct Collection<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CollectionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -110,13 +101,7 @@ pub struct CollectionGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional details about how the specimen was acquired
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SourceDetails<S: BosStr = DefaultStr> {
     ///Number of attempts before successful capture
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -137,13 +122,7 @@ pub struct SourceDetails<S: BosStr = DefaultStr> {
 /// Complete specimen information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpecimenData<S: BosStr = DefaultStr> {
     ///Scientific authorship of the species
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -315,66 +294,66 @@ pub mod collection_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Quantity;
-        type SpecimenId;
-        type CreatedAt;
         type AcquiredAt;
+        type CreatedAt;
+        type SpecimenId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Quantity = Unset;
-        type SpecimenId = Unset;
-        type CreatedAt = Unset;
         type AcquiredAt = Unset;
+        type CreatedAt = Unset;
+        type SpecimenId = Unset;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetQuantity<St> {}
     impl<St: State> State for SetQuantity<St> {
         type Quantity = Set<members::quantity>;
-        type SpecimenId = St::SpecimenId;
+        type AcquiredAt = St::AcquiredAt;
         type CreatedAt = St::CreatedAt;
-        type AcquiredAt = St::AcquiredAt;
-    }
-    ///State transition - sets the `specimen_id` field to Set
-    pub struct SetSpecimenId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSpecimenId<St> {}
-    impl<St: State> State for SetSpecimenId<St> {
-        type Quantity = St::Quantity;
-        type SpecimenId = Set<members::specimen_id>;
-        type CreatedAt = St::CreatedAt;
-        type AcquiredAt = St::AcquiredAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Quantity = St::Quantity;
         type SpecimenId = St::SpecimenId;
-        type CreatedAt = Set<members::created_at>;
-        type AcquiredAt = St::AcquiredAt;
     }
     ///State transition - sets the `acquired_at` field to Set
     pub struct SetAcquiredAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAcquiredAt<St> {}
     impl<St: State> State for SetAcquiredAt<St> {
         type Quantity = St::Quantity;
-        type SpecimenId = St::SpecimenId;
-        type CreatedAt = St::CreatedAt;
         type AcquiredAt = Set<members::acquired_at>;
+        type CreatedAt = St::CreatedAt;
+        type SpecimenId = St::SpecimenId;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Quantity = St::Quantity;
+        type AcquiredAt = St::AcquiredAt;
+        type CreatedAt = Set<members::created_at>;
+        type SpecimenId = St::SpecimenId;
+    }
+    ///State transition - sets the `specimen_id` field to Set
+    pub struct SetSpecimenId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSpecimenId<St> {}
+    impl<St: State> State for SetSpecimenId<St> {
+        type Quantity = St::Quantity;
+        type AcquiredAt = St::AcquiredAt;
+        type CreatedAt = St::CreatedAt;
+        type SpecimenId = Set<members::specimen_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `quantity` field
         pub struct quantity(());
-        ///Marker type for the `specimen_id` field
-        pub struct specimen_id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `specimen_id` field
+        pub struct specimen_id(());
     }
 }
 
@@ -700,9 +679,9 @@ impl<S: BosStr, St> CollectionBuilder<S, St>
 where
     St: collection_state::State,
     St::Quantity: collection_state::IsSet,
-    St::SpecimenId: collection_state::IsSet,
-    St::CreatedAt: collection_state::IsSet,
     St::AcquiredAt: collection_state::IsSet,
+    St::CreatedAt: collection_state::IsSet,
+    St::SpecimenId: collection_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Collection<S> {

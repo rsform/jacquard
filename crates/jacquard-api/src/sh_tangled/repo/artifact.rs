@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -35,10 +35,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "sh.tangled.repo.artifact",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Artifact<S: BosStr = DefaultStr> {
     ///the artifact
@@ -59,13 +56,7 @@ pub struct Artifact<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ArtifactGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -171,85 +162,85 @@ pub mod artifact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Repo;
         type Tag;
-        type Name;
-        type CreatedAt;
         type Artifact;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Repo = Unset;
         type Tag = Unset;
-        type Name = Unset;
-        type CreatedAt = Unset;
         type Artifact = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Tag = St::Tag;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-        type Artifact = St::Artifact;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTag<St> {}
-    impl<St: State> State for SetTag<St> {
-        type Repo = St::Repo;
-        type Tag = Set<members::tag>;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-        type Artifact = St::Artifact;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Repo = St::Repo;
-        type Tag = St::Tag;
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
-        type Artifact = St::Artifact;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Repo = St::Repo;
         type Tag = St::Tag;
-        type Name = St::Name;
-        type CreatedAt = Set<members::created_at>;
         type Artifact = St::Artifact;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type CreatedAt = St::CreatedAt;
+        type Repo = Set<members::repo>;
+        type Tag = St::Tag;
+        type Artifact = St::Artifact;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
+        type CreatedAt = St::CreatedAt;
+        type Repo = St::Repo;
+        type Tag = Set<members::tag>;
+        type Artifact = St::Artifact;
+        type Name = St::Name;
     }
     ///State transition - sets the `artifact` field to Set
     pub struct SetArtifact<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArtifact<St> {}
     impl<St: State> State for SetArtifact<St> {
+        type CreatedAt = St::CreatedAt;
         type Repo = St::Repo;
         type Tag = St::Tag;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
         type Artifact = Set<members::artifact>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Repo = St::Repo;
+        type Tag = St::Tag;
+        type Artifact = St::Artifact;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `tag` field
         pub struct tag(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `artifact` field
         pub struct artifact(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -382,11 +373,11 @@ where
 impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
     St: artifact_state::State,
+    St::CreatedAt: artifact_state::IsSet,
     St::Repo: artifact_state::IsSet,
     St::Tag: artifact_state::IsSet,
-    St::Name: artifact_state::IsSet,
-    St::CreatedAt: artifact_state::IsSet,
     St::Artifact: artifact_state::IsSet,
+    St::Name: artifact_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Artifact<S> {

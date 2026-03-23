@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "org.simocracy.agents",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Agents<S: BosStr = DefaultStr> {
     ///Timestamp when the record was created
@@ -64,13 +61,7 @@ pub struct Agents<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct AgentsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -182,51 +173,51 @@ pub mod agents_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShortDescription;
         type CreatedAt;
         type Sim;
+        type ShortDescription;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShortDescription = Unset;
         type CreatedAt = Unset;
         type Sim = Unset;
-    }
-    ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
-    impl<St: State> State for SetShortDescription<St> {
-        type ShortDescription = Set<members::short_description>;
-        type CreatedAt = St::CreatedAt;
-        type Sim = St::Sim;
+        type ShortDescription = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type ShortDescription = St::ShortDescription;
         type CreatedAt = Set<members::created_at>;
         type Sim = St::Sim;
+        type ShortDescription = St::ShortDescription;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSim<St> {}
     impl<St: State> State for SetSim<St> {
-        type ShortDescription = St::ShortDescription;
         type CreatedAt = St::CreatedAt;
         type Sim = Set<members::sim>;
+        type ShortDescription = St::ShortDescription;
+    }
+    ///State transition - sets the `short_description` field to Set
+    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
+    impl<St: State> State for SetShortDescription<St> {
+        type CreatedAt = St::CreatedAt;
+        type Sim = St::Sim;
+        type ShortDescription = Set<members::short_description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `short_description` field
-        pub struct short_description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `sim` field
         pub struct sim(());
+        ///Marker type for the `short_description` field
+        pub struct short_description(());
     }
 }
 
@@ -370,9 +361,9 @@ where
 impl<S: BosStr, St> AgentsBuilder<S, St>
 where
     St: agents_state::State,
-    St::ShortDescription: agents_state::IsSet,
     St::CreatedAt: agents_state::IsSet,
     St::Sim: agents_state::IsSet,
+    St::ShortDescription: agents_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Agents<S> {

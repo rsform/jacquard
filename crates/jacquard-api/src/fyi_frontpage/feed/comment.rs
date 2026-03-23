@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::fyi_frontpage::richtext::block::Block;
     rename_all = "camelCase",
     rename = "fyi.frontpage.feed.comment",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Comment<S: BosStr = DefaultStr> {
     ///The content of the comment. Note, there are additional constraints placed on the total size of the content within the Frontpage AppView that are not possible to express in lexicon. Generally a comment can have a maximum length of 10,000 graphemes, the Frontpage AppView will enforce this limit.
@@ -56,13 +53,7 @@ pub struct Comment<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -139,51 +130,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocks;
         type Post;
         type CreatedAt;
+        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocks = Unset;
         type Post = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlocks<St> {}
-    impl<St: State> State for SetBlocks<St> {
-        type Blocks = Set<members::blocks>;
-        type Post = St::Post;
-        type CreatedAt = St::CreatedAt;
+        type Blocks = Unset;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPost<St> {}
     impl<St: State> State for SetPost<St> {
-        type Blocks = St::Blocks;
         type Post = Set<members::post>;
         type CreatedAt = St::CreatedAt;
+        type Blocks = St::Blocks;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Blocks = St::Blocks;
         type Post = St::Post;
         type CreatedAt = Set<members::created_at>;
+        type Blocks = St::Blocks;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlocks<St> {}
+    impl<St: State> State for SetBlocks<St> {
+        type Post = St::Post;
+        type CreatedAt = St::CreatedAt;
+        type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `post` field
         pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
     }
 }
 
@@ -290,9 +281,9 @@ where
 impl<S: BosStr, St> CommentBuilder<S, St>
 where
     St: comment_state::State,
-    St::Blocks: comment_state::IsSet,
     St::Post: comment_state::IsSet,
     St::CreatedAt: comment_state::IsSet,
+    St::Blocks: comment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Comment<S> {

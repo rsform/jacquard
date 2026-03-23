@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::net_anisota::beta::game::session;
 /// Summary of activity during this session
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ActivitySummary<S: BosStr = DefaultStr> {
     ///Player's current level at the time of this session update
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,13 +57,7 @@ pub struct ActivitySummary<S: BosStr = DefaultStr> {
 /// Game-specific actions performed
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GameActions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub daily_rewards_claimed: Option<i64>,
@@ -94,10 +82,7 @@ pub struct GameActions<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "net.anisota.beta.game.session",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Session<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -151,13 +136,7 @@ pub struct Session<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct SessionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -168,13 +147,7 @@ pub struct SessionGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional session metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Metadata<S: BosStr = DefaultStr> {
     ///List of features used during the session
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -191,13 +164,7 @@ pub struct Metadata<S: BosStr = DefaultStr> {
 /// Performance-related data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PerformanceMetrics<S: BosStr = DefaultStr> {
     ///Average API response time in milliseconds (rounded to nearest integer)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -212,13 +179,7 @@ pub struct PerformanceMetrics<S: BosStr = DefaultStr> {
 /// Context about how the session started
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SessionContext<S: BosStr = DefaultStr> {
     ///How the user was authenticated
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -934,66 +895,66 @@ pub mod session_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type StartedAt;
+        type Platform;
         type Status;
         type ClientVersion;
-        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type StartedAt = Unset;
+        type Platform = Unset;
         type Status = Unset;
         type ClientVersion = Unset;
-        type Platform = Unset;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartedAt<St> {}
     impl<St: State> State for SetStartedAt<St> {
         type StartedAt = Set<members::started_at>;
+        type Platform = St::Platform;
         type Status = St::Status;
         type ClientVersion = St::ClientVersion;
-        type Platform = St::Platform;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type StartedAt = St::StartedAt;
-        type Status = Set<members::status>;
-        type ClientVersion = St::ClientVersion;
-        type Platform = St::Platform;
-    }
-    ///State transition - sets the `client_version` field to Set
-    pub struct SetClientVersion<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetClientVersion<St> {}
-    impl<St: State> State for SetClientVersion<St> {
-        type StartedAt = St::StartedAt;
-        type Status = St::Status;
-        type ClientVersion = Set<members::client_version>;
-        type Platform = St::Platform;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlatform<St> {}
     impl<St: State> State for SetPlatform<St> {
         type StartedAt = St::StartedAt;
+        type Platform = Set<members::platform>;
         type Status = St::Status;
         type ClientVersion = St::ClientVersion;
-        type Platform = Set<members::platform>;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type StartedAt = St::StartedAt;
+        type Platform = St::Platform;
+        type Status = Set<members::status>;
+        type ClientVersion = St::ClientVersion;
+    }
+    ///State transition - sets the `client_version` field to Set
+    pub struct SetClientVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClientVersion<St> {}
+    impl<St: State> State for SetClientVersion<St> {
+        type StartedAt = St::StartedAt;
+        type Platform = St::Platform;
+        type Status = St::Status;
+        type ClientVersion = Set<members::client_version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `started_at` field
         pub struct started_at(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `client_version` field
         pub struct client_version(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
     }
 }
 
@@ -1319,9 +1280,9 @@ impl<S: BosStr, St> SessionBuilder<S, St>
 where
     St: session_state::State,
     St::StartedAt: session_state::IsSet,
+    St::Platform: session_state::IsSet,
     St::Status: session_state::IsSet,
     St::ClientVersion: session_state::IsSet,
-    St::Platform: session_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Session<S> {

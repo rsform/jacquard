@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,13 +28,7 @@ use crate::community_lexicon::calendar::search_events;
 /// An event record with RSVP counts and URL.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventView<S: BosStr = DefaultStr> {
     ///Number of users who have RSVP'd as going.
     pub count_going: i64,
@@ -50,13 +44,7 @@ pub struct EventView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchEvents<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -73,13 +61,7 @@ pub struct SearchEvents<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchEventsOutput<S: BosStr = DefaultStr> {
     pub results: Vec<search_events::EventView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -195,67 +177,67 @@ pub mod event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CountNotGoing;
         type CountGoing;
-        type CountInterested;
         type Url;
+        type CountNotGoing;
+        type CountInterested;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CountNotGoing = Unset;
         type CountGoing = Unset;
-        type CountInterested = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `count_not_going` field to Set
-    pub struct SetCountNotGoing<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCountNotGoing<St> {}
-    impl<St: State> State for SetCountNotGoing<St> {
-        type CountNotGoing = Set<members::count_not_going>;
-        type CountGoing = St::CountGoing;
-        type CountInterested = St::CountInterested;
-        type Url = St::Url;
+        type CountNotGoing = Unset;
+        type CountInterested = Unset;
     }
     ///State transition - sets the `count_going` field to Set
     pub struct SetCountGoing<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCountGoing<St> {}
     impl<St: State> State for SetCountGoing<St> {
-        type CountNotGoing = St::CountNotGoing;
         type CountGoing = Set<members::count_going>;
-        type CountInterested = St::CountInterested;
         type Url = St::Url;
-    }
-    ///State transition - sets the `count_interested` field to Set
-    pub struct SetCountInterested<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCountInterested<St> {}
-    impl<St: State> State for SetCountInterested<St> {
         type CountNotGoing = St::CountNotGoing;
-        type CountGoing = St::CountGoing;
-        type CountInterested = Set<members::count_interested>;
-        type Url = St::Url;
+        type CountInterested = St::CountInterested;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type CountNotGoing = St::CountNotGoing;
         type CountGoing = St::CountGoing;
-        type CountInterested = St::CountInterested;
         type Url = Set<members::url>;
+        type CountNotGoing = St::CountNotGoing;
+        type CountInterested = St::CountInterested;
+    }
+    ///State transition - sets the `count_not_going` field to Set
+    pub struct SetCountNotGoing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountNotGoing<St> {}
+    impl<St: State> State for SetCountNotGoing<St> {
+        type CountGoing = St::CountGoing;
+        type Url = St::Url;
+        type CountNotGoing = Set<members::count_not_going>;
+        type CountInterested = St::CountInterested;
+    }
+    ///State transition - sets the `count_interested` field to Set
+    pub struct SetCountInterested<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountInterested<St> {}
+    impl<St: State> State for SetCountInterested<St> {
+        type CountGoing = St::CountGoing;
+        type Url = St::Url;
+        type CountNotGoing = St::CountNotGoing;
+        type CountInterested = Set<members::count_interested>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count_not_going` field
-        pub struct count_not_going(());
         ///Marker type for the `count_going` field
         pub struct count_going(());
-        ///Marker type for the `count_interested` field
-        pub struct count_interested(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `count_not_going` field
+        pub struct count_not_going(());
+        ///Marker type for the `count_interested` field
+        pub struct count_interested(());
     }
 }
 
@@ -363,10 +345,10 @@ where
 impl<S: BosStr, St> EventViewBuilder<S, St>
 where
     St: event_view_state::State,
-    St::CountNotGoing: event_view_state::IsSet,
     St::CountGoing: event_view_state::IsSet,
-    St::CountInterested: event_view_state::IsSet,
     St::Url: event_view_state::IsSet,
+    St::CountNotGoing: event_view_state::IsSet,
+    St::CountInterested: event_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> EventView<S> {

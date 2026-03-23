@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::at_margin::annotation;
 /// Annotation body - the content of the annotation
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Body<S: BosStr = DefaultStr> {
     ///MIME type of the body content  Defaults to `"text/plain"`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,13 +54,7 @@ pub struct Body<S: BosStr = DefaultStr> {
 /// W3C CssSelector - select DOM elements by CSS selector
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CssSelector<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
@@ -79,13 +67,7 @@ pub struct CssSelector<S: BosStr = DefaultStr> {
 /// W3C FragmentSelector - select by URI fragment
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FragmentSelector<S: BosStr = DefaultStr> {
     ///Specification the fragment conforms to
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,13 +83,7 @@ pub struct FragmentSelector<S: BosStr = DefaultStr> {
 /// The client/agent that created this record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Generator<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub homepage: Option<UriValue<S>>,
@@ -126,10 +102,7 @@ pub struct Generator<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "at.margin.annotation",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Annotation<S: BosStr = DefaultStr> {
     ///The annotation content (text or reference)
@@ -273,13 +246,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct AnnotationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -290,13 +257,7 @@ pub struct AnnotationGetRecordOutput<S: BosStr = DefaultStr> {
 /// W3C RangeSelector - select range between two selectors
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RangeSelector<S: BosStr = DefaultStr> {
     ///Selector for range end
     pub end_selector: RangeSelectorEndSelector<S>,
@@ -311,13 +272,7 @@ pub struct RangeSelector<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum RangeSelectorEndSelector<S: BosStr = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
@@ -332,13 +287,7 @@ pub enum RangeSelectorEndSelector<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum RangeSelectorStartSelector<S: BosStr = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
@@ -353,13 +302,7 @@ pub enum RangeSelectorStartSelector<S: BosStr = DefaultStr> {
 /// W3C SpecificResource - the target with optional selector
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Target<S: BosStr = DefaultStr> {
     ///Selector to identify the specific segment
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -382,13 +325,7 @@ pub struct Target<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum TargetSelector<S: BosStr = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
@@ -407,13 +344,7 @@ pub enum TargetSelector<S: BosStr = DefaultStr> {
 /// W3C TextPositionSelector - select by character offsets
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TextPositionSelector<S: BosStr = DefaultStr> {
     ///Ending character position (exclusive)
     pub end: i64,
@@ -428,13 +359,7 @@ pub struct TextPositionSelector<S: BosStr = DefaultStr> {
 /// W3C TextQuoteSelector - select text by quoting it with context
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TextQuoteSelector<S: BosStr = DefaultStr> {
     ///The exact text to match
     pub exact: S,
@@ -453,13 +378,7 @@ pub struct TextQuoteSelector<S: BosStr = DefaultStr> {
 /// W3C TimeState - record when content was captured
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TimeState<S: BosStr = DefaultStr> {
     ///URL to cached/archived version
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -474,13 +393,7 @@ pub struct TimeState<S: BosStr = DefaultStr> {
 /// W3C XPathSelector - select by XPath expression
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct XpathSelector<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
@@ -1674,37 +1587,37 @@ pub mod range_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EndSelector;
         type StartSelector;
+        type EndSelector;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EndSelector = Unset;
         type StartSelector = Unset;
-    }
-    ///State transition - sets the `end_selector` field to Set
-    pub struct SetEndSelector<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEndSelector<St> {}
-    impl<St: State> State for SetEndSelector<St> {
-        type EndSelector = Set<members::end_selector>;
-        type StartSelector = St::StartSelector;
+        type EndSelector = Unset;
     }
     ///State transition - sets the `start_selector` field to Set
     pub struct SetStartSelector<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartSelector<St> {}
     impl<St: State> State for SetStartSelector<St> {
-        type EndSelector = St::EndSelector;
         type StartSelector = Set<members::start_selector>;
+        type EndSelector = St::EndSelector;
+    }
+    ///State transition - sets the `end_selector` field to Set
+    pub struct SetEndSelector<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndSelector<St> {}
+    impl<St: State> State for SetEndSelector<St> {
+        type StartSelector = St::StartSelector;
+        type EndSelector = Set<members::end_selector>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end_selector` field
-        pub struct end_selector(());
         ///Marker type for the `start_selector` field
         pub struct start_selector(());
+        ///Marker type for the `end_selector` field
+        pub struct end_selector(());
     }
 }
 
@@ -1791,8 +1704,8 @@ impl<S: BosStr, St: range_selector_state::State> RangeSelectorBuilder<S, St> {
 impl<S: BosStr, St> RangeSelectorBuilder<S, St>
 where
     St: range_selector_state::State,
-    St::EndSelector: range_selector_state::IsSet,
     St::StartSelector: range_selector_state::IsSet,
+    St::EndSelector: range_selector_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RangeSelector<S> {
@@ -1990,37 +1903,37 @@ pub mod text_position_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Start;
         type End;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Start = Unset;
         type End = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStart<St> {}
-    impl<St: State> State for SetStart<St> {
-        type Start = Set<members::start>;
-        type End = St::End;
+        type Start = Unset;
     }
     ///State transition - sets the `end` field to Set
     pub struct SetEnd<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEnd<St> {}
     impl<St: State> State for SetEnd<St> {
-        type Start = St::Start;
         type End = Set<members::end>;
+        type Start = St::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStart<St> {}
+    impl<St: State> State for SetStart<St> {
+        type End = St::End;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start` field
-        pub struct start(());
         ///Marker type for the `end` field
         pub struct end(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
@@ -2109,8 +2022,8 @@ impl<
 impl<S: BosStr, St> TextPositionSelectorBuilder<S, St>
 where
     St: text_position_selector_state::State,
-    St::Start: text_position_selector_state::IsSet,
     St::End: text_position_selector_state::IsSet,
+    St::Start: text_position_selector_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TextPositionSelector<S> {

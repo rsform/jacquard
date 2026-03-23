@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
@@ -19,13 +19,7 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateOAuthClient<S: BosStr = DefaultStr> {
     ///Human-readable name of the OAuth client
     pub client_name: S,
@@ -60,13 +54,7 @@ pub struct CreateOAuthClient<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateOAuthClientOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: OauthClientDetails<S>,
@@ -112,49 +100,49 @@ pub mod create_o_auth_client_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RedirectUris;
         type ClientName;
+        type RedirectUris;
         type SliceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RedirectUris = Unset;
         type ClientName = Unset;
+        type RedirectUris = Unset;
         type SliceUri = Unset;
-    }
-    ///State transition - sets the `redirect_uris` field to Set
-    pub struct SetRedirectUris<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRedirectUris<St> {}
-    impl<St: State> State for SetRedirectUris<St> {
-        type RedirectUris = Set<members::redirect_uris>;
-        type ClientName = St::ClientName;
-        type SliceUri = St::SliceUri;
     }
     ///State transition - sets the `client_name` field to Set
     pub struct SetClientName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClientName<St> {}
     impl<St: State> State for SetClientName<St> {
-        type RedirectUris = St::RedirectUris;
         type ClientName = Set<members::client_name>;
+        type RedirectUris = St::RedirectUris;
+        type SliceUri = St::SliceUri;
+    }
+    ///State transition - sets the `redirect_uris` field to Set
+    pub struct SetRedirectUris<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRedirectUris<St> {}
+    impl<St: State> State for SetRedirectUris<St> {
+        type ClientName = St::ClientName;
+        type RedirectUris = Set<members::redirect_uris>;
         type SliceUri = St::SliceUri;
     }
     ///State transition - sets the `slice_uri` field to Set
     pub struct SetSliceUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSliceUri<St> {}
     impl<St: State> State for SetSliceUri<St> {
-        type RedirectUris = St::RedirectUris;
         type ClientName = St::ClientName;
+        type RedirectUris = St::RedirectUris;
         type SliceUri = Set<members::slice_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `redirect_uris` field
-        pub struct redirect_uris(());
         ///Marker type for the `client_name` field
         pub struct client_name(());
+        ///Marker type for the `redirect_uris` field
+        pub struct redirect_uris(());
         ///Marker type for the `slice_uri` field
         pub struct slice_uri(());
     }
@@ -347,8 +335,8 @@ impl<S: BosStr, St: create_o_auth_client_state::State> CreateOAuthClientBuilder<
 impl<S: BosStr, St> CreateOAuthClientBuilder<S, St>
 where
     St: create_o_auth_client_state::State,
-    St::RedirectUris: create_o_auth_client_state::IsSet,
     St::ClientName: create_o_auth_client_state::IsSet,
+    St::RedirectUris: create_o_auth_client_state::IsSet,
     St::SliceUri: create_o_auth_client_state::IsSet,
 {
     /// Build the final struct.

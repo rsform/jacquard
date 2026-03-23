@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::me_linkna::linkinbio;
 /// Saved service credentials/identifiers for pre-filling widget forms.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConnectedServices<S: BosStr = DefaultStr> {
     ///GitHub username.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,13 +47,7 @@ pub struct ConnectedServices<S: BosStr = DefaultStr> {
 /// A single day's contribution data from GitHub.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GithubContributionDay<S: BosStr = DefaultStr> {
     ///Number of contributions on this day.
     pub count: i64,
@@ -74,13 +62,7 @@ pub struct GithubContributionDay<S: BosStr = DefaultStr> {
 /// A book from a Goodreads shelf.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GoodreadsBook<S: BosStr = DefaultStr> {
     ///Book author.
     pub author: S,
@@ -102,13 +84,7 @@ pub struct GoodreadsBook<S: BosStr = DefaultStr> {
 /// A standard link card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LinkCard<S: BosStr = DefaultStr> {
     ///Whether the card is visible on the public page. Defaults to true.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -139,10 +115,7 @@ pub struct LinkCard<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "me.linkna.linkinbio",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Linkinbio<S: BosStr = DefaultStr> {
     ///Ordered list of cards on the page. Each card is a union of linkCard, widgetGoodreads, widgetGithub, or widgetTealfm.
@@ -164,13 +137,7 @@ pub struct Linkinbio<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum LinkinbioCardsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "me.linkna.linkinbio#linkCard")]
     LinkCard(Box<linkinbio::LinkCard<S>>),
@@ -185,13 +152,7 @@ pub enum LinkinbioCardsItem<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct LinkinbioGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -202,13 +163,7 @@ pub struct LinkinbioGetRecordOutput<S: BosStr = DefaultStr> {
 /// A social media icon link.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SocialIcon<S: BosStr = DefaultStr> {
     ///Unique identifier for the icon.
     pub id: S,
@@ -223,13 +178,7 @@ pub struct SocialIcon<S: BosStr = DefaultStr> {
 /// A recently played track from teal.fm.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TealfmPlay<S: BosStr = DefaultStr> {
     ///Artist name(s).
     pub artist_name: S,
@@ -254,13 +203,7 @@ pub struct TealfmPlay<S: BosStr = DefaultStr> {
 /// Theme configuration for the page appearance.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThemeConfig<S: BosStr = DefaultStr> {
     ///Page background color.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1224,13 +1167,7 @@ where
 /// A GitHub contributions graph widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WidgetGithub<S: BosStr = DefaultStr> {
     ///Contribution data for the last year.
     pub contributions: Vec<linkinbio::GithubContributionDay<S>>,
@@ -1342,13 +1279,7 @@ where
 /// A Goodreads bookshelf widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WidgetGoodreads<S: BosStr = DefaultStr> {
     ///Books on the currently-reading shelf.
     pub books: Vec<linkinbio::GoodreadsBook<S>>,
@@ -1462,13 +1393,7 @@ where
 /// A teal.fm recently played tracks widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WidgetTealfm<S: BosStr = DefaultStr> {
     ///Copyright notice for cover art images.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2869,51 +2794,51 @@ pub mod github_contribution_day_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
-        type Count;
         type Date;
+        type Count;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
-        type Count = Unset;
         type Date = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Level = Set<members::level>;
-        type Count = St::Count;
-        type Date = St::Date;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCount<St> {}
-    impl<St: State> State for SetCount<St> {
-        type Level = St::Level;
-        type Count = Set<members::count>;
-        type Date = St::Date;
+        type Count = Unset;
+        type Level = Unset;
     }
     ///State transition - sets the `date` field to Set
     pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDate<St> {}
     impl<St: State> State for SetDate<St> {
-        type Level = St::Level;
-        type Count = St::Count;
         type Date = Set<members::date>;
+        type Count = St::Count;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCount<St> {}
+    impl<St: State> State for SetCount<St> {
+        type Date = St::Date;
+        type Count = Set<members::count>;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Date = St::Date;
+        type Count = St::Count;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `date` field
         pub struct date(());
+        ///Marker type for the `count` field
+        pub struct count(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -3008,9 +2933,9 @@ where
 impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
 where
     St: github_contribution_day_state::State,
-    St::Level: github_contribution_day_state::IsSet,
-    St::Count: github_contribution_day_state::IsSet,
     St::Date: github_contribution_day_state::IsSet,
+    St::Count: github_contribution_day_state::IsSet,
+    St::Level: github_contribution_day_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GithubContributionDay<S> {
@@ -3230,50 +3155,50 @@ pub mod social_icon_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Platform;
         type Url;
+        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Platform = Unset;
         type Url = Unset;
+        type Platform = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
+        type Url = St::Url;
         type Platform = St::Platform;
-        type Url = St::Url;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlatform<St> {}
-    impl<St: State> State for SetPlatform<St> {
-        type Id = St::Id;
-        type Platform = Set<members::platform>;
-        type Url = St::Url;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
         type Id = St::Id;
-        type Platform = St::Platform;
         type Url = Set<members::url>;
+        type Platform = St::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlatform<St> {}
+    impl<St: State> State for SetPlatform<St> {
+        type Id = St::Id;
+        type Url = St::Url;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
     }
 }
 
@@ -3363,8 +3288,8 @@ impl<S: BosStr, St> SocialIconBuilder<S, St>
 where
     St: social_icon_state::State,
     St::Id: social_icon_state::IsSet,
-    St::Platform: social_icon_state::IsSet,
     St::Url: social_icon_state::IsSet,
+    St::Platform: social_icon_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SocialIcon<S> {
@@ -3399,65 +3324,65 @@ pub mod widget_github_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type GithubUsername;
         type Type;
+        type Id;
         type Contributions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type GithubUsername = Unset;
         type Type = Unset;
+        type Id = Unset;
         type Contributions = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type GithubUsername = St::GithubUsername;
-        type Type = St::Type;
-        type Contributions = St::Contributions;
     }
     ///State transition - sets the `github_username` field to Set
     pub struct SetGithubUsername<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGithubUsername<St> {}
     impl<St: State> State for SetGithubUsername<St> {
-        type Id = St::Id;
         type GithubUsername = Set<members::github_username>;
         type Type = St::Type;
+        type Id = St::Id;
         type Contributions = St::Contributions;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Id = St::Id;
         type GithubUsername = St::GithubUsername;
         type Type = Set<members::r#type>;
+        type Id = St::Id;
+        type Contributions = St::Contributions;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type GithubUsername = St::GithubUsername;
+        type Type = St::Type;
+        type Id = Set<members::id>;
         type Contributions = St::Contributions;
     }
     ///State transition - sets the `contributions` field to Set
     pub struct SetContributions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContributions<St> {}
     impl<St: State> State for SetContributions<St> {
-        type Id = St::Id;
         type GithubUsername = St::GithubUsername;
         type Type = St::Type;
+        type Id = St::Id;
         type Contributions = Set<members::contributions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `github_username` field
         pub struct github_username(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `contributions` field
         pub struct contributions(());
     }
@@ -3628,9 +3553,9 @@ where
 impl<S: BosStr, St> WidgetGithubBuilder<S, St>
 where
     St: widget_github_state::State,
-    St::Id: widget_github_state::IsSet,
     St::GithubUsername: widget_github_state::IsSet,
     St::Type: widget_github_state::IsSet,
+    St::Id: widget_github_state::IsSet,
     St::Contributions: widget_github_state::IsSet,
 {
     /// Build the final struct.
@@ -3676,83 +3601,83 @@ pub mod widget_goodreads_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Shelf;
         type GoodreadsUserId;
         type Books;
+        type Id;
+        type Shelf;
         type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Shelf = Unset;
         type GoodreadsUserId = Unset;
         type Books = Unset;
+        type Id = Unset;
+        type Shelf = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Shelf = St::Shelf;
-        type GoodreadsUserId = St::GoodreadsUserId;
-        type Books = St::Books;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `shelf` field to Set
-    pub struct SetShelf<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShelf<St> {}
-    impl<St: State> State for SetShelf<St> {
-        type Id = St::Id;
-        type Shelf = Set<members::shelf>;
-        type GoodreadsUserId = St::GoodreadsUserId;
-        type Books = St::Books;
-        type Type = St::Type;
     }
     ///State transition - sets the `goodreads_user_id` field to Set
     pub struct SetGoodreadsUserId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGoodreadsUserId<St> {}
     impl<St: State> State for SetGoodreadsUserId<St> {
-        type Id = St::Id;
-        type Shelf = St::Shelf;
         type GoodreadsUserId = Set<members::goodreads_user_id>;
         type Books = St::Books;
+        type Id = St::Id;
+        type Shelf = St::Shelf;
         type Type = St::Type;
     }
     ///State transition - sets the `books` field to Set
     pub struct SetBooks<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBooks<St> {}
     impl<St: State> State for SetBooks<St> {
-        type Id = St::Id;
-        type Shelf = St::Shelf;
         type GoodreadsUserId = St::GoodreadsUserId;
         type Books = Set<members::books>;
+        type Id = St::Id;
+        type Shelf = St::Shelf;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Books = St::Books;
+        type Id = Set<members::id>;
+        type Shelf = St::Shelf;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `shelf` field to Set
+    pub struct SetShelf<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShelf<St> {}
+    impl<St: State> State for SetShelf<St> {
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Books = St::Books;
+        type Id = St::Id;
+        type Shelf = Set<members::shelf>;
         type Type = St::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Id = St::Id;
-        type Shelf = St::Shelf;
         type GoodreadsUserId = St::GoodreadsUserId;
         type Books = St::Books;
+        type Id = St::Id;
+        type Shelf = St::Shelf;
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `shelf` field
-        pub struct shelf(());
         ///Marker type for the `goodreads_user_id` field
         pub struct goodreads_user_id(());
         ///Marker type for the `books` field
         pub struct books(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `shelf` field
+        pub struct shelf(());
         ///Marker type for the `type` field
         pub struct r#type(());
     }
@@ -3949,10 +3874,10 @@ where
 impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
 where
     St: widget_goodreads_state::State,
-    St::Id: widget_goodreads_state::IsSet,
-    St::Shelf: widget_goodreads_state::IsSet,
     St::GoodreadsUserId: widget_goodreads_state::IsSet,
     St::Books: widget_goodreads_state::IsSet,
+    St::Id: widget_goodreads_state::IsSet,
+    St::Shelf: widget_goodreads_state::IsSet,
     St::Type: widget_goodreads_state::IsSet,
 {
     /// Build the final struct.
@@ -4000,49 +3925,49 @@ pub mod widget_tealfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Type;
+        type Id;
         type Plays;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Type = Unset;
+        type Id = Unset;
         type Plays = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Type = St::Type;
-        type Plays = St::Plays;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Id = St::Id;
         type Type = Set<members::r#type>;
+        type Id = St::Id;
+        type Plays = St::Plays;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Type = St::Type;
+        type Id = Set<members::id>;
         type Plays = St::Plays;
     }
     ///State transition - sets the `plays` field to Set
     pub struct SetPlays<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlays<St> {}
     impl<St: State> State for SetPlays<St> {
-        type Id = St::Id;
         type Type = St::Type;
+        type Id = St::Id;
         type Plays = Set<members::plays>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `plays` field
         pub struct plays(());
     }
@@ -4193,8 +4118,8 @@ where
 impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
 where
     St: widget_tealfm_state::State,
-    St::Id: widget_tealfm_state::IsSet,
     St::Type: widget_tealfm_state::IsSet,
+    St::Id: widget_tealfm_state::IsSet,
     St::Plays: widget_tealfm_state::IsSet,
 {
     /// Build the final struct.

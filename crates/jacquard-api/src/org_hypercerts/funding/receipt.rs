@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::app_certified::Did;
     rename_all = "camelCase",
     rename = "org.hypercerts.funding.receipt",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Receipt<S: BosStr = DefaultStr> {
     ///Amount of funding received as a numeric string (e.g. '1000.50').
@@ -76,13 +73,7 @@ pub struct Receipt<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ReceiptGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -221,85 +212,85 @@ pub mod receipt_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type To;
         type Currency;
         type Amount;
-        type CreatedAt;
         type From;
-        type To;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type To = Unset;
         type Currency = Unset;
         type Amount = Unset;
-        type CreatedAt = Unset;
         type From = Unset;
-        type To = Unset;
-    }
-    ///State transition - sets the `currency` field to Set
-    pub struct SetCurrency<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCurrency<St> {}
-    impl<St: State> State for SetCurrency<St> {
-        type Currency = Set<members::currency>;
-        type Amount = St::Amount;
-        type CreatedAt = St::CreatedAt;
-        type From = St::From;
-        type To = St::To;
-    }
-    ///State transition - sets the `amount` field to Set
-    pub struct SetAmount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAmount<St> {}
-    impl<St: State> State for SetAmount<St> {
-        type Currency = St::Currency;
-        type Amount = Set<members::amount>;
-        type CreatedAt = St::CreatedAt;
-        type From = St::From;
-        type To = St::To;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Currency = St::Currency;
-        type Amount = St::Amount;
-        type CreatedAt = Set<members::created_at>;
-        type From = St::From;
-        type To = St::To;
-    }
-    ///State transition - sets the `from` field to Set
-    pub struct SetFrom<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFrom<St> {}
-    impl<St: State> State for SetFrom<St> {
-        type Currency = St::Currency;
-        type Amount = St::Amount;
-        type CreatedAt = St::CreatedAt;
-        type From = Set<members::from>;
-        type To = St::To;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `to` field to Set
     pub struct SetTo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTo<St> {}
     impl<St: State> State for SetTo<St> {
+        type To = Set<members::to>;
         type Currency = St::Currency;
         type Amount = St::Amount;
-        type CreatedAt = St::CreatedAt;
         type From = St::From;
-        type To = Set<members::to>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `currency` field to Set
+    pub struct SetCurrency<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCurrency<St> {}
+    impl<St: State> State for SetCurrency<St> {
+        type To = St::To;
+        type Currency = Set<members::currency>;
+        type Amount = St::Amount;
+        type From = St::From;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `amount` field to Set
+    pub struct SetAmount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAmount<St> {}
+    impl<St: State> State for SetAmount<St> {
+        type To = St::To;
+        type Currency = St::Currency;
+        type Amount = Set<members::amount>;
+        type From = St::From;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `from` field to Set
+    pub struct SetFrom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFrom<St> {}
+    impl<St: State> State for SetFrom<St> {
+        type To = St::To;
+        type Currency = St::Currency;
+        type Amount = St::Amount;
+        type From = Set<members::from>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type To = St::To;
+        type Currency = St::Currency;
+        type Amount = St::Amount;
+        type From = St::From;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `to` field
+        pub struct to(());
         ///Marker type for the `currency` field
         pub struct currency(());
         ///Marker type for the `amount` field
         pub struct amount(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `from` field
         pub struct from(());
-        ///Marker type for the `to` field
-        pub struct to(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -516,11 +507,11 @@ impl<S: BosStr, St: receipt_state::State> ReceiptBuilder<S, St> {
 impl<S: BosStr, St> ReceiptBuilder<S, St>
 where
     St: receipt_state::State,
+    St::To: receipt_state::IsSet,
     St::Currency: receipt_state::IsSet,
     St::Amount: receipt_state::IsSet,
-    St::CreatedAt: receipt_state::IsSet,
     St::From: receipt_state::IsSet,
-    St::To: receipt_state::IsSet,
+    St::CreatedAt: receipt_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Receipt<S> {

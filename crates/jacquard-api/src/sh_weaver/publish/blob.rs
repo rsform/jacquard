@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "sh.weaver.publish.blob",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Blob<S: BosStr = DefaultStr> {
     ///relative path to the blob
@@ -52,13 +49,7 @@ pub struct Blob<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct BlobGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -175,37 +166,37 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Path;
         type Upload;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Path = Unset;
         type Upload = Unset;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPath<St> {}
-    impl<St: State> State for SetPath<St> {
-        type Path = Set<members::path>;
-        type Upload = St::Upload;
+        type Path = Unset;
     }
     ///State transition - sets the `upload` field to Set
     pub struct SetUpload<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpload<St> {}
     impl<St: State> State for SetUpload<St> {
-        type Path = St::Path;
         type Upload = Set<members::upload>;
+        type Path = St::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
+        type Upload = St::Upload;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `upload` field
         pub struct upload(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
@@ -275,8 +266,8 @@ where
 impl<S: BosStr, St> BlobBuilder<S, St>
 where
     St: blob_state::State,
-    St::Path: blob_state::IsSet,
     St::Upload: blob_state::IsSet,
+    St::Path: blob_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Blob<S> {

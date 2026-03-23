@@ -19,7 +19,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -41,13 +41,7 @@ use crate::sh_weaver::actor;
 /// A single author in a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Author<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///signed bytes of the corresponding notebook record in the author's repo
@@ -58,16 +52,10 @@ pub struct Author<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-pub type PinnedList<S: BosStr = DefaultStr> = Vec<StrongRef<S>>;
+pub type PinnedList<S = DefaultStr> = Vec<StrongRef<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileDataView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collaboration_count: Option<i64>,
@@ -89,13 +77,7 @@ pub struct ProfileDataView<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ProfileDataViewInner<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.actor.defs#profileView")]
     ProfileView(Box<actor::ProfileView<S>>),
@@ -107,13 +89,7 @@ pub enum ProfileDataViewInner<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileDataViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub follower_count: Option<i64>,
@@ -129,13 +105,7 @@ pub struct ProfileDataViewBasic<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ProfileDataViewBasicInner<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.actor.defs#profileViewBasic")]
     ProfileViewBasic(Box<crate::sh_weaver::actor::ProfileViewBasic<S>>),
@@ -147,13 +117,7 @@ pub enum ProfileDataViewBasicInner<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -201,13 +165,7 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -228,17 +186,11 @@ pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-pub type PronounsList<S: BosStr = DefaultStr> = Vec<S>;
+pub type PronounsList<S = DefaultStr> = Vec<S>;
 /// A notebook the viewer subscribes to without a global follow.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscribedNotebook<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
@@ -251,13 +203,7 @@ pub struct SubscribedNotebook<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TangledProfileView<S: BosStr = DefaultStr> {
     ///Include link to this account on Bluesky.
     pub bluesky: bool,
@@ -283,13 +229,7 @@ pub struct TangledProfileView<S: BosStr = DefaultStr> {
 /// Viewer's relationship state with an actor (detailed version).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked: Option<AtUri<S>>,
@@ -314,13 +254,7 @@ pub struct ViewerState<S: BosStr = DefaultStr> {
 /// Viewer's relationship state with an actor (basic version).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewerStateBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked: Option<AtUri<S>>,
@@ -2264,37 +2198,37 @@ pub mod profile_view_basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
-        type Did = St::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Handle = St::Handle;
         type Did = Set<members::did>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -2451,8 +2385,8 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
 impl<S: BosStr, St> ProfileViewBasicBuilder<S, St>
 where
     St: profile_view_basic_state::State,
-    St::Handle: profile_view_basic_state::IsSet,
     St::Did: profile_view_basic_state::IsSet,
+    St::Handle: profile_view_basic_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProfileViewBasic<S> {
@@ -2627,51 +2561,51 @@ pub mod tangled_profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
-        type Bluesky;
         type Did;
+        type Bluesky;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
-        type Bluesky = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
-        type Bluesky = St::Bluesky;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `bluesky` field to Set
-    pub struct SetBluesky<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBluesky<St> {}
-    impl<St: State> State for SetBluesky<St> {
-        type Handle = St::Handle;
-        type Bluesky = Set<members::bluesky>;
-        type Did = St::Did;
+        type Bluesky = Unset;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Handle = St::Handle;
-        type Bluesky = St::Bluesky;
         type Did = Set<members::did>;
+        type Bluesky = St::Bluesky;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `bluesky` field to Set
+    pub struct SetBluesky<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBluesky<St> {}
+    impl<St: State> State for SetBluesky<St> {
+        type Did = St::Did;
+        type Bluesky = Set<members::bluesky>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Bluesky = St::Bluesky;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
-        ///Marker type for the `bluesky` field
-        pub struct bluesky(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `bluesky` field
+        pub struct bluesky(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -2837,9 +2771,9 @@ impl<S: BosStr, St: tangled_profile_view_state::State> TangledProfileViewBuilder
 impl<S: BosStr, St> TangledProfileViewBuilder<S, St>
 where
     St: tangled_profile_view_state::State,
-    St::Handle: tangled_profile_view_state::IsSet,
-    St::Bluesky: tangled_profile_view_state::IsSet,
     St::Did: tangled_profile_view_state::IsSet,
+    St::Bluesky: tangled_profile_view_state::IsSet,
+    St::Handle: tangled_profile_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TangledProfileView<S> {

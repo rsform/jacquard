@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,16 +29,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::win_tomo_x::pushat;
-pub type DeviceList<S: BosStr = DefaultStr> = Vec<pushat::DeviceListItem<S>>;
+pub type DeviceList<S = DefaultStr> = Vec<pushat::DeviceListItem<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeviceListItem<S: BosStr = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_device_list_item_current")]
@@ -51,13 +45,7 @@ pub struct DeviceListItem<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyBody<S: BosStr = DefaultStr> {
     ///Body text of the notification.
     pub body: S,
@@ -141,51 +129,51 @@ pub mod device_list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Current;
         type Name;
         type Id;
-        type Current;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Current = Unset;
         type Name = Unset;
         type Id = Unset;
-        type Current = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Id = St::Id;
-        type Current = St::Current;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Name = St::Name;
-        type Id = Set<members::id>;
-        type Current = St::Current;
     }
     ///State transition - sets the `current` field to Set
     pub struct SetCurrent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCurrent<St> {}
     impl<St: State> State for SetCurrent<St> {
+        type Current = Set<members::current>;
         type Name = St::Name;
         type Id = St::Id;
-        type Current = Set<members::current>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Current = St::Current;
+        type Name = Set<members::name>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Current = St::Current;
+        type Name = St::Name;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `current` field
+        pub struct current(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `current` field
-        pub struct current(());
     }
 }
 
@@ -274,9 +262,9 @@ where
 impl<S: BosStr, St> DeviceListItemBuilder<S, St>
 where
     St: device_list_item_state::State,
+    St::Current: device_list_item_state::IsSet,
     St::Name: device_list_item_state::IsSet,
     St::Id: device_list_item_state::IsSet,
-    St::Current: device_list_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DeviceListItem<S> {

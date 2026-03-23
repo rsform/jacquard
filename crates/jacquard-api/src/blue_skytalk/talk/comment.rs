@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "blue.skytalk.talk.comment",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Comment<S: BosStr = DefaultStr> {
     ///Optional attached media (image or audio)
@@ -57,13 +54,7 @@ pub struct Comment<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -163,51 +154,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type ThreadUri;
         type CreatedAt;
+        type ThreadUri;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type ThreadUri = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Text = Set<members::text>;
-        type ThreadUri = St::ThreadUri;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `thread_uri` field to Set
-    pub struct SetThreadUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetThreadUri<St> {}
-    impl<St: State> State for SetThreadUri<St> {
-        type Text = St::Text;
-        type ThreadUri = Set<members::thread_uri>;
-        type CreatedAt = St::CreatedAt;
+        type ThreadUri = Unset;
+        type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Text = St::Text;
-        type ThreadUri = St::ThreadUri;
         type CreatedAt = Set<members::created_at>;
+        type ThreadUri = St::ThreadUri;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `thread_uri` field to Set
+    pub struct SetThreadUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThreadUri<St> {}
+    impl<St: State> State for SetThreadUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type ThreadUri = Set<members::thread_uri>;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type CreatedAt = St::CreatedAt;
+        type ThreadUri = St::ThreadUri;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `thread_uri` field
-        pub struct thread_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `thread_uri` field
+        pub struct thread_uri(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -309,9 +300,9 @@ where
 impl<S: BosStr, St> CommentBuilder<S, St>
 where
     St: comment_state::State,
-    St::Text: comment_state::IsSet,
-    St::ThreadUri: comment_state::IsSet,
     St::CreatedAt: comment_state::IsSet,
+    St::ThreadUri: comment_state::IsSet,
+    St::Text: comment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Comment<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "blue.skytalk.talk.thread",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Thread<S: BosStr = DefaultStr> {
     ///Optional attached media (image or audio)
@@ -60,13 +57,7 @@ pub struct Thread<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ThreadGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -188,51 +179,51 @@ pub mod thread_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ChannelId;
         type Title;
         type CreatedAt;
+        type ChannelId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ChannelId = Unset;
         type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `channel_id` field to Set
-    pub struct SetChannelId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetChannelId<St> {}
-    impl<St: State> State for SetChannelId<St> {
-        type ChannelId = Set<members::channel_id>;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
+        type ChannelId = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type ChannelId = St::ChannelId;
         type Title = Set<members::title>;
         type CreatedAt = St::CreatedAt;
+        type ChannelId = St::ChannelId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type ChannelId = St::ChannelId;
         type Title = St::Title;
         type CreatedAt = Set<members::created_at>;
+        type ChannelId = St::ChannelId;
+    }
+    ///State transition - sets the `channel_id` field to Set
+    pub struct SetChannelId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChannelId<St> {}
+    impl<St: State> State for SetChannelId<St> {
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type ChannelId = Set<members::channel_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `channel_id` field
-        pub struct channel_id(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `channel_id` field
+        pub struct channel_id(());
     }
 }
 
@@ -353,9 +344,9 @@ where
 impl<S: BosStr, St> ThreadBuilder<S, St>
 where
     St: thread_state::State,
-    St::ChannelId: thread_state::IsSet,
     St::Title: thread_state::IsSet,
     St::CreatedAt: thread_state::IsSet,
+    St::ChannelId: thread_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Thread<S> {

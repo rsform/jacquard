@@ -9,20 +9,20 @@ pub mod deltarune;
 pub mod site;
 pub mod state;
 
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 /// Identifies as female.
-pub type GenderFemale<S: BosStr = DefaultStr> = S;
+pub type GenderFemale<S = DefaultStr> = S;
 /// Identifies as male.
-pub type GenderMale<S: BosStr = DefaultStr> = S;
+pub type GenderMale<S = DefaultStr> = S;
 /// Identifies as non-binary.
-pub type GenderNonBinary<S: BosStr = DefaultStr> = S;
+pub type GenderNonBinary<S = DefaultStr> = S;
 /// Other gender identity not listed.
-pub type GenderOther<S: BosStr = DefaultStr> = S;
+pub type GenderOther<S = DefaultStr> = S;
 /// Currently questioning gender identity.
-pub type GenderQuestioning<S: BosStr = DefaultStr> = S;
-pub type PronounsAny<S: BosStr = DefaultStr> = S;
-pub type PronounsHeHim<S: BosStr = DefaultStr> = S;
-pub type PronounsHeThey<S: BosStr = DefaultStr> = S;
-pub type PronounsSheHer<S: BosStr = DefaultStr> = S;
-pub type PronounsSheThey<S: BosStr = DefaultStr> = S;
-pub type PronounsTheyThem<S: BosStr = DefaultStr> = S;
+pub type GenderQuestioning<S = DefaultStr> = S;
+pub type PronounsAny<S = DefaultStr> = S;
+pub type PronounsHeHim<S = DefaultStr> = S;
+pub type PronounsHeThey<S = DefaultStr> = S;
+pub type PronounsSheHer<S = DefaultStr> = S;
+pub type PronounsSheThey<S = DefaultStr> = S;
+pub type PronounsTheyThem<S = DefaultStr> = S;

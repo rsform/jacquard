@@ -16,7 +16,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,13 +35,7 @@ use crate::org_okazu_diary::embed::record::Record;
 /// A descriptor of a material used to help self-gratification.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Subject<S: BosStr = DefaultStr> {
     ///User-specified self-label values for the material. The Lexicon by its nature assumes the material to be possibly sensitive by default, so the explicit label values are intended to signal that a warning should be put on the material even for the Okazu-Diary.org application users who are willing to see mature contents in general.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,13 +48,7 @@ pub struct Subject<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubjectValue<S: BosStr = DefaultStr> {
     #[serde(rename = "org.okazu-diary.embed.external")]
     External(Box<External<S>>),
@@ -70,13 +58,7 @@ pub enum SubjectValue<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Tag<S: BosStr = DefaultStr> {
     pub value: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::pub_leaflet::poll::definition;
     rename_all = "camelCase",
     rename = "pub.leaflet.poll.definition",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Definition<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -52,13 +49,7 @@ pub struct Definition<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct DefinitionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -68,13 +59,7 @@ pub struct DefinitionGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DefinitionOption<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
@@ -201,37 +186,37 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Options;
         type Name;
+        type Options;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Options = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `options` field to Set
-    pub struct SetOptions<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOptions<St> {}
-    impl<St: State> State for SetOptions<St> {
-        type Options = Set<members::options>;
-        type Name = St::Name;
+        type Options = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Options = St::Options;
         type Name = Set<members::name>;
+        type Options = St::Options;
+    }
+    ///State transition - sets the `options` field to Set
+    pub struct SetOptions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOptions<St> {}
+    impl<St: State> State for SetOptions<St> {
+        type Name = St::Name;
+        type Options = Set<members::options>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `options` field
-        pub struct options(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `options` field
+        pub struct options(());
     }
 }
 
@@ -314,8 +299,8 @@ where
 impl<S: BosStr, St> DefinitionBuilder<S, St>
 where
     St: definition_state::State,
-    St::Options: definition_state::IsSet,
     St::Name: definition_state::IsSet,
+    St::Options: definition_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Definition<S> {

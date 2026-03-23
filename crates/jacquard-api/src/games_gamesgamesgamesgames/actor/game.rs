@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::games_gamesgamesgamesgames::actor::game;
 /// Reference to a game, either by AT URI or external platform ID.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GameRef<S: BosStr = DefaultStr> {
     ///External platform's ID for the game.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,10 +54,7 @@ pub struct GameRef<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.actor.game",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Game<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -184,13 +175,7 @@ where
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum GameSignaturesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<StrongRef<S>>),
@@ -199,13 +184,7 @@ pub enum GameSignaturesItem<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct GameGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -416,51 +395,51 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Platform;
         type CreatedAt;
         type Game;
-        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Platform = Unset;
         type CreatedAt = Unset;
         type Game = Unset;
-        type Platform = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Game = St::Game;
-        type Platform = St::Platform;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGame<St> {}
-    impl<St: State> State for SetGame<St> {
-        type CreatedAt = St::CreatedAt;
-        type Game = Set<members::game>;
-        type Platform = St::Platform;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlatform<St> {}
     impl<St: State> State for SetPlatform<St> {
+        type Platform = Set<members::platform>;
         type CreatedAt = St::CreatedAt;
         type Game = St::Game;
-        type Platform = Set<members::platform>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Platform = St::Platform;
+        type CreatedAt = Set<members::created_at>;
+        type Game = St::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGame<St> {}
+    impl<St: State> State for SetGame<St> {
+        type Platform = St::Platform;
+        type CreatedAt = St::CreatedAt;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `game` field
         pub struct game(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
     }
 }
 
@@ -573,9 +552,9 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
 impl<S: BosStr, St> GameBuilder<S, St>
 where
     St: game_state::State,
+    St::Platform: game_state::IsSet,
     St::CreatedAt: game_state::IsSet,
     St::Game: game_state::IsSet,
-    St::Platform: game_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Game<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid, RecordKey, Rkey};
@@ -19,13 +19,7 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecord<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     pub did: Did<S>,
@@ -170,51 +164,51 @@ pub mod get_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Did;
         type Rkey;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Did = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCollection<St> {}
-    impl<St: State> State for SetCollection<St> {
-        type Collection = Set<members::collection>;
-        type Did = St::Did;
-        type Rkey = St::Rkey;
+        type Collection = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Collection = St::Collection;
         type Did = Set<members::did>;
         type Rkey = St::Rkey;
+        type Collection = St::Collection;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRkey<St> {}
     impl<St: State> State for SetRkey<St> {
-        type Collection = St::Collection;
         type Did = St::Did;
         type Rkey = Set<members::rkey>;
+        type Collection = St::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type Did = St::Did;
+        type Rkey = St::Rkey;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -303,9 +297,9 @@ where
 impl<S: BosStr, St> GetRecordBuilder<S, St>
 where
     St: get_record_state::State,
-    St::Collection: get_record_state::IsSet,
     St::Did: get_record_state::IsSet,
     St::Rkey: get_record_state::IsSet,
+    St::Collection: get_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetRecord<S> {

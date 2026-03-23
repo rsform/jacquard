@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "ca.jmaingot.boardGamePlay",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct BoardGamePlay<S: BosStr = DefaultStr> {
     ///corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game
@@ -52,13 +49,7 @@ pub struct BoardGamePlay<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct BoardGamePlayGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -124,51 +115,51 @@ pub mod board_game_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PlayedAt;
         type Name;
         type BggId;
+        type PlayedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PlayedAt = Unset;
         type Name = Unset;
         type BggId = Unset;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlayedAt<St> {}
-    impl<St: State> State for SetPlayedAt<St> {
-        type PlayedAt = Set<members::played_at>;
-        type Name = St::Name;
-        type BggId = St::BggId;
+        type PlayedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type PlayedAt = St::PlayedAt;
         type Name = Set<members::name>;
         type BggId = St::BggId;
+        type PlayedAt = St::PlayedAt;
     }
     ///State transition - sets the `bgg_id` field to Set
     pub struct SetBggId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBggId<St> {}
     impl<St: State> State for SetBggId<St> {
-        type PlayedAt = St::PlayedAt;
         type Name = St::Name;
         type BggId = Set<members::bgg_id>;
+        type PlayedAt = St::PlayedAt;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlayedAt<St> {}
+    impl<St: State> State for SetPlayedAt<St> {
+        type Name = St::Name;
+        type BggId = St::BggId;
+        type PlayedAt = Set<members::played_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `bgg_id` field
         pub struct bgg_id(());
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
     }
 }
 
@@ -257,9 +248,9 @@ where
 impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
 where
     St: board_game_play_state::State,
-    St::PlayedAt: board_game_play_state::IsSet,
     St::Name: board_game_play_state::IsSet,
     St::BggId: board_game_play_state::IsSet,
+    St::PlayedAt: board_game_play_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BoardGamePlay<S> {

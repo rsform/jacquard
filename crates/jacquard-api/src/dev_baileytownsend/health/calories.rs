@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "dev.baileytownsend.health.calories",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Calories<S: BosStr = DefaultStr> {
     pub burned: i64,
@@ -50,13 +47,7 @@ pub struct Calories<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CaloriesGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -122,51 +113,51 @@ pub mod calories_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Intake;
         type Burned;
         type CreatedAt;
+        type Intake;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Intake = Unset;
         type Burned = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `intake` field to Set
-    pub struct SetIntake<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIntake<St> {}
-    impl<St: State> State for SetIntake<St> {
-        type Intake = Set<members::intake>;
-        type Burned = St::Burned;
-        type CreatedAt = St::CreatedAt;
+        type Intake = Unset;
     }
     ///State transition - sets the `burned` field to Set
     pub struct SetBurned<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBurned<St> {}
     impl<St: State> State for SetBurned<St> {
-        type Intake = St::Intake;
         type Burned = Set<members::burned>;
         type CreatedAt = St::CreatedAt;
+        type Intake = St::Intake;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Intake = St::Intake;
         type Burned = St::Burned;
         type CreatedAt = Set<members::created_at>;
+        type Intake = St::Intake;
+    }
+    ///State transition - sets the `intake` field to Set
+    pub struct SetIntake<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIntake<St> {}
+    impl<St: State> State for SetIntake<St> {
+        type Burned = St::Burned;
+        type CreatedAt = St::CreatedAt;
+        type Intake = Set<members::intake>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `intake` field
-        pub struct intake(());
         ///Marker type for the `burned` field
         pub struct burned(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `intake` field
+        pub struct intake(());
     }
 }
 
@@ -255,9 +246,9 @@ where
 impl<S: BosStr, St> CaloriesBuilder<S, St>
 where
     St: calories_state::State,
-    St::Intake: calories_state::IsSet,
     St::Burned: calories_state::IsSet,
     St::CreatedAt: calories_state::IsSet,
+    St::Intake: calories_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Calories<S> {

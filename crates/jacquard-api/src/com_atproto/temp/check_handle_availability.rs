@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::temp::check_handle_availability;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckHandleAvailability<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub birth_date: Option<Datetime>,
@@ -44,13 +38,7 @@ pub struct CheckHandleAvailability<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckHandleAvailabilityOutput<S: BosStr = DefaultStr> {
     ///Echo of the input handle.
     pub handle: Handle<S>,
@@ -62,13 +50,7 @@ pub struct CheckHandleAvailabilityOutput<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum CheckHandleAvailabilityOutputResult<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultAvailable")]
     ResultAvailable(Box<check_handle_availability::ResultAvailable<S>>),
@@ -122,13 +104,7 @@ impl core::fmt::Display for CheckHandleAvailabilityError {
 /// Indicates the provided handle is available.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResultAvailable<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -137,13 +113,7 @@ pub struct ResultAvailable<S: BosStr = DefaultStr> {
 /// Indicates the provided handle is unavailable and gives suggestions of available handles.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResultUnavailable<S: BosStr = DefaultStr> {
     ///List of suggested handles based on the provided inputs.
     pub suggestions: Vec<check_handle_availability::Suggestion<S>>,
@@ -153,13 +123,7 @@ pub struct ResultUnavailable<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Suggestion<S: BosStr = DefaultStr> {
     pub handle: Handle<S>,
     ///Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
@@ -629,37 +593,37 @@ pub mod suggestion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Method;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Method = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
-        type Method = St::Method;
+        type Handle = Unset;
     }
     ///State transition - sets the `method` field to Set
     pub struct SetMethod<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMethod<St> {}
     impl<St: State> State for SetMethod<St> {
-        type Handle = St::Handle;
         type Method = Set<members::method>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Method = St::Method;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `method` field
         pub struct method(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -729,8 +693,8 @@ where
 impl<S: BosStr, St> SuggestionBuilder<S, St>
 where
     St: suggestion_state::State,
-    St::Handle: suggestion_state::IsSet,
     St::Method: suggestion_state::IsSet,
+    St::Handle: suggestion_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Suggestion<S> {

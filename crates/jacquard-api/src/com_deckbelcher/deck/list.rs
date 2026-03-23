@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,13 +34,7 @@ use crate::com_deckbelcher::deck::list;
 /// A card entry in a decklist.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Card<S: BosStr = DefaultStr> {
     ///Number of copies in the deck.
     pub quantity: i64,
@@ -219,10 +213,7 @@ where
     rename_all = "camelCase",
     rename = "com.deckbelcher.deck.list",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct List<S: BosStr = DefaultStr> {
     ///Array of cards in the decklist.
@@ -247,13 +238,7 @@ pub struct List<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ListPrimer<S: BosStr = DefaultStr> {
     #[serde(rename = "com.deckbelcher.richtext#document")]
     RichtextDocument(Box<Document<S>>),
@@ -266,13 +251,7 @@ pub enum ListPrimer<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ListGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -283,13 +262,7 @@ pub struct ListGetRecordOutput<S: BosStr = DefaultStr> {
 /// Primer in a separate ATProto record. For use with any longform writing lexicon.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PrimerRef<S: BosStr = DefaultStr> {
     pub r#ref: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -299,13 +272,7 @@ pub struct PrimerRef<S: BosStr = DefaultStr> {
 /// External primer content. Typically a URL, but any valid URI scheme.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PrimerUri<S: BosStr = DefaultStr> {
     pub uri: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -564,49 +531,49 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quantity;
         type Ref;
+        type Quantity;
         type Section;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quantity = Unset;
         type Ref = Unset;
+        type Quantity = Unset;
         type Section = Unset;
-    }
-    ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuantity<St> {}
-    impl<St: State> State for SetQuantity<St> {
-        type Quantity = Set<members::quantity>;
-        type Ref = St::Ref;
-        type Section = St::Section;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRef<St> {}
     impl<St: State> State for SetRef<St> {
-        type Quantity = St::Quantity;
         type Ref = Set<members::r#ref>;
+        type Quantity = St::Quantity;
+        type Section = St::Section;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuantity<St> {}
+    impl<St: State> State for SetQuantity<St> {
+        type Ref = St::Ref;
+        type Quantity = Set<members::quantity>;
         type Section = St::Section;
     }
     ///State transition - sets the `section` field to Set
     pub struct SetSection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSection<St> {}
     impl<St: State> State for SetSection<St> {
-        type Quantity = St::Quantity;
         type Ref = St::Ref;
+        type Quantity = St::Quantity;
         type Section = Set<members::section>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
         ///Marker type for the `section` field
         pub struct section(());
     }
@@ -710,8 +677,8 @@ impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
 impl<S: BosStr, St> CardBuilder<S, St>
 where
     St: card_state::State,
-    St::Quantity: card_state::IsSet,
     St::Ref: card_state::IsSet,
+    St::Quantity: card_state::IsSet,
     St::Section: card_state::IsSet,
 {
     /// Build the final struct.
@@ -987,49 +954,49 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cards;
         type CreatedAt;
+        type Cards;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cards = Unset;
         type CreatedAt = Unset;
+        type Cards = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `cards` field to Set
-    pub struct SetCards<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCards<St> {}
-    impl<St: State> State for SetCards<St> {
-        type Cards = Set<members::cards>;
-        type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Cards = St::Cards;
         type CreatedAt = Set<members::created_at>;
+        type Cards = St::Cards;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `cards` field to Set
+    pub struct SetCards<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCards<St> {}
+    impl<St: State> State for SetCards<St> {
+        type CreatedAt = St::CreatedAt;
+        type Cards = Set<members::cards>;
         type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Cards = St::Cards;
         type CreatedAt = St::CreatedAt;
+        type Cards = St::Cards;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cards` field
-        pub struct cards(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `cards` field
+        pub struct cards(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -1166,8 +1133,8 @@ impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
 impl<S: BosStr, St> ListBuilder<S, St>
 where
     St: list_state::State,
-    St::Cards: list_state::IsSet,
     St::CreatedAt: list_state::IsSet,
+    St::Cards: list_state::IsSet,
     St::Name: list_state::IsSet,
 {
     /// Build the final struct.

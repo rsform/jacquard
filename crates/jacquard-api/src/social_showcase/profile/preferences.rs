@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,10 +39,7 @@ use crate::social_showcase::VisibilitySettings;
     rename_all = "camelCase",
     rename = "social.showcase.profile.preferences",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Preferences<S: BosStr = DefaultStr> {
     pub activity: ActivitySettings<S>,
@@ -63,13 +60,7 @@ pub struct Preferences<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PreferencesGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -139,85 +130,85 @@ pub mod preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Activity;
+        type Notifications;
         type Privacy;
         type UpdatedAt;
+        type Activity;
         type Visibility;
-        type Notifications;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Activity = Unset;
+        type Notifications = Unset;
         type Privacy = Unset;
         type UpdatedAt = Unset;
+        type Activity = Unset;
         type Visibility = Unset;
-        type Notifications = Unset;
-    }
-    ///State transition - sets the `activity` field to Set
-    pub struct SetActivity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActivity<St> {}
-    impl<St: State> State for SetActivity<St> {
-        type Activity = Set<members::activity>;
-        type Privacy = St::Privacy;
-        type UpdatedAt = St::UpdatedAt;
-        type Visibility = St::Visibility;
-        type Notifications = St::Notifications;
-    }
-    ///State transition - sets the `privacy` field to Set
-    pub struct SetPrivacy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPrivacy<St> {}
-    impl<St: State> State for SetPrivacy<St> {
-        type Activity = St::Activity;
-        type Privacy = Set<members::privacy>;
-        type UpdatedAt = St::UpdatedAt;
-        type Visibility = St::Visibility;
-        type Notifications = St::Notifications;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type Activity = St::Activity;
-        type Privacy = St::Privacy;
-        type UpdatedAt = Set<members::updated_at>;
-        type Visibility = St::Visibility;
-        type Notifications = St::Notifications;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVisibility<St> {}
-    impl<St: State> State for SetVisibility<St> {
-        type Activity = St::Activity;
-        type Privacy = St::Privacy;
-        type UpdatedAt = St::UpdatedAt;
-        type Visibility = Set<members::visibility>;
-        type Notifications = St::Notifications;
     }
     ///State transition - sets the `notifications` field to Set
     pub struct SetNotifications<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNotifications<St> {}
     impl<St: State> State for SetNotifications<St> {
-        type Activity = St::Activity;
+        type Notifications = Set<members::notifications>;
         type Privacy = St::Privacy;
         type UpdatedAt = St::UpdatedAt;
+        type Activity = St::Activity;
         type Visibility = St::Visibility;
-        type Notifications = Set<members::notifications>;
+    }
+    ///State transition - sets the `privacy` field to Set
+    pub struct SetPrivacy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPrivacy<St> {}
+    impl<St: State> State for SetPrivacy<St> {
+        type Notifications = St::Notifications;
+        type Privacy = Set<members::privacy>;
+        type UpdatedAt = St::UpdatedAt;
+        type Activity = St::Activity;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Notifications = St::Notifications;
+        type Privacy = St::Privacy;
+        type UpdatedAt = Set<members::updated_at>;
+        type Activity = St::Activity;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `activity` field to Set
+    pub struct SetActivity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActivity<St> {}
+    impl<St: State> State for SetActivity<St> {
+        type Notifications = St::Notifications;
+        type Privacy = St::Privacy;
+        type UpdatedAt = St::UpdatedAt;
+        type Activity = Set<members::activity>;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type Notifications = St::Notifications;
+        type Privacy = St::Privacy;
+        type UpdatedAt = St::UpdatedAt;
+        type Activity = St::Activity;
+        type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `activity` field
-        pub struct activity(());
+        ///Marker type for the `notifications` field
+        pub struct notifications(());
         ///Marker type for the `privacy` field
         pub struct privacy(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `activity` field
+        pub struct activity(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
-        ///Marker type for the `notifications` field
-        pub struct notifications(());
     }
 }
 
@@ -378,11 +369,11 @@ where
 impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
     St: preferences_state::State,
-    St::Activity: preferences_state::IsSet,
+    St::Notifications: preferences_state::IsSet,
     St::Privacy: preferences_state::IsSet,
     St::UpdatedAt: preferences_state::IsSet,
+    St::Activity: preferences_state::IsSet,
     St::Visibility: preferences_state::IsSet,
-    St::Notifications: preferences_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Preferences<S> {

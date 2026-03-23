@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_job_status;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JobStatus<S: BosStr = DefaultStr> {
     ///When the job completed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,26 +55,14 @@ pub struct JobStatus<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJobStatus<S: BosStr = DefaultStr> {
     pub job_id: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJobStatusOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -90,13 +72,7 @@ pub struct GetJobStatusOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SyncJobResult<S: BosStr = DefaultStr> {
     ///List of collection NSIDs that were synced
     pub collections_synced: Vec<Nsid<S>>,
@@ -177,66 +153,66 @@ pub mod job_status_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type RetryCount;
+        type Status;
         type JobId;
         type CreatedAt;
-        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type RetryCount = Unset;
+        type Status = Unset;
         type JobId = Unset;
         type CreatedAt = Unset;
-        type Status = Unset;
     }
     ///State transition - sets the `retry_count` field to Set
     pub struct SetRetryCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRetryCount<St> {}
     impl<St: State> State for SetRetryCount<St> {
         type RetryCount = Set<members::retry_count>;
+        type Status = St::Status;
         type JobId = St::JobId;
         type CreatedAt = St::CreatedAt;
-        type Status = St::Status;
-    }
-    ///State transition - sets the `job_id` field to Set
-    pub struct SetJobId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetJobId<St> {}
-    impl<St: State> State for SetJobId<St> {
-        type RetryCount = St::RetryCount;
-        type JobId = Set<members::job_id>;
-        type CreatedAt = St::CreatedAt;
-        type Status = St::Status;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type RetryCount = St::RetryCount;
-        type JobId = St::JobId;
-        type CreatedAt = Set<members::created_at>;
-        type Status = St::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
         type RetryCount = St::RetryCount;
+        type Status = Set<members::status>;
         type JobId = St::JobId;
         type CreatedAt = St::CreatedAt;
-        type Status = Set<members::status>;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetJobId<St> {}
+    impl<St: State> State for SetJobId<St> {
+        type RetryCount = St::RetryCount;
+        type Status = St::Status;
+        type JobId = Set<members::job_id>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type RetryCount = St::RetryCount;
+        type Status = St::Status;
+        type JobId = St::JobId;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `retry_count` field
         pub struct retry_count(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `job_id` field
         pub struct job_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
     }
 }
 
@@ -412,9 +388,9 @@ impl<S: BosStr, St> JobStatusBuilder<S, St>
 where
     St: job_status_state::State,
     St::RetryCount: job_status_state::IsSet,
+    St::Status: job_status_state::IsSet,
     St::JobId: job_status_state::IsSet,
     St::CreatedAt: job_status_state::IsSet,
-    St::Status: job_status_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> JobStatus<S> {
@@ -740,85 +716,85 @@ pub mod sync_job_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CollectionsSynced;
-        type Message;
-        type Success;
         type ReposProcessed;
+        type Message;
         type TotalRecords;
+        type CollectionsSynced;
+        type Success;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CollectionsSynced = Unset;
-        type Message = Unset;
-        type Success = Unset;
         type ReposProcessed = Unset;
+        type Message = Unset;
         type TotalRecords = Unset;
-    }
-    ///State transition - sets the `collections_synced` field to Set
-    pub struct SetCollectionsSynced<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCollectionsSynced<St> {}
-    impl<St: State> State for SetCollectionsSynced<St> {
-        type CollectionsSynced = Set<members::collections_synced>;
-        type Message = St::Message;
-        type Success = St::Success;
-        type ReposProcessed = St::ReposProcessed;
-        type TotalRecords = St::TotalRecords;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type CollectionsSynced = St::CollectionsSynced;
-        type Message = Set<members::message>;
-        type Success = St::Success;
-        type ReposProcessed = St::ReposProcessed;
-        type TotalRecords = St::TotalRecords;
-    }
-    ///State transition - sets the `success` field to Set
-    pub struct SetSuccess<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSuccess<St> {}
-    impl<St: State> State for SetSuccess<St> {
-        type CollectionsSynced = St::CollectionsSynced;
-        type Message = St::Message;
-        type Success = Set<members::success>;
-        type ReposProcessed = St::ReposProcessed;
-        type TotalRecords = St::TotalRecords;
+        type CollectionsSynced = Unset;
+        type Success = Unset;
     }
     ///State transition - sets the `repos_processed` field to Set
     pub struct SetReposProcessed<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReposProcessed<St> {}
     impl<St: State> State for SetReposProcessed<St> {
-        type CollectionsSynced = St::CollectionsSynced;
-        type Message = St::Message;
-        type Success = St::Success;
         type ReposProcessed = Set<members::repos_processed>;
+        type Message = St::Message;
         type TotalRecords = St::TotalRecords;
+        type CollectionsSynced = St::CollectionsSynced;
+        type Success = St::Success;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type ReposProcessed = St::ReposProcessed;
+        type Message = Set<members::message>;
+        type TotalRecords = St::TotalRecords;
+        type CollectionsSynced = St::CollectionsSynced;
+        type Success = St::Success;
     }
     ///State transition - sets the `total_records` field to Set
     pub struct SetTotalRecords<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotalRecords<St> {}
     impl<St: State> State for SetTotalRecords<St> {
-        type CollectionsSynced = St::CollectionsSynced;
-        type Message = St::Message;
-        type Success = St::Success;
         type ReposProcessed = St::ReposProcessed;
+        type Message = St::Message;
         type TotalRecords = Set<members::total_records>;
+        type CollectionsSynced = St::CollectionsSynced;
+        type Success = St::Success;
+    }
+    ///State transition - sets the `collections_synced` field to Set
+    pub struct SetCollectionsSynced<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollectionsSynced<St> {}
+    impl<St: State> State for SetCollectionsSynced<St> {
+        type ReposProcessed = St::ReposProcessed;
+        type Message = St::Message;
+        type TotalRecords = St::TotalRecords;
+        type CollectionsSynced = Set<members::collections_synced>;
+        type Success = St::Success;
+    }
+    ///State transition - sets the `success` field to Set
+    pub struct SetSuccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSuccess<St> {}
+    impl<St: State> State for SetSuccess<St> {
+        type ReposProcessed = St::ReposProcessed;
+        type Message = St::Message;
+        type TotalRecords = St::TotalRecords;
+        type CollectionsSynced = St::CollectionsSynced;
+        type Success = Set<members::success>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collections_synced` field
-        pub struct collections_synced(());
-        ///Marker type for the `message` field
-        pub struct message(());
-        ///Marker type for the `success` field
-        pub struct success(());
         ///Marker type for the `repos_processed` field
         pub struct repos_processed(());
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `total_records` field
         pub struct total_records(());
+        ///Marker type for the `collections_synced` field
+        pub struct collections_synced(());
+        ///Marker type for the `success` field
+        pub struct success(());
     }
 }
 
@@ -945,11 +921,11 @@ where
 impl<S: BosStr, St> SyncJobResultBuilder<S, St>
 where
     St: sync_job_result_state::State,
-    St::CollectionsSynced: sync_job_result_state::IsSet,
-    St::Message: sync_job_result_state::IsSet,
-    St::Success: sync_job_result_state::IsSet,
     St::ReposProcessed: sync_job_result_state::IsSet,
+    St::Message: sync_job_result_state::IsSet,
     St::TotalRecords: sync_job_result_state::IsSet,
+    St::CollectionsSynced: sync_job_result_state::IsSet,
+    St::Success: sync_job_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SyncJobResult<S> {

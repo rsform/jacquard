@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ForkStatus<S: BosStr = DefaultStr> {
     ///Branch to check status for
     pub branch: S,
@@ -42,13 +36,7 @@ pub struct ForkStatus<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ForkStatusOutput<S: BosStr = DefaultStr> {
     ///Fork status: 0=UpToDate, 1=FastForwardable, 2=Conflict, 3=MissingBranch
     pub status: i64,
@@ -94,85 +82,85 @@ pub mod fork_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type HiddenRef;
         type Source;
-        type Branch;
+        type HiddenRef;
+        type Did;
         type Name;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type HiddenRef = Unset;
         type Source = Unset;
-        type Branch = Unset;
+        type HiddenRef = Unset;
+        type Did = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type HiddenRef = St::HiddenRef;
-        type Source = St::Source;
-        type Branch = St::Branch;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `hidden_ref` field to Set
-    pub struct SetHiddenRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHiddenRef<St> {}
-    impl<St: State> State for SetHiddenRef<St> {
-        type Did = St::Did;
-        type HiddenRef = Set<members::hidden_ref>;
-        type Source = St::Source;
-        type Branch = St::Branch;
-        type Name = St::Name;
+        type Branch = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSource<St> {}
     impl<St: State> State for SetSource<St> {
-        type Did = St::Did;
-        type HiddenRef = St::HiddenRef;
         type Source = Set<members::source>;
-        type Branch = St::Branch;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBranch<St> {}
-    impl<St: State> State for SetBranch<St> {
-        type Did = St::Did;
         type HiddenRef = St::HiddenRef;
-        type Source = St::Source;
-        type Branch = Set<members::branch>;
+        type Did = St::Did;
         type Name = St::Name;
+        type Branch = St::Branch;
+    }
+    ///State transition - sets the `hidden_ref` field to Set
+    pub struct SetHiddenRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHiddenRef<St> {}
+    impl<St: State> State for SetHiddenRef<St> {
+        type Source = St::Source;
+        type HiddenRef = Set<members::hidden_ref>;
+        type Did = St::Did;
+        type Name = St::Name;
+        type Branch = St::Branch;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Source = St::Source;
+        type HiddenRef = St::HiddenRef;
+        type Did = Set<members::did>;
+        type Name = St::Name;
+        type Branch = St::Branch;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Did = St::Did;
-        type HiddenRef = St::HiddenRef;
         type Source = St::Source;
-        type Branch = St::Branch;
+        type HiddenRef = St::HiddenRef;
+        type Did = St::Did;
         type Name = Set<members::name>;
+        type Branch = St::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBranch<St> {}
+    impl<St: State> State for SetBranch<St> {
+        type Source = St::Source;
+        type HiddenRef = St::HiddenRef;
+        type Did = St::Did;
+        type Name = St::Name;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `hidden_ref` field
-        pub struct hidden_ref(());
         ///Marker type for the `source` field
         pub struct source(());
-        ///Marker type for the `branch` field
-        pub struct branch(());
+        ///Marker type for the `hidden_ref` field
+        pub struct hidden_ref(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
@@ -299,11 +287,11 @@ where
 impl<S: BosStr, St> ForkStatusBuilder<S, St>
 where
     St: fork_status_state::State,
-    St::Did: fork_status_state::IsSet,
-    St::HiddenRef: fork_status_state::IsSet,
     St::Source: fork_status_state::IsSet,
-    St::Branch: fork_status_state::IsSet,
+    St::HiddenRef: fork_status_state::IsSet,
+    St::Did: fork_status_state::IsSet,
     St::Name: fork_status_state::IsSet,
+    St::Branch: fork_status_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ForkStatus<S> {

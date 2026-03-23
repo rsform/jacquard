@@ -18,7 +18,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,13 +36,7 @@ use crate::zone_stratos;
 /// Indicates this record requires hydration from an external service. The stub record on the PDS contains minimal data; full content is fetched from the service endpoint.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Source<S: BosStr = DefaultStr> {
     ///DID of the hydration service, optionally with fragment identifying the service entry (e.g., 'did:plc:abc123#atproto_pns').
     pub service: Did<S>,
@@ -136,13 +130,7 @@ where
 /// A strong reference to a record, including its content hash for verification.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubjectRef<S: BosStr = DefaultStr> {
     ///CID of the full record content for integrity verification.
     pub cid: Cid<S>,
@@ -203,51 +191,51 @@ pub mod source_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Vary;
         type Service;
         type Subject;
-        type Vary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Vary = Unset;
         type Service = Unset;
         type Subject = Unset;
-        type Vary = Unset;
-    }
-    ///State transition - sets the `service` field to Set
-    pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetService<St> {}
-    impl<St: State> State for SetService<St> {
-        type Service = Set<members::service>;
-        type Subject = St::Subject;
-        type Vary = St::Vary;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Service = St::Service;
-        type Subject = Set<members::subject>;
-        type Vary = St::Vary;
     }
     ///State transition - sets the `vary` field to Set
     pub struct SetVary<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVary<St> {}
     impl<St: State> State for SetVary<St> {
+        type Vary = Set<members::vary>;
         type Service = St::Service;
         type Subject = St::Subject;
-        type Vary = Set<members::vary>;
+    }
+    ///State transition - sets the `service` field to Set
+    pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetService<St> {}
+    impl<St: State> State for SetService<St> {
+        type Vary = St::Vary;
+        type Service = Set<members::service>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Vary = St::Vary;
+        type Service = St::Service;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `vary` field
+        pub struct vary(());
         ///Marker type for the `service` field
         pub struct service(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `vary` field
-        pub struct vary(());
     }
 }
 
@@ -340,9 +328,9 @@ where
 impl<S: BosStr, St> SourceBuilder<S, St>
 where
     St: source_state::State,
+    St::Vary: source_state::IsSet,
     St::Service: source_state::IsSet,
     St::Subject: source_state::IsSet,
-    St::Vary: source_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Source<S> {

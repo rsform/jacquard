@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,10 +37,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "app.certified.badge.award",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Award<S: BosStr = DefaultStr> {
     ///Reference to the badge definition for this award.
@@ -62,13 +59,7 @@ pub struct Award<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum AwardSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "app.certified.defs#did")]
     Did(Box<Did<S>>),
@@ -79,13 +70,7 @@ pub enum AwardSubject<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct AwardGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -171,51 +156,51 @@ pub mod award_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Subject;
         type Badge;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Subject = Unset;
         type Badge = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type Badge = St::Badge;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `badge` field to Set
-    pub struct SetBadge<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBadge<St> {}
-    impl<St: State> State for SetBadge<St> {
-        type Subject = St::Subject;
-        type Badge = Set<members::badge>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Subject = St::Subject;
         type Badge = St::Badge;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
+        type Badge = St::Badge;
+    }
+    ///State transition - sets the `badge` field to Set
+    pub struct SetBadge<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBadge<St> {}
+    impl<St: State> State for SetBadge<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+        type Badge = Set<members::badge>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `badge` field
         pub struct badge(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -336,9 +321,9 @@ impl<S: BosStr, St: award_state::State> AwardBuilder<S, St> {
 impl<S: BosStr, St> AwardBuilder<S, St>
 where
     St: award_state::State,
+    St::CreatedAt: award_state::IsSet,
     St::Subject: award_state::IsSet,
     St::Badge: award_state::IsSet,
-    St::CreatedAt: award_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Award<S> {

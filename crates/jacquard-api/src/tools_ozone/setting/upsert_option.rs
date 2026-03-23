@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
@@ -19,13 +19,7 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::setting::DefsOption;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpsertOption<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -210,13 +204,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpsertOptionOutput<S: BosStr = DefaultStr> {
     pub option: DefsOption<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -261,49 +249,49 @@ pub mod upsert_option_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Value;
+        type Key;
         type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Value = Unset;
+        type Key = Unset;
         type Scope = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Key = Set<members::key>;
-        type Value = St::Value;
-        type Scope = St::Scope;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Key = St::Key;
         type Value = Set<members::value>;
+        type Key = St::Key;
+        type Scope = St::Scope;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Value = St::Value;
+        type Key = Set<members::key>;
         type Scope = St::Scope;
     }
     ///State transition - sets the `scope` field to Set
     pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetScope<St> {}
     impl<St: State> State for SetScope<St> {
-        type Key = St::Key;
         type Value = St::Value;
+        type Key = St::Key;
         type Scope = Set<members::scope>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `key` field
+        pub struct key(());
         ///Marker type for the `scope` field
         pub struct scope(());
     }
@@ -432,8 +420,8 @@ where
 impl<S: BosStr, St> UpsertOptionBuilder<S, St>
 where
     St: upsert_option_state::State,
-    St::Key: upsert_option_state::IsSet,
     St::Value: upsert_option_state::IsSet,
+    St::Key: upsert_option_state::IsSet,
     St::Scope: upsert_option_state::IsSet,
 {
     /// Build the final struct.

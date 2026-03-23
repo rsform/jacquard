@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "place.stream.broadcast.origin",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Origin<S: BosStr = DefaultStr> {
     ///did of the broadcaster that operates the server syndicating the livestream
@@ -62,13 +59,7 @@ pub struct Origin<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct OriginGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -144,51 +135,51 @@ pub mod origin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Streamer;
         type Server;
         type UpdatedAt;
-        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Streamer = Unset;
         type Server = Unset;
         type UpdatedAt = Unset;
-        type Streamer = Unset;
-    }
-    ///State transition - sets the `server` field to Set
-    pub struct SetServer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetServer<St> {}
-    impl<St: State> State for SetServer<St> {
-        type Server = Set<members::server>;
-        type UpdatedAt = St::UpdatedAt;
-        type Streamer = St::Streamer;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type Server = St::Server;
-        type UpdatedAt = Set<members::updated_at>;
-        type Streamer = St::Streamer;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStreamer<St> {}
     impl<St: State> State for SetStreamer<St> {
+        type Streamer = Set<members::streamer>;
         type Server = St::Server;
         type UpdatedAt = St::UpdatedAt;
-        type Streamer = Set<members::streamer>;
+    }
+    ///State transition - sets the `server` field to Set
+    pub struct SetServer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServer<St> {}
+    impl<St: State> State for SetServer<St> {
+        type Streamer = St::Streamer;
+        type Server = Set<members::server>;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Streamer = St::Streamer;
+        type Server = St::Server;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
         ///Marker type for the `server` field
         pub struct server(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
     }
 }
 
@@ -323,9 +314,9 @@ impl<S: BosStr, St: origin_state::State> OriginBuilder<S, St> {
 impl<S: BosStr, St> OriginBuilder<S, St>
 where
     St: origin_state::State,
+    St::Streamer: origin_state::IsSet,
     St::Server: origin_state::IsSet,
     St::UpdatedAt: origin_state::IsSet,
-    St::Streamer: origin_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Origin<S> {

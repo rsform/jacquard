@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "pub.quizzy.quizDone",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct QuizDone<S: BosStr = DefaultStr> {
     ///Reference to the quizBegin record
@@ -52,13 +49,7 @@ pub struct QuizDone<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct QuizDoneGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -124,37 +115,37 @@ pub mod quiz_done_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type QuizBegin;
         type Timestamp;
+        type QuizBegin;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type QuizBegin = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `quiz_begin` field to Set
-    pub struct SetQuizBegin<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuizBegin<St> {}
-    impl<St: State> State for SetQuizBegin<St> {
-        type QuizBegin = Set<members::quiz_begin>;
-        type Timestamp = St::Timestamp;
+        type QuizBegin = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type QuizBegin = St::QuizBegin;
         type Timestamp = Set<members::timestamp>;
+        type QuizBegin = St::QuizBegin;
+    }
+    ///State transition - sets the `quiz_begin` field to Set
+    pub struct SetQuizBegin<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuizBegin<St> {}
+    impl<St: State> State for SetQuizBegin<St> {
+        type Timestamp = St::Timestamp;
+        type QuizBegin = Set<members::quiz_begin>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quiz_begin` field
-        pub struct quiz_begin(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `quiz_begin` field
+        pub struct quiz_begin(());
     }
 }
 
@@ -224,8 +215,8 @@ where
 impl<S: BosStr, St> QuizDoneBuilder<S, St>
 where
     St: quiz_done_state::State,
-    St::QuizBegin: quiz_done_state::IsSet,
     St::Timestamp: quiz_done_state::IsSet,
+    St::QuizBegin: quiz_done_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> QuizDone<S> {

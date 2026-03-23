@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::net_anisota::beta::game::pack;
     rename_all = "camelCase",
     rename = "net.anisota.beta.game.pack",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Pack<S: BosStr = DefaultStr> {
     ///When the record was created
@@ -65,13 +62,7 @@ pub struct Pack<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PackGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -82,13 +73,7 @@ pub struct PackGetRecordOutput<S: BosStr = DefaultStr> {
 /// A single pack opening entry in the history
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PackHistoryEntry<S: BosStr = DefaultStr> {
     ///Items received from this pack
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -106,13 +91,7 @@ pub struct PackHistoryEntry<S: BosStr = DefaultStr> {
 /// An item received from a pack opening
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReceivedItem<S: BosStr = DefaultStr> {
     ///ID of the item received
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -254,67 +233,67 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type TotalOpens;
         type LastOpenTime;
         type Streak;
-        type TotalOpens;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
+        type TotalOpens = Unset;
         type LastOpenTime = Unset;
         type Streak = Unset;
-        type TotalOpens = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `last_open_time` field to Set
-    pub struct SetLastOpenTime<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLastOpenTime<St> {}
-    impl<St: State> State for SetLastOpenTime<St> {
-        type LastOpenTime = Set<members::last_open_time>;
-        type Streak = St::Streak;
-        type TotalOpens = St::TotalOpens;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `streak` field to Set
-    pub struct SetStreak<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStreak<St> {}
-    impl<St: State> State for SetStreak<St> {
-        type LastOpenTime = St::LastOpenTime;
-        type Streak = Set<members::streak>;
-        type TotalOpens = St::TotalOpens;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `total_opens` field to Set
-    pub struct SetTotalOpens<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTotalOpens<St> {}
-    impl<St: State> State for SetTotalOpens<St> {
-        type LastOpenTime = St::LastOpenTime;
-        type Streak = St::Streak;
-        type TotalOpens = Set<members::total_opens>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type TotalOpens = St::TotalOpens;
         type LastOpenTime = St::LastOpenTime;
         type Streak = St::Streak;
+    }
+    ///State transition - sets the `total_opens` field to Set
+    pub struct SetTotalOpens<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotalOpens<St> {}
+    impl<St: State> State for SetTotalOpens<St> {
+        type CreatedAt = St::CreatedAt;
+        type TotalOpens = Set<members::total_opens>;
+        type LastOpenTime = St::LastOpenTime;
+        type Streak = St::Streak;
+    }
+    ///State transition - sets the `last_open_time` field to Set
+    pub struct SetLastOpenTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastOpenTime<St> {}
+    impl<St: State> State for SetLastOpenTime<St> {
+        type CreatedAt = St::CreatedAt;
         type TotalOpens = St::TotalOpens;
-        type CreatedAt = Set<members::created_at>;
+        type LastOpenTime = Set<members::last_open_time>;
+        type Streak = St::Streak;
+    }
+    ///State transition - sets the `streak` field to Set
+    pub struct SetStreak<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreak<St> {}
+    impl<St: State> State for SetStreak<St> {
+        type CreatedAt = St::CreatedAt;
+        type TotalOpens = St::TotalOpens;
+        type LastOpenTime = St::LastOpenTime;
+        type Streak = Set<members::streak>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `total_opens` field
+        pub struct total_opens(());
         ///Marker type for the `last_open_time` field
         pub struct last_open_time(());
         ///Marker type for the `streak` field
         pub struct streak(());
-        ///Marker type for the `total_opens` field
-        pub struct total_opens(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -475,10 +454,10 @@ where
 impl<S: BosStr, St> PackBuilder<S, St>
 where
     St: pack_state::State,
+    St::CreatedAt: pack_state::IsSet,
+    St::TotalOpens: pack_state::IsSet,
     St::LastOpenTime: pack_state::IsSet,
     St::Streak: pack_state::IsSet,
-    St::TotalOpens: pack_state::IsSet,
-    St::CreatedAt: pack_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pack<S> {

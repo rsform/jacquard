@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "org.okazu-diary.material.collectionItem",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct CollectionItem<S: BosStr = DefaultStr> {
     ///Reference to the collection record (`org.okazu-diary.feed.collection`).
@@ -59,13 +56,7 @@ pub struct CollectionItem<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CollectionItemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -175,51 +166,51 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Collection;
         type CreatedAt;
         type Subjects;
-        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Collection = Unset;
         type CreatedAt = Unset;
         type Subjects = Unset;
-        type Collection = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Subjects = St::Subjects;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `subjects` field to Set
-    pub struct SetSubjects<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubjects<St> {}
-    impl<St: State> State for SetSubjects<St> {
-        type CreatedAt = St::CreatedAt;
-        type Subjects = Set<members::subjects>;
-        type Collection = St::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
+        type Collection = Set<members::collection>;
         type CreatedAt = St::CreatedAt;
         type Subjects = St::Subjects;
-        type Collection = Set<members::collection>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Collection = St::Collection;
+        type CreatedAt = Set<members::created_at>;
+        type Subjects = St::Subjects;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubjects<St> {}
+    impl<St: State> State for SetSubjects<St> {
+        type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
+        type Subjects = Set<members::subjects>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subjects` field
         pub struct subjects(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
     }
 }
 
@@ -340,9 +331,9 @@ impl<S: BosStr, St: collection_item_state::State> CollectionItemBuilder<S, St> {
 impl<S: BosStr, St> CollectionItemBuilder<S, St>
 where
     St: collection_item_state::State,
+    St::Collection: collection_item_state::IsSet,
     St::CreatedAt: collection_item_state::IsSet,
     St::Subjects: collection_item_state::IsSet,
-    St::Collection: collection_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionItem<S> {

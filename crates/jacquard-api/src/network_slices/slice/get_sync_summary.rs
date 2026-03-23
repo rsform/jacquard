@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,13 +26,7 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_sync_summary;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CollectionSummary<S: BosStr = DefaultStr> {
     pub collection: S,
     pub estimated_repos: i64,
@@ -43,13 +37,7 @@ pub struct CollectionSummary<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSyncSummary<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<S>>,
@@ -62,13 +50,7 @@ pub struct GetSyncSummary<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSyncSummaryOutput<S: BosStr = DefaultStr> {
     ///The actual limit applied (user-specified or default)
     pub applied_limit: i64,
@@ -132,51 +114,51 @@ pub mod collection_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsExternal;
         type Collection;
         type EstimatedRepos;
+        type IsExternal;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsExternal = Unset;
         type Collection = Unset;
         type EstimatedRepos = Unset;
-    }
-    ///State transition - sets the `is_external` field to Set
-    pub struct SetIsExternal<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIsExternal<St> {}
-    impl<St: State> State for SetIsExternal<St> {
-        type IsExternal = Set<members::is_external>;
-        type Collection = St::Collection;
-        type EstimatedRepos = St::EstimatedRepos;
+        type IsExternal = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
-        type IsExternal = St::IsExternal;
         type Collection = Set<members::collection>;
         type EstimatedRepos = St::EstimatedRepos;
+        type IsExternal = St::IsExternal;
     }
     ///State transition - sets the `estimated_repos` field to Set
     pub struct SetEstimatedRepos<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEstimatedRepos<St> {}
     impl<St: State> State for SetEstimatedRepos<St> {
-        type IsExternal = St::IsExternal;
         type Collection = St::Collection;
         type EstimatedRepos = Set<members::estimated_repos>;
+        type IsExternal = St::IsExternal;
+    }
+    ///State transition - sets the `is_external` field to Set
+    pub struct SetIsExternal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIsExternal<St> {}
+    impl<St: State> State for SetIsExternal<St> {
+        type Collection = St::Collection;
+        type EstimatedRepos = St::EstimatedRepos;
+        type IsExternal = Set<members::is_external>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_external` field
-        pub struct is_external(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `estimated_repos` field
         pub struct estimated_repos(());
+        ///Marker type for the `is_external` field
+        pub struct is_external(());
     }
 }
 
@@ -265,9 +247,9 @@ where
 impl<S: BosStr, St> CollectionSummaryBuilder<S, St>
 where
     St: collection_summary_state::State,
-    St::IsExternal: collection_summary_state::IsSet,
     St::Collection: collection_summary_state::IsSet,
     St::EstimatedRepos: collection_summary_state::IsSet,
+    St::IsExternal: collection_summary_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionSummary<S> {

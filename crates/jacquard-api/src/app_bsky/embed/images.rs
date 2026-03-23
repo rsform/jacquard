@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,13 +29,7 @@ use crate::app_bsky::embed::AspectRatio;
 use crate::app_bsky::embed::images;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     pub alt: S,
@@ -48,13 +42,7 @@ pub struct Image<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Images<S: BosStr = DefaultStr> {
     pub images: Vec<images::Image<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -63,13 +51,7 @@ pub struct Images<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     pub images: Vec<images::ViewImage<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -78,13 +60,7 @@ pub struct View<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewImage<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     pub alt: S,
@@ -731,51 +707,51 @@ pub mod view_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Alt;
         type Fullsize;
         type Thumb;
-        type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Alt = Unset;
         type Fullsize = Unset;
         type Thumb = Unset;
-        type Alt = Unset;
-    }
-    ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFullsize<St> {}
-    impl<St: State> State for SetFullsize<St> {
-        type Fullsize = Set<members::fullsize>;
-        type Thumb = St::Thumb;
-        type Alt = St::Alt;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetThumb<St> {}
-    impl<St: State> State for SetThumb<St> {
-        type Fullsize = St::Fullsize;
-        type Thumb = Set<members::thumb>;
-        type Alt = St::Alt;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAlt<St> {}
     impl<St: State> State for SetAlt<St> {
+        type Alt = Set<members::alt>;
         type Fullsize = St::Fullsize;
         type Thumb = St::Thumb;
-        type Alt = Set<members::alt>;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFullsize<St> {}
+    impl<St: State> State for SetFullsize<St> {
+        type Alt = St::Alt;
+        type Fullsize = Set<members::fullsize>;
+        type Thumb = St::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThumb<St> {}
+    impl<St: State> State for SetThumb<St> {
+        type Alt = St::Alt;
+        type Fullsize = St::Fullsize;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `alt` field
+        pub struct alt(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
-        ///Marker type for the `alt` field
-        pub struct alt(());
     }
 }
 
@@ -882,9 +858,9 @@ where
 impl<S: BosStr, St> ViewImageBuilder<S, St>
 where
     St: view_image_state::State,
+    St::Alt: view_image_state::IsSet,
     St::Fullsize: view_image_state::IsSet,
     St::Thumb: view_image_state::IsSet,
-    St::Alt: view_image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ViewImage<S> {

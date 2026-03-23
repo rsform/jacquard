@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.claimReview",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ClaimReview<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -134,13 +131,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ClaimReviewGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -218,67 +209,67 @@ pub mod claim_review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Claim;
+        type CreatedAt;
         type ReviewedBy;
         type Status;
-        type CreatedAt;
+        type Claim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Claim = Unset;
+        type CreatedAt = Unset;
         type ReviewedBy = Unset;
         type Status = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `claim` field to Set
-    pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetClaim<St> {}
-    impl<St: State> State for SetClaim<St> {
-        type Claim = Set<members::claim>;
-        type ReviewedBy = St::ReviewedBy;
-        type Status = St::Status;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `reviewed_by` field to Set
-    pub struct SetReviewedBy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReviewedBy<St> {}
-    impl<St: State> State for SetReviewedBy<St> {
-        type Claim = St::Claim;
-        type ReviewedBy = Set<members::reviewed_by>;
-        type Status = St::Status;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Claim = St::Claim;
-        type ReviewedBy = St::ReviewedBy;
-        type Status = Set<members::status>;
-        type CreatedAt = St::CreatedAt;
+        type Claim = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Claim = St::Claim;
+        type CreatedAt = Set<members::created_at>;
         type ReviewedBy = St::ReviewedBy;
         type Status = St::Status;
-        type CreatedAt = Set<members::created_at>;
+        type Claim = St::Claim;
+    }
+    ///State transition - sets the `reviewed_by` field to Set
+    pub struct SetReviewedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReviewedBy<St> {}
+    impl<St: State> State for SetReviewedBy<St> {
+        type CreatedAt = St::CreatedAt;
+        type ReviewedBy = Set<members::reviewed_by>;
+        type Status = St::Status;
+        type Claim = St::Claim;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
+        type ReviewedBy = St::ReviewedBy;
+        type Status = Set<members::status>;
+        type Claim = St::Claim;
+    }
+    ///State transition - sets the `claim` field to Set
+    pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClaim<St> {}
+    impl<St: State> State for SetClaim<St> {
+        type CreatedAt = St::CreatedAt;
+        type ReviewedBy = St::ReviewedBy;
+        type Status = St::Status;
+        type Claim = Set<members::claim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim` field
-        pub struct claim(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `reviewed_by` field
         pub struct reviewed_by(());
         ///Marker type for the `status` field
         pub struct status(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `claim` field
+        pub struct claim(());
     }
 }
 
@@ -419,10 +410,10 @@ where
 impl<S: BosStr, St> ClaimReviewBuilder<S, St>
 where
     St: claim_review_state::State,
-    St::Claim: claim_review_state::IsSet,
+    St::CreatedAt: claim_review_state::IsSet,
     St::ReviewedBy: claim_review_state::IsSet,
     St::Status: claim_review_state::IsSet,
-    St::CreatedAt: claim_review_state::IsSet,
+    St::Claim: claim_review_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ClaimReview<S> {

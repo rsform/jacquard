@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::tech_tokimeki::takibi::log;
     rename_all = "camelCase",
     rename = "tech.tokimeki.takibi.log",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Log<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -53,13 +50,7 @@ pub struct Log<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct LogGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -70,13 +61,7 @@ pub struct LogGetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a visible spark with timing information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SparkRef<S: BosStr = DefaultStr> {
     ///Milliseconds since the spark appeared on screen (0-10000)
     pub elapsed: i64,
@@ -400,37 +385,37 @@ pub mod spark_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Elapsed;
         type Spark;
+        type Elapsed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Elapsed = Unset;
         type Spark = Unset;
-    }
-    ///State transition - sets the `elapsed` field to Set
-    pub struct SetElapsed<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetElapsed<St> {}
-    impl<St: State> State for SetElapsed<St> {
-        type Elapsed = Set<members::elapsed>;
-        type Spark = St::Spark;
+        type Elapsed = Unset;
     }
     ///State transition - sets the `spark` field to Set
     pub struct SetSpark<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSpark<St> {}
     impl<St: State> State for SetSpark<St> {
-        type Elapsed = St::Elapsed;
         type Spark = Set<members::spark>;
+        type Elapsed = St::Elapsed;
+    }
+    ///State transition - sets the `elapsed` field to Set
+    pub struct SetElapsed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetElapsed<St> {}
+    impl<St: State> State for SetElapsed<St> {
+        type Spark = St::Spark;
+        type Elapsed = Set<members::elapsed>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `elapsed` field
-        pub struct elapsed(());
         ///Marker type for the `spark` field
         pub struct spark(());
+        ///Marker type for the `elapsed` field
+        pub struct elapsed(());
     }
 }
 
@@ -500,8 +485,8 @@ where
 impl<S: BosStr, St> SparkRefBuilder<S, St>
 where
     St: spark_ref_state::State,
-    St::Elapsed: spark_ref_state::IsSet,
     St::Spark: spark_ref_state::IsSet,
+    St::Elapsed: spark_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SparkRef<S> {

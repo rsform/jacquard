@@ -166,7 +166,7 @@ pub fn generate_build_method(
 /// Extract the default value expression for an object property, if one exists.
 fn schema_default_expr(
     prop: &LexObjectProperty<'static>,
-    resolved: &crate::codegen::prettify::ResolvedImports,
+    _resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> Option<TokenStream> {
     match prop {
         LexObjectProperty::Boolean(b) => {
@@ -179,9 +179,7 @@ fn schema_default_expr(
         }
         LexObjectProperty::String(s) if s.known_values.is_none() => {
             let v = s.default.as_ref()?.as_ref();
-            // Use SmolStr for the default literal, then convert to S.
-            let smol_str_path = resolved.type_path(&crate::codegen::prettify::CommonType::SmolStr);
-            Some(quote! { #smol_str_path::from(#v) })
+            Some(quote! { S::from_static(#v) })
         }
         _ => None,
     }

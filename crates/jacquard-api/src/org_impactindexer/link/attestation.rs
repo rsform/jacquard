@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::org_impactindexer::link::attestation;
 /// The EIP-712 typed data message structure
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Eip712Message<S: BosStr = DefaultStr> {
     ///The chain ID as a string (for bigint compatibility, max uint256)
     pub chain_id: S,
@@ -60,10 +54,7 @@ pub struct Eip712Message<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "org.impactindexer.link.attestation",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Attestation<S: BosStr = DefaultStr> {
     ///The EVM wallet address (checksummed or lowercase, 0x-prefixed)
@@ -171,13 +162,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct AttestationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -581,105 +566,105 @@ pub mod attestation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type SignatureType;
         type Address;
+        type SignatureType;
         type Signature;
         type ChainId;
         type Message;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type SignatureType = Unset;
         type Address = Unset;
+        type SignatureType = Unset;
         type Signature = Unset;
         type ChainId = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type SignatureType = St::SignatureType;
-        type Address = St::Address;
-        type Signature = St::Signature;
-        type ChainId = St::ChainId;
-        type Message = St::Message;
-    }
-    ///State transition - sets the `signature_type` field to Set
-    pub struct SetSignatureType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSignatureType<St> {}
-    impl<St: State> State for SetSignatureType<St> {
-        type CreatedAt = St::CreatedAt;
-        type SignatureType = Set<members::signature_type>;
-        type Address = St::Address;
-        type Signature = St::Signature;
-        type ChainId = St::ChainId;
-        type Message = St::Message;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `address` field to Set
     pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAddress<St> {}
     impl<St: State> State for SetAddress<St> {
-        type CreatedAt = St::CreatedAt;
-        type SignatureType = St::SignatureType;
         type Address = Set<members::address>;
+        type SignatureType = St::SignatureType;
         type Signature = St::Signature;
         type ChainId = St::ChainId;
         type Message = St::Message;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `signature_type` field to Set
+    pub struct SetSignatureType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignatureType<St> {}
+    impl<St: State> State for SetSignatureType<St> {
+        type Address = St::Address;
+        type SignatureType = Set<members::signature_type>;
+        type Signature = St::Signature;
+        type ChainId = St::ChainId;
+        type Message = St::Message;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignature<St> {}
     impl<St: State> State for SetSignature<St> {
-        type CreatedAt = St::CreatedAt;
-        type SignatureType = St::SignatureType;
         type Address = St::Address;
+        type SignatureType = St::SignatureType;
         type Signature = Set<members::signature>;
         type ChainId = St::ChainId;
         type Message = St::Message;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `chain_id` field to Set
     pub struct SetChainId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetChainId<St> {}
     impl<St: State> State for SetChainId<St> {
-        type CreatedAt = St::CreatedAt;
-        type SignatureType = St::SignatureType;
         type Address = St::Address;
+        type SignatureType = St::SignatureType;
         type Signature = St::Signature;
         type ChainId = Set<members::chain_id>;
         type Message = St::Message;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
-        type CreatedAt = St::CreatedAt;
-        type SignatureType = St::SignatureType;
         type Address = St::Address;
+        type SignatureType = St::SignatureType;
         type Signature = St::Signature;
         type ChainId = St::ChainId;
         type Message = Set<members::message>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Address = St::Address;
+        type SignatureType = St::SignatureType;
+        type Signature = St::Signature;
+        type ChainId = St::ChainId;
+        type Message = St::Message;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `signature_type` field
-        pub struct signature_type(());
         ///Marker type for the `address` field
         pub struct address(());
+        ///Marker type for the `signature_type` field
+        pub struct signature_type(());
         ///Marker type for the `signature` field
         pub struct signature(());
         ///Marker type for the `chain_id` field
         pub struct chain_id(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -832,12 +817,12 @@ where
 impl<S: BosStr, St> AttestationBuilder<S, St>
 where
     St: attestation_state::State,
-    St::CreatedAt: attestation_state::IsSet,
-    St::SignatureType: attestation_state::IsSet,
     St::Address: attestation_state::IsSet,
+    St::SignatureType: attestation_state::IsSet,
     St::Signature: attestation_state::IsSet,
     St::ChainId: attestation_state::IsSet,
     St::Message: attestation_state::IsSet,
+    St::CreatedAt: attestation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Attestation<S> {

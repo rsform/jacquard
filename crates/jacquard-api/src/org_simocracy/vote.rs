@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "org.simocracy.vote",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Vote<S: BosStr = DefaultStr> {
     ///Timestamp when the vote was cast
@@ -54,13 +51,7 @@ pub struct Vote<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct VoteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -126,49 +117,49 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Votes;
         type CreatedAt;
+        type Votes;
         type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Votes = Unset;
         type CreatedAt = Unset;
+        type Votes = Unset;
         type Sim = Unset;
-    }
-    ///State transition - sets the `votes` field to Set
-    pub struct SetVotes<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVotes<St> {}
-    impl<St: State> State for SetVotes<St> {
-        type Votes = Set<members::votes>;
-        type CreatedAt = St::CreatedAt;
-        type Sim = St::Sim;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Votes = St::Votes;
         type CreatedAt = Set<members::created_at>;
+        type Votes = St::Votes;
+        type Sim = St::Sim;
+    }
+    ///State transition - sets the `votes` field to Set
+    pub struct SetVotes<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVotes<St> {}
+    impl<St: State> State for SetVotes<St> {
+        type CreatedAt = St::CreatedAt;
+        type Votes = Set<members::votes>;
         type Sim = St::Sim;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSim<St> {}
     impl<St: State> State for SetSim<St> {
-        type Votes = St::Votes;
         type CreatedAt = St::CreatedAt;
+        type Votes = St::Votes;
         type Sim = Set<members::sim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `votes` field
-        pub struct votes(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `votes` field
+        pub struct votes(());
         ///Marker type for the `sim` field
         pub struct sim(());
     }
@@ -259,8 +250,8 @@ where
 impl<S: BosStr, St> VoteBuilder<S, St>
 where
     St: vote_state::State,
-    St::Votes: vote_state::IsSet,
     St::CreatedAt: vote_state::IsSet,
+    St::Votes: vote_state::IsSet,
     St::Sim: vote_state::IsSet,
 {
     /// Build the final struct.

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::io_atcr::hold::notify_manifest;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
@@ -45,13 +39,7 @@ pub struct BlobInfo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChildManifestInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
@@ -67,13 +55,7 @@ pub struct ChildManifestInfo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LayerInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
@@ -87,13 +69,7 @@ pub struct LayerInfo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyManifest<S: BosStr = DefaultStr> {
     pub manifest: notify_manifest::ManifestInfo<S>,
     ///Manifest digest for building layer record AT-URIs
@@ -195,13 +171,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyManifestOutput<S: BosStr = DefaultStr> {
     ///Number of layer records created (push only)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -285,13 +255,7 @@ impl core::fmt::Display for NotifyManifestError {
 /// OCI manifest information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ManifestInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<notify_manifest::BlobInfo<S>>,
@@ -309,13 +273,7 @@ pub struct ManifestInfo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlatformInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub architecture: Option<S>,
@@ -794,8 +752,8 @@ pub mod notify_manifest_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type UserDid;
-        type ManifestDigest;
         type Manifest;
+        type ManifestDigest;
         type Repository;
     }
     /// Empty state - all required fields are unset
@@ -803,8 +761,8 @@ pub mod notify_manifest_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type UserDid = Unset;
-        type ManifestDigest = Unset;
         type Manifest = Unset;
+        type ManifestDigest = Unset;
         type Repository = Unset;
     }
     ///State transition - sets the `user_did` field to Set
@@ -812,17 +770,8 @@ pub mod notify_manifest_state {
     impl<St: State> sealed::Sealed for SetUserDid<St> {}
     impl<St: State> State for SetUserDid<St> {
         type UserDid = Set<members::user_did>;
+        type Manifest = St::Manifest;
         type ManifestDigest = St::ManifestDigest;
-        type Manifest = St::Manifest;
-        type Repository = St::Repository;
-    }
-    ///State transition - sets the `manifest_digest` field to Set
-    pub struct SetManifestDigest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetManifestDigest<St> {}
-    impl<St: State> State for SetManifestDigest<St> {
-        type UserDid = St::UserDid;
-        type ManifestDigest = Set<members::manifest_digest>;
-        type Manifest = St::Manifest;
         type Repository = St::Repository;
     }
     ///State transition - sets the `manifest` field to Set
@@ -830,8 +779,17 @@ pub mod notify_manifest_state {
     impl<St: State> sealed::Sealed for SetManifest<St> {}
     impl<St: State> State for SetManifest<St> {
         type UserDid = St::UserDid;
-        type ManifestDigest = St::ManifestDigest;
         type Manifest = Set<members::manifest>;
+        type ManifestDigest = St::ManifestDigest;
+        type Repository = St::Repository;
+    }
+    ///State transition - sets the `manifest_digest` field to Set
+    pub struct SetManifestDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetManifestDigest<St> {}
+    impl<St: State> State for SetManifestDigest<St> {
+        type UserDid = St::UserDid;
+        type Manifest = St::Manifest;
+        type ManifestDigest = Set<members::manifest_digest>;
         type Repository = St::Repository;
     }
     ///State transition - sets the `repository` field to Set
@@ -839,8 +797,8 @@ pub mod notify_manifest_state {
     impl<St: State> sealed::Sealed for SetRepository<St> {}
     impl<St: State> State for SetRepository<St> {
         type UserDid = St::UserDid;
-        type ManifestDigest = St::ManifestDigest;
         type Manifest = St::Manifest;
+        type ManifestDigest = St::ManifestDigest;
         type Repository = Set<members::repository>;
     }
     /// Marker types for field names
@@ -848,10 +806,10 @@ pub mod notify_manifest_state {
     pub mod members {
         ///Marker type for the `user_did` field
         pub struct user_did(());
-        ///Marker type for the `manifest_digest` field
-        pub struct manifest_digest(());
         ///Marker type for the `manifest` field
         pub struct manifest(());
+        ///Marker type for the `manifest_digest` field
+        pub struct manifest_digest(());
         ///Marker type for the `repository` field
         pub struct repository(());
     }
@@ -998,8 +956,8 @@ impl<S: BosStr, St> NotifyManifestBuilder<S, St>
 where
     St: notify_manifest_state::State,
     St::UserDid: notify_manifest_state::IsSet,
-    St::ManifestDigest: notify_manifest_state::IsSet,
     St::Manifest: notify_manifest_state::IsSet,
+    St::ManifestDigest: notify_manifest_state::IsSet,
     St::Repository: notify_manifest_state::IsSet,
 {
     /// Build the final struct.

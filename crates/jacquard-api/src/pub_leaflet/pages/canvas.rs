@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,13 +41,7 @@ use crate::pub_leaflet::blocks::website::Website;
 use crate::pub_leaflet::pages::canvas;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Block<S: BosStr = DefaultStr> {
     pub block: BlockBlock<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -65,13 +59,7 @@ pub struct Block<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum BlockBlock<S: BosStr = DefaultStr> {
     #[serde(rename = "pub.leaflet.blocks.iframe")]
     Iframe(Box<Iframe<S>>),
@@ -107,13 +95,7 @@ pub enum BlockBlock<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Canvas<S: BosStr = DefaultStr> {
     pub blocks: Vec<canvas::Block<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -124,13 +106,7 @@ pub struct Canvas<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Position<S: BosStr = DefaultStr> {
     pub block: Vec<i64>,
     pub offset: i64,
@@ -140,13 +116,7 @@ pub struct Position<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Quote<S: BosStr = DefaultStr> {
     pub end: canvas::Position<S>,
     pub start: canvas::Position<S>,
@@ -252,66 +222,66 @@ pub mod block_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Y;
+        type Block;
         type Width;
         type X;
-        type Block;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Y = Unset;
+        type Block = Unset;
         type Width = Unset;
         type X = Unset;
-        type Block = Unset;
     }
     ///State transition - sets the `y` field to Set
     pub struct SetY<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetY<St> {}
     impl<St: State> State for SetY<St> {
         type Y = Set<members::y>;
+        type Block = St::Block;
         type Width = St::Width;
         type X = St::X;
-        type Block = St::Block;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWidth<St> {}
-    impl<St: State> State for SetWidth<St> {
-        type Y = St::Y;
-        type Width = Set<members::width>;
-        type X = St::X;
-        type Block = St::Block;
-    }
-    ///State transition - sets the `x` field to Set
-    pub struct SetX<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetX<St> {}
-    impl<St: State> State for SetX<St> {
-        type Y = St::Y;
-        type Width = St::Width;
-        type X = Set<members::x>;
-        type Block = St::Block;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlock<St> {}
     impl<St: State> State for SetBlock<St> {
         type Y = St::Y;
+        type Block = Set<members::block>;
         type Width = St::Width;
         type X = St::X;
-        type Block = Set<members::block>;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Y = St::Y;
+        type Block = St::Block;
+        type Width = Set<members::width>;
+        type X = St::X;
+    }
+    ///State transition - sets the `x` field to Set
+    pub struct SetX<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetX<St> {}
+    impl<St: State> State for SetX<St> {
+        type Y = St::Y;
+        type Block = St::Block;
+        type Width = St::Width;
+        type X = Set<members::x>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `y` field
         pub struct y(());
+        ///Marker type for the `block` field
+        pub struct block(());
         ///Marker type for the `width` field
         pub struct width(());
         ///Marker type for the `x` field
         pub struct x(());
-        ///Marker type for the `block` field
-        pub struct block(());
     }
 }
 
@@ -447,9 +417,9 @@ impl<S: BosStr, St> BlockBuilder<S, St>
 where
     St: block_state::State,
     St::Y: block_state::IsSet,
+    St::Block: block_state::IsSet,
     St::Width: block_state::IsSet,
     St::X: block_state::IsSet,
-    St::Block: block_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Block<S> {
@@ -911,37 +881,37 @@ pub mod quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type End;
         type Start;
+        type End;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type End = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `end` field to Set
-    pub struct SetEnd<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEnd<St> {}
-    impl<St: State> State for SetEnd<St> {
-        type End = Set<members::end>;
-        type Start = St::Start;
+        type End = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStart<St> {}
     impl<St: State> State for SetStart<St> {
-        type End = St::End;
         type Start = Set<members::start>;
+        type End = St::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEnd<St> {}
+    impl<St: State> State for SetEnd<St> {
+        type Start = St::Start;
+        type End = Set<members::end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end` field
-        pub struct end(());
         ///Marker type for the `start` field
         pub struct start(());
+        ///Marker type for the `end` field
+        pub struct end(());
     }
 }
 
@@ -1011,8 +981,8 @@ where
 impl<S: BosStr, St> QuoteBuilder<S, St>
 where
     St: quote_state::State,
-    St::End: quote_state::IsSet,
     St::Start: quote_state::IsSet,
+    St::End: quote_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Quote<S> {

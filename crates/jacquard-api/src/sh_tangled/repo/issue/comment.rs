@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,10 +33,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "sh.tangled.repo.issue.comment",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Comment<S: BosStr = DefaultStr> {
     pub body: S,
@@ -55,13 +52,7 @@ pub struct Comment<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -128,50 +119,50 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Issue;
-        type Body;
         type CreatedAt;
+        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Issue = Unset;
-        type Body = Unset;
         type CreatedAt = Unset;
+        type Body = Unset;
     }
     ///State transition - sets the `issue` field to Set
     pub struct SetIssue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIssue<St> {}
     impl<St: State> State for SetIssue<St> {
         type Issue = Set<members::issue>;
+        type CreatedAt = St::CreatedAt;
         type Body = St::Body;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBody<St> {}
-    impl<St: State> State for SetBody<St> {
-        type Issue = St::Issue;
-        type Body = Set<members::body>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Issue = St::Issue;
-        type Body = St::Body;
         type CreatedAt = Set<members::created_at>;
+        type Body = St::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBody<St> {}
+    impl<St: State> State for SetBody<St> {
+        type Issue = St::Issue;
+        type CreatedAt = St::CreatedAt;
+        type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `issue` field
         pub struct issue(());
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `body` field
+        pub struct body(());
     }
 }
 
@@ -307,8 +298,8 @@ impl<S: BosStr, St> CommentBuilder<S, St>
 where
     St: comment_state::State,
     St::Issue: comment_state::IsSet,
-    St::Body: comment_state::IsSet,
     St::CreatedAt: comment_state::IsSet,
+    St::Body: comment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Comment<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancelPipeline<S: BosStr = DefaultStr> {
     ///pipeline at-uri
     pub pipeline: AtUri<S>,
@@ -74,49 +68,49 @@ pub mod cancel_pipeline_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Pipeline;
+        type Repo;
         type Workflow;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Pipeline = Unset;
+        type Repo = Unset;
         type Workflow = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Pipeline = St::Pipeline;
-        type Workflow = St::Workflow;
     }
     ///State transition - sets the `pipeline` field to Set
     pub struct SetPipeline<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPipeline<St> {}
     impl<St: State> State for SetPipeline<St> {
-        type Repo = St::Repo;
         type Pipeline = Set<members::pipeline>;
+        type Repo = St::Repo;
+        type Workflow = St::Workflow;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Pipeline = St::Pipeline;
+        type Repo = Set<members::repo>;
         type Workflow = St::Workflow;
     }
     ///State transition - sets the `workflow` field to Set
     pub struct SetWorkflow<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWorkflow<St> {}
     impl<St: State> State for SetWorkflow<St> {
-        type Repo = St::Repo;
         type Pipeline = St::Pipeline;
+        type Repo = St::Repo;
         type Workflow = Set<members::workflow>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `pipeline` field
         pub struct pipeline(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `workflow` field
         pub struct workflow(());
     }
@@ -207,8 +201,8 @@ where
 impl<S: BosStr, St> CancelPipelineBuilder<S, St>
 where
     St: cancel_pipeline_state::State,
-    St::Repo: cancel_pipeline_state::IsSet,
     St::Pipeline: cancel_pipeline_state::IsSet,
+    St::Repo: cancel_pipeline_state::IsSet,
     St::Workflow: cancel_pipeline_state::IsSet,
 {
     /// Build the final struct.

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::stats;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CollectionStats<S: BosStr = DefaultStr> {
     ///Collection NSID
     pub collection: Nsid<S>,
@@ -47,26 +41,14 @@ pub struct CollectionStats<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Stats<S: BosStr = DefaultStr> {
     pub slice: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatsOutput<S: BosStr = DefaultStr> {
     ///Per-collection statistics
     pub collection_stats: Vec<stats::CollectionStats<S>>,
@@ -131,51 +113,51 @@ pub mod collection_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RecordCount;
         type Collection;
         type UniqueActors;
+        type RecordCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RecordCount = Unset;
         type Collection = Unset;
         type UniqueActors = Unset;
-    }
-    ///State transition - sets the `record_count` field to Set
-    pub struct SetRecordCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecordCount<St> {}
-    impl<St: State> State for SetRecordCount<St> {
-        type RecordCount = Set<members::record_count>;
-        type Collection = St::Collection;
-        type UniqueActors = St::UniqueActors;
+        type RecordCount = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
-        type RecordCount = St::RecordCount;
         type Collection = Set<members::collection>;
         type UniqueActors = St::UniqueActors;
+        type RecordCount = St::RecordCount;
     }
     ///State transition - sets the `unique_actors` field to Set
     pub struct SetUniqueActors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUniqueActors<St> {}
     impl<St: State> State for SetUniqueActors<St> {
-        type RecordCount = St::RecordCount;
         type Collection = St::Collection;
         type UniqueActors = Set<members::unique_actors>;
+        type RecordCount = St::RecordCount;
+    }
+    ///State transition - sets the `record_count` field to Set
+    pub struct SetRecordCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecordCount<St> {}
+    impl<St: State> State for SetRecordCount<St> {
+        type Collection = St::Collection;
+        type UniqueActors = St::UniqueActors;
+        type RecordCount = Set<members::record_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record_count` field
-        pub struct record_count(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `unique_actors` field
         pub struct unique_actors(());
+        ///Marker type for the `record_count` field
+        pub struct record_count(());
     }
 }
 
@@ -264,9 +246,9 @@ where
 impl<S: BosStr, St> CollectionStatsBuilder<S, St>
 where
     St: collection_stats_state::State,
-    St::RecordCount: collection_stats_state::IsSet,
     St::Collection: collection_stats_state::IsSet,
     St::UniqueActors: collection_stats_state::IsSet,
+    St::RecordCount: collection_stats_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionStats<S> {

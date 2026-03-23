@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,13 +28,7 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::embed::external;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExternalEmbed<S: BosStr = DefaultStr> {
     pub description: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -47,13 +41,7 @@ pub struct ExternalEmbed<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct External<S: BosStr = DefaultStr> {
     pub embeds: Vec<external::ExternalEmbed<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -62,13 +50,7 @@ pub struct External<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     pub external: Vec<external::ViewExternal<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -77,13 +59,7 @@ pub struct View<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewExternal<S: BosStr = DefaultStr> {
     pub description: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -224,51 +200,51 @@ pub mod external_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Uri;
         type Description;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Uri = Unset;
         type Description = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Description = St::Description;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDescription<St> {}
-    impl<St: State> State for SetDescription<St> {
-        type Uri = St::Uri;
-        type Description = Set<members::description>;
-        type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
+        type Title = Set<members::title>;
         type Uri = St::Uri;
         type Description = St::Description;
-        type Title = Set<members::title>;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Title = St::Title;
+        type Uri = Set<members::uri>;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Title = St::Title;
+        type Uri = St::Uri;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
@@ -370,9 +346,9 @@ where
 impl<S: BosStr, St> ExternalEmbedBuilder<S, St>
 where
     St: external_embed_state::State,
+    St::Title: external_embed_state::IsSet,
     St::Uri: external_embed_state::IsSet,
     St::Description: external_embed_state::IsSet,
-    St::Title: external_embed_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ExternalEmbed<S> {
@@ -740,51 +716,51 @@ pub mod view_external_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Uri;
         type Description;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Uri = Unset;
         type Description = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Description = St::Description;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDescription<St> {}
-    impl<St: State> State for SetDescription<St> {
-        type Uri = St::Uri;
-        type Description = Set<members::description>;
-        type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
+        type Title = Set<members::title>;
         type Uri = St::Uri;
         type Description = St::Description;
-        type Title = Set<members::title>;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Title = St::Title;
+        type Uri = Set<members::uri>;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Title = St::Title;
+        type Uri = St::Uri;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
@@ -886,9 +862,9 @@ where
 impl<S: BosStr, St> ViewExternalBuilder<S, St>
 where
     St: view_external_state::State,
+    St::Title: view_external_state::IsSet,
     St::Uri: view_external_state::IsSet,
     St::Description: view_external_state::IsSet,
-    St::Title: view_external_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ViewExternal<S> {

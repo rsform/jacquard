@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::app_gainforest::evaluator::service;
 /// Definition of a single evaluation type produced by this evaluator.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EvaluationTypeDefinition<S: BosStr = DefaultStr> {
     ///The evaluation type identifier (must match an entry in evaluationTypes).
     pub identifier: S,
@@ -57,13 +51,7 @@ pub struct EvaluationTypeDefinition<S: BosStr = DefaultStr> {
 /// Localized name and description for an evaluation type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EvaluationTypeLocale<S: BosStr = DefaultStr> {
     ///Longer description of what this evaluation type does.
     pub description: S,
@@ -78,13 +66,7 @@ pub struct EvaluationTypeLocale<S: BosStr = DefaultStr> {
 /// Policies declaring what this evaluator does and how it operates.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EvaluatorPolicies<S: BosStr = DefaultStr> {
     ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -192,10 +174,7 @@ where
     rename_all = "camelCase",
     rename = "app.gainforest.evaluator.service",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Service<S: BosStr = DefaultStr> {
     ///Timestamp of when this evaluator service was declared.
@@ -209,13 +188,7 @@ pub struct Service<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -873,37 +846,37 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Policies;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Policies = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Policies = St::Policies;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `policies` field to Set
     pub struct SetPolicies<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPolicies<St> {}
     impl<St: State> State for SetPolicies<St> {
-        type CreatedAt = St::CreatedAt;
         type Policies = Set<members::policies>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Policies = St::Policies;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `policies` field
         pub struct policies(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -973,8 +946,8 @@ where
 impl<S: BosStr, St> ServiceBuilder<S, St>
 where
     St: service_state::State,
-    St::CreatedAt: service_state::IsSet,
     St::Policies: service_state::IsSet,
+    St::CreatedAt: service_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Service<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateLivestream<S: BosStr = DefaultStr> {
     ///The AT-URI of the livestream record to update.
     pub livestream_uri: AtUri<S>,
@@ -39,13 +33,7 @@ pub struct UpdateLivestream<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateLivestreamOutput<S: BosStr = DefaultStr> {
     ///The CID of the updated livestream record.
     pub cid: Cid<S>,
@@ -166,37 +154,37 @@ pub mod update_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LivestreamUri;
         type Streamer;
+        type LivestreamUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LivestreamUri = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `livestream_uri` field to Set
-    pub struct SetLivestreamUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLivestreamUri<St> {}
-    impl<St: State> State for SetLivestreamUri<St> {
-        type LivestreamUri = Set<members::livestream_uri>;
-        type Streamer = St::Streamer;
+        type LivestreamUri = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStreamer<St> {}
     impl<St: State> State for SetStreamer<St> {
-        type LivestreamUri = St::LivestreamUri;
         type Streamer = Set<members::streamer>;
+        type LivestreamUri = St::LivestreamUri;
+    }
+    ///State transition - sets the `livestream_uri` field to Set
+    pub struct SetLivestreamUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLivestreamUri<St> {}
+    impl<St: State> State for SetLivestreamUri<St> {
+        type Streamer = St::Streamer;
+        type LivestreamUri = Set<members::livestream_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `livestream_uri` field
-        pub struct livestream_uri(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `livestream_uri` field
+        pub struct livestream_uri(());
     }
 }
 
@@ -279,8 +267,8 @@ impl<S: BosStr, St: update_livestream_state::State> UpdateLivestreamBuilder<S, S
 impl<S: BosStr, St> UpdateLivestreamBuilder<S, St>
 where
     St: update_livestream_state::State,
-    St::LivestreamUri: update_livestream_state::IsSet,
     St::Streamer: update_livestream_state::IsSet,
+    St::LivestreamUri: update_livestream_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateLivestream<S> {

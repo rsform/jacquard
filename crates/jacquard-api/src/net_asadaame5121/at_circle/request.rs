@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::net_asadaame5121::at_circle::RingRef;
     rename_all = "camelCase",
     rename = "net.asadaame5121.at-circle.request",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Request<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -60,13 +57,7 @@ pub struct Request<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct RequestGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -178,67 +169,67 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SiteUrl;
-        type CreatedAt;
-        type SiteTitle;
         type Ring;
+        type SiteUrl;
+        type SiteTitle;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SiteUrl = Unset;
-        type CreatedAt = Unset;
-        type SiteTitle = Unset;
         type Ring = Unset;
-    }
-    ///State transition - sets the `site_url` field to Set
-    pub struct SetSiteUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSiteUrl<St> {}
-    impl<St: State> State for SetSiteUrl<St> {
-        type SiteUrl = Set<members::site_url>;
-        type CreatedAt = St::CreatedAt;
-        type SiteTitle = St::SiteTitle;
-        type Ring = St::Ring;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type SiteUrl = St::SiteUrl;
-        type CreatedAt = Set<members::created_at>;
-        type SiteTitle = St::SiteTitle;
-        type Ring = St::Ring;
-    }
-    ///State transition - sets the `site_title` field to Set
-    pub struct SetSiteTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSiteTitle<St> {}
-    impl<St: State> State for SetSiteTitle<St> {
-        type SiteUrl = St::SiteUrl;
-        type CreatedAt = St::CreatedAt;
-        type SiteTitle = Set<members::site_title>;
-        type Ring = St::Ring;
+        type SiteUrl = Unset;
+        type SiteTitle = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRing<St> {}
     impl<St: State> State for SetRing<St> {
-        type SiteUrl = St::SiteUrl;
-        type CreatedAt = St::CreatedAt;
-        type SiteTitle = St::SiteTitle;
         type Ring = Set<members::ring>;
+        type SiteUrl = St::SiteUrl;
+        type SiteTitle = St::SiteTitle;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `site_url` field to Set
+    pub struct SetSiteUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSiteUrl<St> {}
+    impl<St: State> State for SetSiteUrl<St> {
+        type Ring = St::Ring;
+        type SiteUrl = Set<members::site_url>;
+        type SiteTitle = St::SiteTitle;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `site_title` field to Set
+    pub struct SetSiteTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSiteTitle<St> {}
+    impl<St: State> State for SetSiteTitle<St> {
+        type Ring = St::Ring;
+        type SiteUrl = St::SiteUrl;
+        type SiteTitle = Set<members::site_title>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Ring = St::Ring;
+        type SiteUrl = St::SiteUrl;
+        type SiteTitle = St::SiteTitle;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site_url` field
-        pub struct site_url(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `site_title` field
-        pub struct site_title(());
         ///Marker type for the `ring` field
         pub struct ring(());
+        ///Marker type for the `site_url` field
+        pub struct site_url(());
+        ///Marker type for the `site_title` field
+        pub struct site_title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -379,10 +370,10 @@ where
 impl<S: BosStr, St> RequestBuilder<S, St>
 where
     St: request_state::State,
-    St::SiteUrl: request_state::IsSet,
-    St::CreatedAt: request_state::IsSet,
-    St::SiteTitle: request_state::IsSet,
     St::Ring: request_state::IsSet,
+    St::SiteUrl: request_state::IsSet,
+    St::SiteTitle: request_state::IsSet,
+    St::CreatedAt: request_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Request<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -20,13 +20,7 @@ use crate::tools_ozone::safelink::Event;
 use crate::tools_ozone::safelink::PatternType;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveRule<S: BosStr = DefaultStr> {
     ///Optional comment about why the rule is being removed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,13 +37,7 @@ pub struct RemoveRule<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveRuleOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Event<S>,
@@ -138,37 +126,37 @@ pub mod remove_rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pattern;
         type Url;
+        type Pattern;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pattern = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `pattern` field to Set
-    pub struct SetPattern<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPattern<St> {}
-    impl<St: State> State for SetPattern<St> {
-        type Pattern = Set<members::pattern>;
-        type Url = St::Url;
+        type Pattern = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type Pattern = St::Pattern;
         type Url = Set<members::url>;
+        type Pattern = St::Pattern;
+    }
+    ///State transition - sets the `pattern` field to Set
+    pub struct SetPattern<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPattern<St> {}
+    impl<St: State> State for SetPattern<St> {
+        type Url = St::Url;
+        type Pattern = Set<members::pattern>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pattern` field
-        pub struct pattern(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `pattern` field
+        pub struct pattern(());
     }
 }
 
@@ -264,8 +252,8 @@ where
 impl<S: BosStr, St> RemoveRuleBuilder<S, St>
 where
     St: remove_rule_state::State,
-    St::Pattern: remove_rule_state::IsSet,
     St::Url: remove_rule_state::IsSet,
+    St::Pattern: remove_rule_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RemoveRule<S> {

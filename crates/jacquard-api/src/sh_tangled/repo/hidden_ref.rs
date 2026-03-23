@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HiddenRef<S: BosStr = DefaultStr> {
     ///Fork reference name
     pub fork_ref: S,
@@ -38,13 +32,7 @@ pub struct HiddenRef<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HiddenRefOutput<S: BosStr = DefaultStr> {
     ///Error message if creation failed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -97,50 +85,50 @@ pub mod hidden_ref_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type ForkRef;
         type RemoteRef;
+        type ForkRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type ForkRef = Unset;
         type RemoteRef = Unset;
+        type ForkRef = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
+        type RemoteRef = St::RemoteRef;
         type ForkRef = St::ForkRef;
-        type RemoteRef = St::RemoteRef;
-    }
-    ///State transition - sets the `fork_ref` field to Set
-    pub struct SetForkRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetForkRef<St> {}
-    impl<St: State> State for SetForkRef<St> {
-        type Repo = St::Repo;
-        type ForkRef = Set<members::fork_ref>;
-        type RemoteRef = St::RemoteRef;
     }
     ///State transition - sets the `remote_ref` field to Set
     pub struct SetRemoteRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRemoteRef<St> {}
     impl<St: State> State for SetRemoteRef<St> {
         type Repo = St::Repo;
-        type ForkRef = St::ForkRef;
         type RemoteRef = Set<members::remote_ref>;
+        type ForkRef = St::ForkRef;
+    }
+    ///State transition - sets the `fork_ref` field to Set
+    pub struct SetForkRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetForkRef<St> {}
+    impl<St: State> State for SetForkRef<St> {
+        type Repo = St::Repo;
+        type RemoteRef = St::RemoteRef;
+        type ForkRef = Set<members::fork_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `fork_ref` field
-        pub struct fork_ref(());
         ///Marker type for the `remote_ref` field
         pub struct remote_ref(());
+        ///Marker type for the `fork_ref` field
+        pub struct fork_ref(());
     }
 }
 
@@ -230,8 +218,8 @@ impl<S: BosStr, St> HiddenRefBuilder<S, St>
 where
     St: hidden_ref_state::State,
     St::Repo: hidden_ref_state::IsSet,
-    St::ForkRef: hidden_ref_state::IsSet,
     St::RemoteRef: hidden_ref_state::IsSet,
+    St::ForkRef: hidden_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> HiddenRef<S> {

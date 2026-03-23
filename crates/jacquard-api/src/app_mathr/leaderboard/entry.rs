@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "app.mathr.leaderboard.entry",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Entry<S: BosStr = DefaultStr> {
     ///Timestamp when the score was verified and added to the leaderboard
@@ -72,13 +69,7 @@ pub struct Entry<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -192,83 +183,83 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type PlayerDid;
         type CreatedAt;
         type TotalChallenges;
         type Level;
-        type PlayerDid;
         type TotalSuccesses;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type PlayerDid = Unset;
         type CreatedAt = Unset;
         type TotalChallenges = Unset;
         type Level = Unset;
-        type PlayerDid = Unset;
         type TotalSuccesses = Unset;
+    }
+    ///State transition - sets the `player_did` field to Set
+    pub struct SetPlayerDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlayerDid<St> {}
+    impl<St: State> State for SetPlayerDid<St> {
+        type PlayerDid = Set<members::player_did>;
+        type CreatedAt = St::CreatedAt;
+        type TotalChallenges = St::TotalChallenges;
+        type Level = St::Level;
+        type TotalSuccesses = St::TotalSuccesses;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type PlayerDid = St::PlayerDid;
         type CreatedAt = Set<members::created_at>;
         type TotalChallenges = St::TotalChallenges;
         type Level = St::Level;
-        type PlayerDid = St::PlayerDid;
         type TotalSuccesses = St::TotalSuccesses;
     }
     ///State transition - sets the `total_challenges` field to Set
     pub struct SetTotalChallenges<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotalChallenges<St> {}
     impl<St: State> State for SetTotalChallenges<St> {
+        type PlayerDid = St::PlayerDid;
         type CreatedAt = St::CreatedAt;
         type TotalChallenges = Set<members::total_challenges>;
         type Level = St::Level;
-        type PlayerDid = St::PlayerDid;
         type TotalSuccesses = St::TotalSuccesses;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLevel<St> {}
     impl<St: State> State for SetLevel<St> {
+        type PlayerDid = St::PlayerDid;
         type CreatedAt = St::CreatedAt;
         type TotalChallenges = St::TotalChallenges;
         type Level = Set<members::level>;
-        type PlayerDid = St::PlayerDid;
-        type TotalSuccesses = St::TotalSuccesses;
-    }
-    ///State transition - sets the `player_did` field to Set
-    pub struct SetPlayerDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlayerDid<St> {}
-    impl<St: State> State for SetPlayerDid<St> {
-        type CreatedAt = St::CreatedAt;
-        type TotalChallenges = St::TotalChallenges;
-        type Level = St::Level;
-        type PlayerDid = Set<members::player_did>;
         type TotalSuccesses = St::TotalSuccesses;
     }
     ///State transition - sets the `total_successes` field to Set
     pub struct SetTotalSuccesses<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotalSuccesses<St> {}
     impl<St: State> State for SetTotalSuccesses<St> {
+        type PlayerDid = St::PlayerDid;
         type CreatedAt = St::CreatedAt;
         type TotalChallenges = St::TotalChallenges;
         type Level = St::Level;
-        type PlayerDid = St::PlayerDid;
         type TotalSuccesses = Set<members::total_successes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `player_did` field
+        pub struct player_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `total_challenges` field
         pub struct total_challenges(());
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `player_did` field
-        pub struct player_did(());
         ///Marker type for the `total_successes` field
         pub struct total_successes(());
     }
@@ -473,10 +464,10 @@ where
 impl<S: BosStr, St> EntryBuilder<S, St>
 where
     St: entry_state::State,
+    St::PlayerDid: entry_state::IsSet,
     St::CreatedAt: entry_state::IsSet,
     St::TotalChallenges: entry_state::IsSet,
     St::Level: entry_state::IsSet,
-    St::PlayerDid: entry_state::IsSet,
     St::TotalSuccesses: entry_state::IsSet,
 {
     /// Build the final struct.

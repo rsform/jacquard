@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 /// Arrow tensor format. Stores multi-dimensional arrays using Arrow's tensor IPC format. Versions maintained at https://json-schema.alt.science/atdata-arrow-tensor/{version}/

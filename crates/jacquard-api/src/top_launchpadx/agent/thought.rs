@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "top.launchpadx.agent.thought",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Thought<S: BosStr = DefaultStr> {
     ///Timestamp when the thought was recorded.
@@ -57,13 +54,7 @@ pub struct Thought<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ThoughtGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -129,37 +120,37 @@ pub mod thought_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WorkType;
         type CreatedAt;
+        type WorkType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WorkType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `work_type` field to Set
-    pub struct SetWorkType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorkType<St> {}
-    impl<St: State> State for SetWorkType<St> {
-        type WorkType = Set<members::work_type>;
-        type CreatedAt = St::CreatedAt;
+        type WorkType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type WorkType = St::WorkType;
         type CreatedAt = Set<members::created_at>;
+        type WorkType = St::WorkType;
+    }
+    ///State transition - sets the `work_type` field to Set
+    pub struct SetWorkType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorkType<St> {}
+    impl<St: State> State for SetWorkType<St> {
+        type CreatedAt = St::CreatedAt;
+        type WorkType = Set<members::work_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work_type` field
-        pub struct work_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `work_type` field
+        pub struct work_type(());
     }
 }
 
@@ -255,8 +246,8 @@ where
 impl<S: BosStr, St> ThoughtBuilder<S, St>
 where
     St: thought_state::State,
-    St::WorkType: thought_state::IsSet,
     St::CreatedAt: thought_state::IsSet,
+    St::WorkType: thought_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Thought<S> {

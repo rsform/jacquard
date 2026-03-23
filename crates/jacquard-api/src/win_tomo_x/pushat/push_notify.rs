@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,13 +19,7 @@ use serde::{Serialize, Deserialize};
 use crate::win_tomo_x::pushat::NotifyBody;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PushNotify<S: BosStr = DefaultStr> {
     pub body: NotifyBody<S>,
     ///The DID of the target user to whom the notification will be sent.
@@ -36,13 +30,7 @@ pub struct PushNotify<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PushNotifyOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -137,37 +125,37 @@ pub mod push_notify_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Body;
         type Target;
+        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Body = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBody<St> {}
-    impl<St: State> State for SetBody<St> {
-        type Body = Set<members::body>;
-        type Target = St::Target;
+        type Body = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTarget<St> {}
     impl<St: State> State for SetTarget<St> {
-        type Body = St::Body;
         type Target = Set<members::target>;
+        type Body = St::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBody<St> {}
+    impl<St: State> State for SetBody<St> {
+        type Target = St::Target;
+        type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `body` field
+        pub struct body(());
     }
 }
 
@@ -237,8 +225,8 @@ where
 impl<S: BosStr, St> PushNotifyBuilder<S, St>
 where
     St: push_notify_state::State,
-    St::Body: push_notify_state::IsSet,
     St::Target: push_notify_state::IsSet,
+    St::Body: push_notify_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PushNotify<S> {

@@ -18,7 +18,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,13 +36,7 @@ use serde::{Serialize, Deserialize};
 /// Object containing a blob to external data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LargeBlob<S: BosStr = DefaultStr> {
     ///Blob to external data (up to 100MB)
     pub blob: BlobRef<S>,
@@ -53,13 +47,7 @@ pub struct LargeBlob<S: BosStr = DefaultStr> {
 /// Object containing a large image
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LargeImage<S: BosStr = DefaultStr> {
     ///Image (up to 10MB)
     pub image: BlobRef<S>,
@@ -70,13 +58,7 @@ pub struct LargeImage<S: BosStr = DefaultStr> {
 /// Object containing a blob to external data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SmallBlob<S: BosStr = DefaultStr> {
     ///Blob to external data (up to 10MB)
     pub blob: BlobRef<S>,
@@ -87,13 +69,7 @@ pub struct SmallBlob<S: BosStr = DefaultStr> {
 /// Object containing a small image
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SmallImage<S: BosStr = DefaultStr> {
     ///Image (up to 5MB)
     pub image: BlobRef<S>,
@@ -104,13 +80,7 @@ pub struct SmallImage<S: BosStr = DefaultStr> {
 /// Object containing a small video
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SmallVideo<S: BosStr = DefaultStr> {
     ///Video (up to 20MB)
     pub video: BlobRef<S>,
@@ -121,13 +91,7 @@ pub struct SmallVideo<S: BosStr = DefaultStr> {
 /// Object containing a URI to external data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Uri<S: BosStr = DefaultStr> {
     ///URI to external data
     pub uri: UriValue<S>,

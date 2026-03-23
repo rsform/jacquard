@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::com_deckbelcher::richtext::Document;
     rename_all = "camelCase",
     rename = "com.deckbelcher.social.reply",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Reply<S: BosStr = DefaultStr> {
     ///Rich text content.
@@ -58,13 +55,7 @@ pub struct Reply<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ReplyGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -132,8 +123,8 @@ pub mod reply_state {
     pub trait State: sealed::Sealed {
         type Content;
         type Parent;
-        type Root;
         type CreatedAt;
+        type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -141,8 +132,8 @@ pub mod reply_state {
     impl State for Empty {
         type Content = Unset;
         type Parent = Unset;
-        type Root = Unset;
         type CreatedAt = Unset;
+        type Root = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
@@ -150,8 +141,8 @@ pub mod reply_state {
     impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
         type Parent = St::Parent;
-        type Root = St::Root;
         type CreatedAt = St::CreatedAt;
+        type Root = St::Root;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<St: State = Empty>(PhantomData<fn() -> St>);
@@ -159,17 +150,8 @@ pub mod reply_state {
     impl<St: State> State for SetParent<St> {
         type Content = St::Content;
         type Parent = Set<members::parent>;
+        type CreatedAt = St::CreatedAt;
         type Root = St::Root;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoot<St> {}
-    impl<St: State> State for SetRoot<St> {
-        type Content = St::Content;
-        type Parent = St::Parent;
-        type Root = Set<members::root>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -177,8 +159,17 @@ pub mod reply_state {
     impl<St: State> State for SetCreatedAt<St> {
         type Content = St::Content;
         type Parent = St::Parent;
-        type Root = St::Root;
         type CreatedAt = Set<members::created_at>;
+        type Root = St::Root;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoot<St> {}
+    impl<St: State> State for SetRoot<St> {
+        type Content = St::Content;
+        type Parent = St::Parent;
+        type CreatedAt = St::CreatedAt;
+        type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -187,10 +178,10 @@ pub mod reply_state {
         pub struct content(());
         ///Marker type for the `parent` field
         pub struct parent(());
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `root` field
+        pub struct root(());
     }
 }
 
@@ -319,8 +310,8 @@ where
     St: reply_state::State,
     St::Content: reply_state::IsSet,
     St::Parent: reply_state::IsSet,
-    St::Root: reply_state::IsSet,
     St::CreatedAt: reply_state::IsSet,
+    St::Root: reply_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Reply<S> {

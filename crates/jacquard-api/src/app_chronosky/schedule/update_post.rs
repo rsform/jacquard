@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,13 +41,7 @@ use crate::app_chronosky::schedule::update_post;
 /// Image reference that supports both new blob uploads and existing image CID references.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageRef<S: BosStr = DefaultStr> {
     ///Alt text for the image.
     pub alt: S,
@@ -64,13 +58,7 @@ pub struct ImageRef<S: BosStr = DefaultStr> {
 /// Images embed that supports CID references for existing images.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImagesEmbed<S: BosStr = DefaultStr> {
     pub images: Vec<update_post::ImageRef<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -79,13 +67,7 @@ pub struct ImagesEmbed<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdatePost<S: BosStr = DefaultStr> {
     ///Whether to disable quote posts
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -120,13 +102,7 @@ pub struct UpdatePost<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum UpdatePostEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "app.chronosky.schedule.updatePost#imagesEmbed")]
     ImagesEmbed(Box<update_post::ImagesEmbed<S>>),
@@ -145,13 +121,7 @@ pub enum UpdatePostEmbed<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum UpdatePostThreadgateRulesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     ThreadgateMentionRule(Box<MentionRule<S>>),
@@ -165,13 +135,7 @@ pub enum UpdatePostThreadgateRulesItem<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdatePostOutput<S: BosStr = DefaultStr> {
     pub post: ScheduledPost<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]

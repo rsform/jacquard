@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -28,13 +28,7 @@ use serde::{Serialize, Deserialize};
 /// Attestation signature proving a score was submitted through ATPlay SDK
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Attestation<S: BosStr = DefaultStr> {
     ///Timestamp when the attestation was created (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -84,37 +78,37 @@ pub mod attestation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
         type Key;
+        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSignature<St> {}
-    impl<St: State> State for SetSignature<St> {
-        type Signature = Set<members::signature>;
-        type Key = St::Key;
+        type Signature = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
-        type Signature = St::Signature;
         type Key = Set<members::key>;
+        type Signature = St::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignature<St> {}
+    impl<St: State> State for SetSignature<St> {
+        type Key = St::Key;
+        type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
     }
 }
 
@@ -197,8 +191,8 @@ where
 impl<S: BosStr, St> AttestationBuilder<S, St>
 where
     St: attestation_state::State,
-    St::Signature: attestation_state::IsSet,
     St::Key: attestation_state::IsSet,
+    St::Signature: attestation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Attestation<S> {

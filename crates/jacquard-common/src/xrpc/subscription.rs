@@ -3,6 +3,7 @@
 //! This module defines traits and types for typed WebSocket subscriptions,
 //! mirroring the request/response pattern used for HTTP XRPC endpoints.
 
+use crate::bos::BosStr;
 use crate::deps::fluent_uri::{
     ParseError, Uri,
     pct_enc::{
@@ -13,9 +14,7 @@ use crate::deps::fluent_uri::{
 use crate::error::DecodeError;
 use crate::stream::StreamError;
 use crate::websocket::{WebSocketClient, WebSocketConnection, WsSink, WsStream};
-use crate::bos::BosStr;
 use crate::{CowStr, Data, IntoStatic, RawData, WsMessage};
-use smol_str::SmolStr;
 use alloc::borrow::ToOwned;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -27,8 +26,9 @@ use core::marker::PhantomData;
 use n0_future::stream::Boxed;
 #[cfg(target_arch = "wasm32")]
 use n0_future::stream::BoxedLocal as Boxed;
-use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 
 /// Encoding format for subscription messages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -84,7 +84,7 @@ pub trait SubscriptionResp {
 /// It defines the NSID and associated stream response type.
 ///
 /// The trait is implemented on the subscription parameters type.
-pub trait XrpcSubscription: Serialize {
+pub trait XrpcSubscription {
     /// The NSID for this XRPC subscription
     const NSID: &'static str;
 
@@ -101,7 +101,10 @@ pub trait XrpcSubscription: Serialize {
     /// Encode query params for WebSocket URL
     ///
     /// Default implementation uses serde_html_form to encode the struct as query parameters.
-    fn query_params(&self) -> Vec<(String, String)> {
+    fn query_params(&self) -> Vec<(String, String)>
+    where
+        Self: Serialize,
+    {
         // Default: use serde_html_form to encode self
         serde_html_form::to_string(self)
             .ok()
@@ -191,45 +194,33 @@ pub fn parse_event_header<'a>(bytes: &'a [u8]) -> Result<(EventHeader, &'a [u8])
 /// Decode JSON messages from a WebSocket stream
 pub fn decode_json_msg<S: SubscriptionResp>(
     msg_result: Result<crate::websocket::WsMessage, StreamError>,
-) -> Option<Result<StreamMessage<'static, S>, StreamError>>
+) -> Option<Result<StreamMessage<SmolStr, S>, StreamError>>
 where
-    for<'a> StreamMessage<'a, S>: IntoStatic<Output = StreamMessage<'static, S>>,
+    StreamMessage<SmolStr, S>: DeserializeOwned,
 {
     use crate::websocket::WsMessage;
 
     match msg_result {
-        Ok(WsMessage::Text(text)) => Some(
-            S::decode_message(text.as_ref())
-                .map(|v| v.into_static())
-                .map_err(StreamError::decode),
-        ),
+        Ok(WsMessage::Text(text)) => {
+            Some(S::decode_message::<SmolStr>(text.as_ref()).map_err(StreamError::decode))
+        }
         Ok(WsMessage::Binary(bytes)) => {
             #[cfg(feature = "zstd")]
             {
                 // Try to decompress with zstd first (Jetstream uses zstd compression)
                 match decompress_zstd(&bytes) {
                     Ok(decompressed) => Some(
-                        S::decode_message(&decompressed)
-                            .map(|v| v.into_static())
-                            .map_err(StreamError::decode),
+                        S::decode_message::<SmolStr>(&decompressed).map_err(StreamError::decode),
                     ),
                     Err(_) => {
                         // Not zstd-compressed, try direct decode
-                        Some(
-                            S::decode_message(&bytes)
-                                .map(|v| v.into_static())
-                                .map_err(StreamError::decode),
-                        )
+                        Some(S::decode_message::<SmolStr>(&bytes).map_err(StreamError::decode))
                     }
                 }
             }
             #[cfg(not(feature = "zstd"))]
             {
-                Some(
-                    S::decode_message(&bytes)
-                        .map(|v| v.into_static())
-                        .map_err(StreamError::decode),
-                )
+                Some(S::decode_message::<SmolStr>(&bytes).map_err(StreamError::decode))
             }
         }
         Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
@@ -258,18 +249,16 @@ fn decompress_zstd(bytes: &[u8]) -> Result<Vec<u8>, std::io::Error> {
 /// Decode CBOR messages from a WebSocket stream
 pub fn decode_cbor_msg<S: SubscriptionResp>(
     msg_result: Result<crate::websocket::WsMessage, StreamError>,
-) -> Option<Result<StreamMessage<'static, S>, StreamError>>
+) -> Option<Result<StreamMessage<SmolStr, S>, StreamError>>
 where
-    for<'a> StreamMessage<'a, S>: IntoStatic<Output = StreamMessage<'static, S>>,
+    StreamMessage<SmolStr, S>: DeserializeOwned,
 {
     use crate::websocket::WsMessage;
 
     match msg_result {
-        Ok(WsMessage::Binary(bytes)) => Some(
-            S::decode_message(&bytes)
-                .map(|v| v.into_static())
-                .map_err(StreamError::decode),
-        ),
+        Ok(WsMessage::Binary(bytes)) => {
+            Some(S::decode_message::<SmolStr>(&bytes).map_err(StreamError::decode))
+        }
         Ok(WsMessage::Text(_)) => Some(Err(StreamError::wrong_message_format(
             "expected binary frame for CBOR, got text",
         ))),
@@ -370,10 +359,10 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         self,
     ) -> (
         WsSink,
-        Boxed<Result<StreamMessage<'static, S>, StreamError>>,
+        Boxed<Result<StreamMessage<SmolStr, S>, StreamError>>,
     )
     where
-        for<'a> StreamMessage<'a, S>: IntoStatic<Output = StreamMessage<'static, S>>,
+        StreamMessage<SmolStr, S>: DeserializeOwned,
     {
         use n0_future::StreamExt as _;
 
@@ -548,7 +537,10 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         }
         fn parse_cbor(
             bytes: &[u8],
-        ) -> Result<Data<smol_str::SmolStr>, serde_ipld_dagcbor::DecodeError<core::convert::Infallible>> {
+        ) -> Result<
+            Data<smol_str::SmolStr>,
+            serde_ipld_dagcbor::DecodeError<core::convert::Infallible>,
+        > {
             serde_ipld_dagcbor::from_slice(bytes)
         }
 
@@ -677,9 +669,9 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
     /// Replaces the internal WebSocket stream with one copy and returns a typed decoded
     /// stream. Both streams receive all messages. Useful for observing raw messages
     /// while also processing typed messages.
-    pub fn tee(&mut self) -> Boxed<Result<StreamMessage<'static, S>, StreamError>>
+    pub fn tee(&mut self) -> Boxed<Result<StreamMessage<SmolStr, S>, StreamError>>
     where
-        for<'a> StreamMessage<'a, S>: IntoStatic<Output = StreamMessage<'static, S>>,
+        StreamMessage<SmolStr, S>: DeserializeOwned,
     {
         use n0_future::StreamExt as _;
 
@@ -734,7 +726,7 @@ pub trait SubscriptionEndpoint {
     const ENCODING: MessageEncoding;
 
     /// Subscription parameters type
-    type Params<'de>: XrpcSubscription + Deserialize<'de> + IntoStatic;
+    type Params<S: BosStr>: XrpcSubscription;
 
     /// Stream response type
     type Stream: SubscriptionResp;
@@ -893,7 +885,7 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
         params: &Sub,
     ) -> Result<SubscriptionStream<Sub::Stream>, C::Error>
     where
-        Sub: XrpcSubscription,
+        Sub: XrpcSubscription + Serialize,
     {
         let query_params = params.query_params();
         let uri = build_subscription_uri(&self.base, Sub::NSID, Sub::CUSTOM_PATH, &query_params)
@@ -929,7 +921,7 @@ pub trait SubscriptionClient: WebSocketClient {
         params: &Sub,
     ) -> impl Future<Output = Result<SubscriptionStream<Sub::Stream>, Self::Error>>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Serialize + Send + Sync,
         Self: Sync;
 
     /// Subscribe to an XRPC subscription endpoint using the client's base URI and options.
@@ -939,7 +931,7 @@ pub trait SubscriptionClient: WebSocketClient {
         params: &Sub,
     ) -> impl Future<Output = Result<SubscriptionStream<Sub::Stream>, Self::Error>>
     where
-        Sub: XrpcSubscription + Send + Sync;
+        Sub: XrpcSubscription + Serialize + Send + Sync;
 
     /// Subscribe with custom options.
     #[cfg(not(target_arch = "wasm32"))]
@@ -949,7 +941,7 @@ pub trait SubscriptionClient: WebSocketClient {
         opts: SubscriptionOptions<'_>,
     ) -> impl Future<Output = Result<SubscriptionStream<Sub::Stream>, Self::Error>>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Serialize + Send + Sync,
         Self: Sync;
 
     /// Subscribe with custom options.
@@ -960,7 +952,7 @@ pub trait SubscriptionClient: WebSocketClient {
         opts: SubscriptionOptions<'_>,
     ) -> impl Future<Output = Result<SubscriptionStream<Sub::Stream>, Self::Error>>
     where
-        Sub: XrpcSubscription + Send + Sync;
+        Sub: XrpcSubscription + Serialize + Send + Sync;
 }
 
 /// Simple stateless subscription client wrapping a WebSocketClient.
@@ -1027,7 +1019,7 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         params: &Sub,
     ) -> Result<SubscriptionStream<Sub::Stream>, Self::Error>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Serialize + Send + Sync,
         Self: Sync,
     {
         let opts = self.subscription_opts().await;
@@ -1040,7 +1032,7 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         params: &Sub,
     ) -> Result<SubscriptionStream<Sub::Stream>, Self::Error>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Serialize + Send + Sync,
     {
         let opts = self.subscription_opts().await;
         self.subscribe_with_opts(params, opts).await
@@ -1053,7 +1045,7 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         opts: SubscriptionOptions<'_>,
     ) -> Result<SubscriptionStream<Sub::Stream>, Self::Error>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Serialize + Send + Sync,
         Self: Sync,
     {
         let base = self.base_uri().await;
@@ -1070,7 +1062,7 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         opts: SubscriptionOptions<'_>,
     ) -> Result<SubscriptionStream<Sub::Stream>, Self::Error>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Serialize + Send + Sync,
     {
         let base = self.base_uri().await;
         self.subscription(base)

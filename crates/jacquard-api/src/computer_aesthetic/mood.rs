@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "computer.aesthetic.mood",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Mood<S: BosStr = DefaultStr> {
     ///The mood text content
@@ -53,13 +50,7 @@ pub struct Mood<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct MoodGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -137,50 +128,50 @@ pub mod mood_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type When;
-        type Ref;
         type Mood;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type When = Unset;
-        type Ref = Unset;
         type Mood = Unset;
+        type Ref = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWhen<St> {}
     impl<St: State> State for SetWhen<St> {
         type When = Set<members::when>;
+        type Mood = St::Mood;
         type Ref = St::Ref;
-        type Mood = St::Mood;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRef<St> {}
-    impl<St: State> State for SetRef<St> {
-        type When = St::When;
-        type Ref = Set<members::r#ref>;
-        type Mood = St::Mood;
     }
     ///State transition - sets the `mood` field to Set
     pub struct SetMood<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMood<St> {}
     impl<St: State> State for SetMood<St> {
         type When = St::When;
-        type Ref = St::Ref;
         type Mood = Set<members::mood>;
+        type Ref = St::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type When = St::When;
+        type Mood = St::Mood;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `mood` field
         pub struct mood(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
@@ -270,8 +261,8 @@ impl<S: BosStr, St> MoodBuilder<S, St>
 where
     St: mood_state::State,
     St::When: mood_state::IsSet,
-    St::Ref: mood_state::IsSet,
     St::Mood: mood_state::IsSet,
+    St::Ref: mood_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Mood<S> {

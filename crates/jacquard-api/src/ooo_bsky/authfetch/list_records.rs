@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,13 +28,7 @@ use crate::ooo_bsky::authfetch::strategy::Strategy;
 use crate::ooo_bsky::authfetch::list_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRecords<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,13 +43,7 @@ pub struct ListRecords<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRecordsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -67,13 +55,7 @@ pub struct ListRecordsOutput<S: BosStr = DefaultStr> {
 /// A record in the hidden repository.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Record<S: BosStr = DefaultStr> {
     ///The strategy used to authenticate fetch requests for this record.
     pub strategy: Strategy<S>,
@@ -270,50 +252,50 @@ pub mod record_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Strategy;
-        type Uri;
         type Value;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Strategy = Unset;
-        type Uri = Unset;
         type Value = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `strategy` field to Set
     pub struct SetStrategy<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStrategy<St> {}
     impl<St: State> State for SetStrategy<St> {
         type Strategy = Set<members::strategy>;
+        type Value = St::Value;
         type Uri = St::Uri;
-        type Value = St::Value;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Strategy = St::Strategy;
-        type Uri = Set<members::uri>;
-        type Value = St::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
         type Strategy = St::Strategy;
-        type Uri = St::Uri;
         type Value = Set<members::value>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Strategy = St::Strategy;
+        type Value = St::Value;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `strategy` field
         pub struct strategy(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -403,8 +385,8 @@ impl<S: BosStr, St> RecordBuilder<S, St>
 where
     St: record_state::State,
     St::Strategy: record_state::IsSet,
-    St::Uri: record_state::IsSet,
     St::Value: record_state::IsSet,
+    St::Uri: record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Record<S> {

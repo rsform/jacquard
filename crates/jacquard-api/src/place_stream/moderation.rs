@@ -18,7 +18,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,13 +35,7 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PermissionView<S: BosStr = DefaultStr> {
     ///The streamer who granted these permissions
     pub author: ProfileViewBasic<S>,
@@ -80,8 +74,8 @@ pub mod permission_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
         type Record;
+        type Author;
         type Uri;
         type Cid;
     }
@@ -89,26 +83,26 @@ pub mod permission_view_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
         type Record = Unset;
+        type Author = Unset;
         type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthor<St> {}
-    impl<St: State> State for SetAuthor<St> {
-        type Author = Set<members::author>;
-        type Record = St::Record;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Author = St::Author;
         type Record = Set<members::record>;
+        type Author = St::Author;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Record = St::Record;
+        type Author = Set<members::author>;
         type Uri = St::Uri;
         type Cid = St::Cid;
     }
@@ -116,8 +110,8 @@ pub mod permission_view_state {
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Author = St::Author;
         type Record = St::Record;
+        type Author = St::Author;
         type Uri = Set<members::uri>;
         type Cid = St::Cid;
     }
@@ -125,18 +119,18 @@ pub mod permission_view_state {
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Author = St::Author;
         type Record = St::Record;
+        type Author = St::Author;
         type Uri = St::Uri;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
@@ -253,8 +247,8 @@ where
 impl<S: BosStr, St> PermissionViewBuilder<S, St>
 where
     St: permission_view_state::State,
-    St::Author: permission_view_state::IsSet,
     St::Record: permission_view_state::IsSet,
+    St::Author: permission_view_state::IsSet,
     St::Uri: permission_view_state::IsSet,
     St::Cid: permission_view_state::IsSet,
 {

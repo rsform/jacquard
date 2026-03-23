@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Merge<S: BosStr = DefaultStr> {
     ///Author email for the merge commit
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -90,8 +84,8 @@ pub mod merge_state {
     pub trait State: sealed::Sealed {
         type Patch;
         type Name;
-        type Did;
         type Branch;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -99,8 +93,8 @@ pub mod merge_state {
     impl State for Empty {
         type Patch = Unset;
         type Name = Unset;
-        type Did = Unset;
         type Branch = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
@@ -108,8 +102,8 @@ pub mod merge_state {
     impl<St: State> State for SetPatch<St> {
         type Patch = Set<members::patch>;
         type Name = St::Name;
-        type Did = St::Did;
         type Branch = St::Branch;
+        type Did = St::Did;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
@@ -117,17 +111,8 @@ pub mod merge_state {
     impl<St: State> State for SetName<St> {
         type Patch = St::Patch;
         type Name = Set<members::name>;
+        type Branch = St::Branch;
         type Did = St::Did;
-        type Branch = St::Branch;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Patch = St::Patch;
-        type Name = St::Name;
-        type Did = Set<members::did>;
-        type Branch = St::Branch;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
@@ -135,8 +120,17 @@ pub mod merge_state {
     impl<St: State> State for SetBranch<St> {
         type Patch = St::Patch;
         type Name = St::Name;
-        type Did = St::Did;
         type Branch = Set<members::branch>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Patch = St::Patch;
+        type Name = St::Name;
+        type Branch = St::Branch;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -145,10 +139,10 @@ pub mod merge_state {
         pub struct patch(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `branch` field
         pub struct branch(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -319,8 +313,8 @@ where
     St: merge_state::State,
     St::Patch: merge_state::IsSet,
     St::Name: merge_state::IsSet,
-    St::Did: merge_state::IsSet,
     St::Branch: merge_state::IsSet,
+    St::Did: merge_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Merge<S> {

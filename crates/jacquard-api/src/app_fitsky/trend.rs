@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use serde::{Serialize, Deserialize};
 use crate::app_fitsky::trend;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DataPoint<S: BosStr = DefaultStr> {
     pub date: Datetime,
     ///Value in base units (meters, seconds, calories, count, bpm)
@@ -53,10 +47,7 @@ pub struct DataPoint<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "app.fitsky.trend",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Trend<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -435,13 +426,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct TrendGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -451,13 +436,7 @@ pub struct TrendGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TrendSummary<S: BosStr = DefaultStr> {
     ///Average value in base units
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -968,85 +947,85 @@ pub mod trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WidgetType;
         type Period;
+        type WidgetType;
+        type Metric;
         type Summary;
         type CreatedAt;
-        type Metric;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WidgetType = Unset;
         type Period = Unset;
+        type WidgetType = Unset;
+        type Metric = Unset;
         type Summary = Unset;
         type CreatedAt = Unset;
-        type Metric = Unset;
-    }
-    ///State transition - sets the `widget_type` field to Set
-    pub struct SetWidgetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWidgetType<St> {}
-    impl<St: State> State for SetWidgetType<St> {
-        type WidgetType = Set<members::widget_type>;
-        type Period = St::Period;
-        type Summary = St::Summary;
-        type CreatedAt = St::CreatedAt;
-        type Metric = St::Metric;
     }
     ///State transition - sets the `period` field to Set
     pub struct SetPeriod<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPeriod<St> {}
     impl<St: State> State for SetPeriod<St> {
-        type WidgetType = St::WidgetType;
         type Period = Set<members::period>;
+        type WidgetType = St::WidgetType;
+        type Metric = St::Metric;
         type Summary = St::Summary;
         type CreatedAt = St::CreatedAt;
-        type Metric = St::Metric;
     }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSummary<St> {}
-    impl<St: State> State for SetSummary<St> {
-        type WidgetType = St::WidgetType;
+    ///State transition - sets the `widget_type` field to Set
+    pub struct SetWidgetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidgetType<St> {}
+    impl<St: State> State for SetWidgetType<St> {
         type Period = St::Period;
-        type Summary = Set<members::summary>;
-        type CreatedAt = St::CreatedAt;
+        type WidgetType = Set<members::widget_type>;
         type Metric = St::Metric;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type WidgetType = St::WidgetType;
-        type Period = St::Period;
         type Summary = St::Summary;
-        type CreatedAt = Set<members::created_at>;
-        type Metric = St::Metric;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMetric<St> {}
     impl<St: State> State for SetMetric<St> {
-        type WidgetType = St::WidgetType;
         type Period = St::Period;
+        type WidgetType = St::WidgetType;
+        type Metric = Set<members::metric>;
         type Summary = St::Summary;
         type CreatedAt = St::CreatedAt;
-        type Metric = Set<members::metric>;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSummary<St> {}
+    impl<St: State> State for SetSummary<St> {
+        type Period = St::Period;
+        type WidgetType = St::WidgetType;
+        type Metric = St::Metric;
+        type Summary = Set<members::summary>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Period = St::Period;
+        type WidgetType = St::WidgetType;
+        type Metric = St::Metric;
+        type Summary = St::Summary;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `widget_type` field
-        pub struct widget_type(());
         ///Marker type for the `period` field
         pub struct period(());
+        ///Marker type for the `widget_type` field
+        pub struct widget_type(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
         ///Marker type for the `summary` field
         pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
     }
 }
 
@@ -1238,11 +1217,11 @@ where
 impl<S: BosStr, St> TrendBuilder<S, St>
 where
     St: trend_state::State,
-    St::WidgetType: trend_state::IsSet,
     St::Period: trend_state::IsSet,
+    St::WidgetType: trend_state::IsSet,
+    St::Metric: trend_state::IsSet,
     St::Summary: trend_state::IsSet,
     St::CreatedAt: trend_state::IsSet,
-    St::Metric: trend_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Trend<S> {

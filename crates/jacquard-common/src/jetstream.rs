@@ -3,6 +3,7 @@
 //! Jetstream is a simplified JSON-based alternative to the atproto firehose.
 //! Unlike subscribeRepos which uses DAG-CBOR, Jetstream uses JSON encoding.
 
+use crate::bos::{BosStr, DefaultStr};
 use crate::types::cid::Cid;
 use crate::types::nsid::Nsid;
 use crate::types::string::{Datetime, Did, Handle, Rkey};
@@ -16,18 +17,16 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(feature = "std", builder(start_fn = new))]
-pub struct JetstreamParams<'a> {
+pub struct JetstreamParams<S: BosStr = DefaultStr> {
     /// Filter by collection NSIDs (max 100)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub wanted_collections: Option<Vec<Nsid<CowStr<'a>>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wanted_collections: Option<Vec<Nsid<S>>>,
 
     /// Filter by DIDs (max 10,000)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    // TODO: add S: Bos<...> param
     #[builder(into)]
-    pub wanted_dids: Option<Vec<Did>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wanted_dids: Option<Vec<Did<S>>>,
 
     /// Unix microseconds timestamp to start playback
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,49 +72,40 @@ pub struct RawJetstreamCommit<'a> {
     #[serde(borrow)]
     pub rkey: CowStr<'a>,
     /// Record data (present for create/update)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
+    #[serde(borrow, skip_serializing_if = "Option::is_none")]
     pub record: Option<RawData<'a>>,
     /// Content identifier
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
+    #[serde(borrow, skip_serializing_if = "Option::is_none")]
     pub cid: Option<CowStr<'a>>,
 }
 
 /// Commit event details (additional validation)
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct JetstreamCommit<'a> {
+pub struct JetstreamCommit<S: BosStr = DefaultStr> {
     /// Revision string
-    #[serde(borrow)]
-    pub rev: CowStr<'a>,
+    pub rev: S,
     /// Operation type
     pub operation: CommitOperation,
     /// Collection NSID
-    #[serde(borrow)]
-    pub collection: Nsid<CowStr<'a>>,
+    pub collection: Nsid<S>,
     /// Record key
-    #[serde(borrow)]
-    pub rkey: Rkey<CowStr<'a>>,
+    pub rkey: Rkey<S>,
     /// Record data (present for create/update)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub record: Option<Data<CowStr<'a>>>,
+    pub record: Option<Data<S>>,
     /// Content identifier
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<CowStr<'a>>>,
+    pub cid: Option<Cid<S>>,
 }
 
 /// Identity event details
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct JetstreamIdentity<'a> {
+pub struct JetstreamIdentity<S: BosStr = DefaultStr> {
     /// DID
-    // TODO: add S: Bos<...> param
-    pub did: Did,
+    pub did: Did<S>,
     /// Handle
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<Handle<CowStr<'a>>>,
+    pub handle: Option<Handle<S>>,
     /// Sequence number
     pub seq: i64,
     /// Timestamp
@@ -124,72 +114,67 @@ pub struct JetstreamIdentity<'a> {
 
 /// Account event details
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct JetstreamAccount<'a> {
+pub struct JetstreamAccount<S: BosStr = DefaultStr> {
     /// Account active status
     pub active: bool,
     /// DID
-    // TODO: add S: Bos<...> param
-    pub did: Did,
+    pub did: Did<S>,
     /// Sequence number
     pub seq: i64,
     /// Timestamp
     pub time: Datetime,
     /// Optional status message
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<CowStr<'a>>,
+    pub status: Option<S>,
 }
 
 /// Jetstream event message
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "kind")]
-#[serde(rename_all = "lowercase")]
-pub enum JetstreamMessage<'a> {
+#[serde(tag = "kind", rename_all = "lowercase")]
+pub enum JetstreamMessage<S: BosStr = DefaultStr> {
     /// Commit event
     Commit {
         /// DID
-        // TODO: add S: Bos<...> param
-        did: Did,
+        did: Did<S>,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Commit details
-        #[serde(borrow)]
-        commit: JetstreamCommit<'a>,
+        commit: JetstreamCommit<S>,
     },
     /// Identity event
     Identity {
         /// DID
-        // TODO: add S: Bos<...> param
-        did: Did,
+        did: Did<S>,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Identity details
-        #[serde(borrow)]
-        identity: JetstreamIdentity<'a>,
+        identity: JetstreamIdentity<S>,
     },
     /// Account event
     Account {
         /// DID
-        // TODO: add S: Bos<...> param
-        did: Did,
+        did: Did<S>,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Account details
-        #[serde(borrow)]
-        account: JetstreamAccount<'a>,
+        account: JetstreamAccount<S>,
     },
 }
 
-/// Jetstream event message
+/// Jetstream event message (minimal validation — uses raw data types)
+///
+/// The `identity` and `account` variants use `CowStr<'a>` as their backing string type,
+/// while `commit` is backed by `RawJetstreamCommit<'a>` which uses `RawData<'a>` for
+/// the record field. Until `RawData` is migrated to BOS type parameters, this type
+/// retains a lifetime parameter.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "kind")]
-#[serde(rename_all = "lowercase")]
+#[serde(tag = "kind", rename_all = "lowercase")]
 pub enum RawJetstreamMessage<'a> {
     /// Commit event
     Commit {
         /// DID
-        // TODO: add S: Bos<...> param
-        did: Did,
+        #[serde(borrow)]
+        did: Did<CowStr<'a>>,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Commit details
@@ -199,26 +184,26 @@ pub enum RawJetstreamMessage<'a> {
     /// Identity event
     Identity {
         /// DID
-        // TODO: add S: Bos<...> param
-        did: Did,
+        #[serde(borrow)]
+        did: Did<CowStr<'a>>,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Identity details
         #[serde(borrow)]
-        identity: JetstreamIdentity<'a>,
+        identity: JetstreamIdentity<CowStr<'a>>,
     },
     /// Account event
     Account {
         /// DID
-        // TODO: add S: Bos<...> param
-        did: Did,
+        #[serde(borrow)]
+        did: Did<CowStr<'a>>,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Account details
         #[serde(borrow)]
-        account: JetstreamAccount<'a>,
+        account: JetstreamAccount<CowStr<'a>>,
     },
-    /// Unknown messsage type
+    /// Unknown message type
     #[serde(untagged)]
     Unknown(RawData<'a>),
 }
@@ -231,8 +216,12 @@ impl IntoStatic for CommitOperation {
     }
 }
 
-impl IntoStatic for JetstreamCommit<'_> {
-    type Output = JetstreamCommit<'static>;
+impl<S> IntoStatic for JetstreamCommit<S>
+where
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = JetstreamCommit<S::Output>;
 
     fn into_static(self) -> Self::Output {
         JetstreamCommit {
@@ -261,8 +250,12 @@ impl IntoStatic for RawJetstreamCommit<'_> {
     }
 }
 
-impl IntoStatic for JetstreamIdentity<'_> {
-    type Output = JetstreamIdentity<'static>;
+impl<S> IntoStatic for JetstreamIdentity<S>
+where
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = JetstreamIdentity<S::Output>;
 
     fn into_static(self) -> Self::Output {
         JetstreamIdentity {
@@ -274,8 +267,12 @@ impl IntoStatic for JetstreamIdentity<'_> {
     }
 }
 
-impl IntoStatic for JetstreamAccount<'_> {
-    type Output = JetstreamAccount<'static>;
+impl<S> IntoStatic for JetstreamAccount<S>
+where
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = JetstreamAccount<S::Output>;
 
     fn into_static(self) -> Self::Output {
         JetstreamAccount {
@@ -288,8 +285,12 @@ impl IntoStatic for JetstreamAccount<'_> {
     }
 }
 
-impl IntoStatic for JetstreamMessage<'_> {
-    type Output = JetstreamMessage<'static>;
+impl<S> IntoStatic for JetstreamMessage<S>
+where
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = JetstreamMessage<S::Output>;
 
     fn into_static(self) -> Self::Output {
         match self {
@@ -369,21 +370,24 @@ impl SubscriptionResp for JetstreamStream {
     const ENCODING: MessageEncoding = MessageEncoding::Json;
 
     /// Typed Jetstream message
-    type Message<'de> = JetstreamMessage<'de>;
+    type Message<S: BosStr> = JetstreamMessage<S>;
 
     /// Generic error type
     type Error = crate::xrpc::GenericError;
 }
 
-impl<'a> XrpcSubscription for JetstreamParams<'a> {
+impl<S: BosStr + Serialize> XrpcSubscription for JetstreamParams<S> {
     const NSID: &'static str = "jetstream";
     const ENCODING: MessageEncoding = MessageEncoding::Json;
     const CUSTOM_PATH: Option<&'static str> = Some("/subscribe");
     type Stream = JetstreamStream;
 }
 
-impl IntoStatic for JetstreamParams<'_> {
-    type Output = JetstreamParams<'static>;
+impl<S: BosStr + IntoStatic> IntoStatic for JetstreamParams<S>
+where
+    S::Output: BosStr,
+{
+    type Output = JetstreamParams<S::Output>;
 
     fn into_static(self) -> Self::Output {
         JetstreamParams {
@@ -403,20 +407,18 @@ impl IntoStatic for JetstreamParams<'_> {
 
 /// Parameters for subscribing to Jetstream
 #[cfg_attr(feature = "std", derive(bon::Builder))]
+#[cfg_attr(feature = "std", builder(start_fn = new))]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-#[cfg_attr(feature = "std", builder(start_fn = new))]
 pub struct RawJetstreamParams<'a> {
     /// Filter by collection NSIDs (max 100)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
+    #[serde(borrow, skip_serializing_if = "Option::is_none")]
     pub wanted_collections: Option<Vec<crate::CowStr<'a>>>,
 
     /// Filter by DIDs (max 10,000)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
+    #[serde(borrow, skip_serializing_if = "Option::is_none")]
     pub wanted_dids: Option<Vec<crate::CowStr<'a>>>,
 
     /// Unix microseconds timestamp to start playback
@@ -436,15 +438,15 @@ pub struct RawJetstreamParams<'a> {
     pub require_hello: Option<bool>,
 }
 
-/// Stream response type for Jetstream subscriptions
+/// Stream response type for raw (minimally-validated) Jetstream subscriptions
 pub struct JetstreamRawStream;
 
 impl SubscriptionResp for JetstreamRawStream {
     const NSID: &'static str = "jetstream";
     const ENCODING: MessageEncoding = MessageEncoding::Json;
 
-    /// Typed Jetstream message
-    type Message<'de> = RawJetstreamMessage<'de>;
+    /// Raw Jetstream message
+    type Message<S: BosStr> = RawJetstreamMessage<'static>;
 
     /// Generic error type
     type Error = crate::xrpc::GenericError;

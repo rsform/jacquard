@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,10 +33,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "social.grain.gallery.item",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Item<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -53,13 +50,7 @@ pub struct Item<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ItemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -129,51 +120,51 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Gallery;
-        type Item;
         type CreatedAt;
+        type Item;
+        type Gallery;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Gallery = Unset;
-        type Item = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `gallery` field to Set
-    pub struct SetGallery<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGallery<St> {}
-    impl<St: State> State for SetGallery<St> {
-        type Gallery = Set<members::gallery>;
-        type Item = St::Item;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetItem<St> {}
-    impl<St: State> State for SetItem<St> {
-        type Gallery = St::Gallery;
-        type Item = Set<members::item>;
-        type CreatedAt = St::CreatedAt;
+        type Item = Unset;
+        type Gallery = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Gallery = St::Gallery;
-        type Item = St::Item;
         type CreatedAt = Set<members::created_at>;
+        type Item = St::Item;
+        type Gallery = St::Gallery;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItem<St> {}
+    impl<St: State> State for SetItem<St> {
+        type CreatedAt = St::CreatedAt;
+        type Item = Set<members::item>;
+        type Gallery = St::Gallery;
+    }
+    ///State transition - sets the `gallery` field to Set
+    pub struct SetGallery<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGallery<St> {}
+    impl<St: State> State for SetGallery<St> {
+        type CreatedAt = St::CreatedAt;
+        type Item = St::Item;
+        type Gallery = Set<members::gallery>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `gallery` field
-        pub struct gallery(());
-        ///Marker type for the `item` field
-        pub struct item(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `item` field
+        pub struct item(());
+        ///Marker type for the `gallery` field
+        pub struct gallery(());
     }
 }
 
@@ -275,9 +266,9 @@ impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
 impl<S: BosStr, St> ItemBuilder<S, St>
 where
     St: item_state::State,
-    St::Gallery: item_state::IsSet,
-    St::Item: item_state::IsSet,
     St::CreatedAt: item_state::IsSet,
+    St::Item: item_state::IsSet,
+    St::Gallery: item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Item<S> {

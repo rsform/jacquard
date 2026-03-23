@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -40,10 +40,7 @@ use crate::community_lexicon::location::geo::Geo;
     rename_all = "camelCase",
     rename = "app.beaconbits.beacon",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Beacon<S: BosStr = DefaultStr> {
     ///Structured address using community lexicon
@@ -187,13 +184,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct BeaconGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -377,8 +368,8 @@ pub mod beacon_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type VenueUri;
-        type Visibility;
         type CreatedAt;
+        type Visibility;
         type VenueName;
     }
     /// Empty state - all required fields are unset
@@ -386,8 +377,8 @@ pub mod beacon_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type VenueUri = Unset;
-        type Visibility = Unset;
         type CreatedAt = Unset;
+        type Visibility = Unset;
         type VenueName = Unset;
     }
     ///State transition - sets the `venue_uri` field to Set
@@ -395,17 +386,8 @@ pub mod beacon_state {
     impl<St: State> sealed::Sealed for SetVenueUri<St> {}
     impl<St: State> State for SetVenueUri<St> {
         type VenueUri = Set<members::venue_uri>;
+        type CreatedAt = St::CreatedAt;
         type Visibility = St::Visibility;
-        type CreatedAt = St::CreatedAt;
-        type VenueName = St::VenueName;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVisibility<St> {}
-    impl<St: State> State for SetVisibility<St> {
-        type VenueUri = St::VenueUri;
-        type Visibility = Set<members::visibility>;
-        type CreatedAt = St::CreatedAt;
         type VenueName = St::VenueName;
     }
     ///State transition - sets the `created_at` field to Set
@@ -413,8 +395,17 @@ pub mod beacon_state {
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type VenueUri = St::VenueUri;
-        type Visibility = St::Visibility;
         type CreatedAt = Set<members::created_at>;
+        type Visibility = St::Visibility;
+        type VenueName = St::VenueName;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type VenueUri = St::VenueUri;
+        type CreatedAt = St::CreatedAt;
+        type Visibility = Set<members::visibility>;
         type VenueName = St::VenueName;
     }
     ///State transition - sets the `venue_name` field to Set
@@ -422,8 +413,8 @@ pub mod beacon_state {
     impl<St: State> sealed::Sealed for SetVenueName<St> {}
     impl<St: State> State for SetVenueName<St> {
         type VenueUri = St::VenueUri;
-        type Visibility = St::Visibility;
         type CreatedAt = St::CreatedAt;
+        type Visibility = St::Visibility;
         type VenueName = Set<members::venue_name>;
     }
     /// Marker types for field names
@@ -431,10 +422,10 @@ pub mod beacon_state {
     pub mod members {
         ///Marker type for the `venue_uri` field
         pub struct venue_uri(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
     }
@@ -750,8 +741,8 @@ impl<S: BosStr, St> BeaconBuilder<S, St>
 where
     St: beacon_state::State,
     St::VenueUri: beacon_state::IsSet,
-    St::Visibility: beacon_state::IsSet,
     St::CreatedAt: beacon_state::IsSet,
+    St::Visibility: beacon_state::IsSet,
     St::VenueName: beacon_state::IsSet,
 {
     /// Build the final struct.

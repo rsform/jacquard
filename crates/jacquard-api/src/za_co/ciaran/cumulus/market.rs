@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "za.co.ciaran.cumulus.market",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Market<S: BosStr = DefaultStr> {
     pub closes_at: Datetime,
@@ -51,13 +48,7 @@ pub struct Market<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct MarketGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -134,67 +125,67 @@ pub mod market_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Question;
-        type Liquidity;
+        type CreatedAt;
         type ClosesAt;
+        type Liquidity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Question = Unset;
-        type Liquidity = Unset;
+        type CreatedAt = Unset;
         type ClosesAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Question = St::Question;
-        type Liquidity = St::Liquidity;
-        type ClosesAt = St::ClosesAt;
+        type Liquidity = Unset;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetQuestion<St> {}
     impl<St: State> State for SetQuestion<St> {
-        type CreatedAt = St::CreatedAt;
         type Question = Set<members::question>;
-        type Liquidity = St::Liquidity;
-        type ClosesAt = St::ClosesAt;
-    }
-    ///State transition - sets the `liquidity` field to Set
-    pub struct SetLiquidity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLiquidity<St> {}
-    impl<St: State> State for SetLiquidity<St> {
         type CreatedAt = St::CreatedAt;
-        type Question = St::Question;
-        type Liquidity = Set<members::liquidity>;
         type ClosesAt = St::ClosesAt;
+        type Liquidity = St::Liquidity;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Question = St::Question;
+        type CreatedAt = Set<members::created_at>;
+        type ClosesAt = St::ClosesAt;
+        type Liquidity = St::Liquidity;
     }
     ///State transition - sets the `closes_at` field to Set
     pub struct SetClosesAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClosesAt<St> {}
     impl<St: State> State for SetClosesAt<St> {
-        type CreatedAt = St::CreatedAt;
         type Question = St::Question;
-        type Liquidity = St::Liquidity;
+        type CreatedAt = St::CreatedAt;
         type ClosesAt = Set<members::closes_at>;
+        type Liquidity = St::Liquidity;
+    }
+    ///State transition - sets the `liquidity` field to Set
+    pub struct SetLiquidity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLiquidity<St> {}
+    impl<St: State> State for SetLiquidity<St> {
+        type Question = St::Question;
+        type CreatedAt = St::CreatedAt;
+        type ClosesAt = St::ClosesAt;
+        type Liquidity = Set<members::liquidity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `question` field
         pub struct question(());
-        ///Marker type for the `liquidity` field
-        pub struct liquidity(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `closes_at` field
         pub struct closes_at(());
+        ///Marker type for the `liquidity` field
+        pub struct liquidity(());
     }
 }
 
@@ -302,10 +293,10 @@ where
 impl<S: BosStr, St> MarketBuilder<S, St>
 where
     St: market_state::State,
-    St::CreatedAt: market_state::IsSet,
     St::Question: market_state::IsSet,
-    St::Liquidity: market_state::IsSet,
+    St::CreatedAt: market_state::IsSet,
     St::ClosesAt: market_state::IsSet,
+    St::Liquidity: market_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Market<S> {

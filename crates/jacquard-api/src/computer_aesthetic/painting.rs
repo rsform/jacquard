@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "computer.aesthetic.painting",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Painting<S: BosStr = DefaultStr> {
     ///Short alphanumeric code for easy lookup (e.g., 'a3b')
@@ -64,13 +61,7 @@ pub struct Painting<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PaintingGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -230,85 +221,85 @@ pub mod painting_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Ref;
+        type Code;
         type Slug;
         type ImageUrl;
-        type Code;
         type When;
-        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Ref = Unset;
+        type Code = Unset;
         type Slug = Unset;
         type ImageUrl = Unset;
-        type Code = Unset;
         type When = Unset;
-        type Ref = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlug<St> {}
-    impl<St: State> State for SetSlug<St> {
-        type Slug = Set<members::slug>;
-        type ImageUrl = St::ImageUrl;
-        type Code = St::Code;
-        type When = St::When;
-        type Ref = St::Ref;
-    }
-    ///State transition - sets the `image_url` field to Set
-    pub struct SetImageUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImageUrl<St> {}
-    impl<St: State> State for SetImageUrl<St> {
-        type Slug = St::Slug;
-        type ImageUrl = Set<members::image_url>;
-        type Code = St::Code;
-        type When = St::When;
-        type Ref = St::Ref;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCode<St> {}
-    impl<St: State> State for SetCode<St> {
-        type Slug = St::Slug;
-        type ImageUrl = St::ImageUrl;
-        type Code = Set<members::code>;
-        type When = St::When;
-        type Ref = St::Ref;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWhen<St> {}
-    impl<St: State> State for SetWhen<St> {
-        type Slug = St::Slug;
-        type ImageUrl = St::ImageUrl;
-        type Code = St::Code;
-        type When = Set<members::when>;
-        type Ref = St::Ref;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRef<St> {}
     impl<St: State> State for SetRef<St> {
+        type Ref = Set<members::r#ref>;
+        type Code = St::Code;
         type Slug = St::Slug;
         type ImageUrl = St::ImageUrl;
-        type Code = St::Code;
         type When = St::When;
-        type Ref = Set<members::r#ref>;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCode<St> {}
+    impl<St: State> State for SetCode<St> {
+        type Ref = St::Ref;
+        type Code = Set<members::code>;
+        type Slug = St::Slug;
+        type ImageUrl = St::ImageUrl;
+        type When = St::When;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type Ref = St::Ref;
+        type Code = St::Code;
+        type Slug = Set<members::slug>;
+        type ImageUrl = St::ImageUrl;
+        type When = St::When;
+    }
+    ///State transition - sets the `image_url` field to Set
+    pub struct SetImageUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImageUrl<St> {}
+    impl<St: State> State for SetImageUrl<St> {
+        type Ref = St::Ref;
+        type Code = St::Code;
+        type Slug = St::Slug;
+        type ImageUrl = Set<members::image_url>;
+        type When = St::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
+        type Ref = St::Ref;
+        type Code = St::Code;
+        type Slug = St::Slug;
+        type ImageUrl = St::ImageUrl;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `code` field
+        pub struct code(());
         ///Marker type for the `slug` field
         pub struct slug(());
         ///Marker type for the `image_url` field
         pub struct image_url(());
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
     }
 }
 
@@ -469,11 +460,11 @@ where
 impl<S: BosStr, St> PaintingBuilder<S, St>
 where
     St: painting_state::State,
+    St::Ref: painting_state::IsSet,
+    St::Code: painting_state::IsSet,
     St::Slug: painting_state::IsSet,
     St::ImageUrl: painting_state::IsSet,
-    St::Code: painting_state::IsSet,
     St::When: painting_state::IsSet,
-    St::Ref: painting_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Painting<S> {

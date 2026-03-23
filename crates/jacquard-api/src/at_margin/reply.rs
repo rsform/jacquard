@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::at_margin::reply;
     rename_all = "camelCase",
     rename = "at.margin.reply",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Reply<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -59,13 +56,7 @@ pub struct Reply<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ReplyGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -76,13 +67,7 @@ pub struct ReplyGetRecordOutput<S: BosStr = DefaultStr> {
 /// Strong reference to an annotation or reply
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReplyRef<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -191,65 +176,65 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type CreatedAt;
         type Root;
+        type CreatedAt;
+        type Text;
         type Parent;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type CreatedAt = Unset;
         type Root = Unset;
+        type CreatedAt = Unset;
+        type Text = Unset;
         type Parent = Unset;
     }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Text = Set<members::text>;
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoot<St> {}
+    impl<St: State> State for SetRoot<St> {
+        type Root = Set<members::root>;
         type CreatedAt = St::CreatedAt;
-        type Root = St::Root;
+        type Text = St::Text;
         type Parent = St::Parent;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Text = St::Text;
-        type CreatedAt = Set<members::created_at>;
         type Root = St::Root;
+        type CreatedAt = Set<members::created_at>;
+        type Text = St::Text;
         type Parent = St::Parent;
     }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoot<St> {}
-    impl<St: State> State for SetRoot<St> {
-        type Text = St::Text;
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Root = St::Root;
         type CreatedAt = St::CreatedAt;
-        type Root = Set<members::root>;
+        type Text = Set<members::text>;
         type Parent = St::Parent;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetParent<St> {}
     impl<St: State> State for SetParent<St> {
-        type Text = St::Text;
-        type CreatedAt = St::CreatedAt;
         type Root = St::Root;
+        type CreatedAt = St::CreatedAt;
+        type Text = St::Text;
         type Parent = Set<members::parent>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
         ///Marker type for the `parent` field
         pub struct parent(());
     }
@@ -378,16 +363,16 @@ where
 impl<S: BosStr, St> ReplyBuilder<S, St>
 where
     St: reply_state::State,
-    St::Text: reply_state::IsSet,
-    St::CreatedAt: reply_state::IsSet,
     St::Root: reply_state::IsSet,
+    St::CreatedAt: reply_state::IsSet,
+    St::Text: reply_state::IsSet,
     St::Parent: reply_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Reply<S> {
         Reply {
             created_at: self._fields.0.unwrap(),
-            format: self._fields.1.or_else(|| Some(SmolStr::from("text/plain"))),
+            format: self._fields.1.or_else(|| Some(S::from_static("text/plain"))),
             parent: self._fields.2.unwrap(),
             root: self._fields.3.unwrap(),
             text: self._fields.4.unwrap(),
@@ -398,7 +383,7 @@ where
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Reply<S> {
         Reply {
             created_at: self._fields.0.unwrap(),
-            format: self._fields.1.or_else(|| Some(SmolStr::from("text/plain"))),
+            format: self._fields.1.or_else(|| Some(S::from_static("text/plain"))),
             parent: self._fields.2.unwrap(),
             root: self._fields.3.unwrap(),
             text: self._fields.4.unwrap(),
@@ -530,37 +515,37 @@ pub mod reply_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -630,8 +615,8 @@ where
 impl<S: BosStr, St> ReplyRefBuilder<S, St>
 where
     St: reply_ref_state::State,
-    St::Uri: reply_ref_state::IsSet,
     St::Cid: reply_ref_state::IsSet,
+    St::Uri: reply_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ReplyRef<S> {

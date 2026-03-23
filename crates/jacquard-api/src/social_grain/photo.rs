@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,10 +39,7 @@ use crate::social_grain::photo;
     rename_all = "camelCase",
     rename = "social.grain.photo",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Photo<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
@@ -59,13 +56,7 @@ pub struct Photo<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PhotoGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -75,13 +66,7 @@ pub struct PhotoGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExifView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -115,13 +100,7 @@ pub struct ExifView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PhotoView<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     pub alt: S,
@@ -494,37 +473,37 @@ pub mod exif_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Photo;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Photo = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Photo = St::Photo;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `photo` field to Set
     pub struct SetPhoto<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPhoto<St> {}
     impl<St: State> State for SetPhoto<St> {
-        type CreatedAt = St::CreatedAt;
         type Photo = Set<members::photo>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Photo = St::Photo;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `photo` field
         pub struct photo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -780,8 +759,8 @@ impl<S: BosStr, St: exif_view_state::State> ExifViewBuilder<S, St> {
 impl<S: BosStr, St> ExifViewBuilder<S, St>
 where
     St: exif_view_state::State,
-    St::CreatedAt: exif_view_state::IsSet,
     St::Photo: exif_view_state::IsSet,
+    St::CreatedAt: exif_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ExifView<S> {
@@ -1022,84 +1001,84 @@ pub mod photo_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Cid;
-        type Alt;
-        type Thumb;
         type Uri;
         type Fullsize;
+        type Alt;
+        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Cid = Unset;
-        type Alt = Unset;
-        type Thumb = Unset;
         type Uri = Unset;
         type Fullsize = Unset;
+        type Alt = Unset;
+        type Thumb = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+        type Fullsize = St::Fullsize;
         type Alt = St::Alt;
         type Thumb = St::Thumb;
-        type Uri = St::Uri;
-        type Fullsize = St::Fullsize;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAlt<St> {}
-    impl<St: State> State for SetAlt<St> {
-        type Cid = St::Cid;
-        type Alt = Set<members::alt>;
-        type Thumb = St::Thumb;
-        type Uri = St::Uri;
-        type Fullsize = St::Fullsize;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetThumb<St> {}
-    impl<St: State> State for SetThumb<St> {
-        type Cid = St::Cid;
-        type Alt = St::Alt;
-        type Thumb = Set<members::thumb>;
-        type Uri = St::Uri;
-        type Fullsize = St::Fullsize;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
         type Cid = St::Cid;
-        type Alt = St::Alt;
-        type Thumb = St::Thumb;
         type Uri = Set<members::uri>;
         type Fullsize = St::Fullsize;
+        type Alt = St::Alt;
+        type Thumb = St::Thumb;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFullsize<St> {}
     impl<St: State> State for SetFullsize<St> {
         type Cid = St::Cid;
-        type Alt = St::Alt;
-        type Thumb = St::Thumb;
         type Uri = St::Uri;
         type Fullsize = Set<members::fullsize>;
+        type Alt = St::Alt;
+        type Thumb = St::Thumb;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlt<St> {}
+    impl<St: State> State for SetAlt<St> {
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Fullsize = St::Fullsize;
+        type Alt = Set<members::alt>;
+        type Thumb = St::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThumb<St> {}
+    impl<St: State> State for SetThumb<St> {
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Fullsize = St::Fullsize;
+        type Alt = St::Alt;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `alt` field
-        pub struct alt(());
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
     }
 }
 
@@ -1261,10 +1240,10 @@ impl<S: BosStr, St> PhotoViewBuilder<S, St>
 where
     St: photo_view_state::State,
     St::Cid: photo_view_state::IsSet,
-    St::Alt: photo_view_state::IsSet,
-    St::Thumb: photo_view_state::IsSet,
     St::Uri: photo_view_state::IsSet,
     St::Fullsize: photo_view_state::IsSet,
+    St::Alt: photo_view_state::IsSet,
+    St::Thumb: photo_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PhotoView<S> {

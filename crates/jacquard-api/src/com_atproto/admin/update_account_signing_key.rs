@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateAccountSigningKey<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///Did-key formatted public key
@@ -71,37 +65,37 @@ pub mod update_account_signing_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type SigningKey;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type SigningKey = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type SigningKey = St::SigningKey;
+        type Did = Unset;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSigningKey<St> {}
     impl<St: State> State for SetSigningKey<St> {
-        type Did = St::Did;
         type SigningKey = Set<members::signing_key>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type SigningKey = St::SigningKey;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -185,8 +179,8 @@ where
 impl<S: BosStr, St> UpdateAccountSigningKeyBuilder<S, St>
 where
     St: update_account_signing_key_state::State,
-    St::Did: update_account_signing_key_state::IsSet,
     St::SigningKey: update_account_signing_key_state::IsSet,
+    St::Did: update_account_signing_key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateAccountSigningKey<S> {

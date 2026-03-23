@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Nsid, Cid, RecordKey, Rkey};
@@ -19,13 +19,7 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecord<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -36,13 +30,7 @@ pub struct GetRecord<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -129,50 +117,50 @@ pub mod get_record_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Collection;
         type Rkey;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Collection = Unset;
         type Rkey = Unset;
+        type Collection = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
+        type Rkey = St::Rkey;
         type Collection = St::Collection;
-        type Rkey = St::Rkey;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCollection<St> {}
-    impl<St: State> State for SetCollection<St> {
-        type Repo = St::Repo;
-        type Collection = Set<members::collection>;
-        type Rkey = St::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRkey<St> {}
     impl<St: State> State for SetRkey<St> {
         type Repo = St::Repo;
-        type Collection = St::Collection;
         type Rkey = Set<members::rkey>;
+        type Collection = St::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type Repo = St::Repo;
+        type Rkey = St::Rkey;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -280,8 +268,8 @@ impl<S: BosStr, St> GetRecordBuilder<S, St>
 where
     St: get_record_state::State,
     St::Repo: get_record_state::IsSet,
-    St::Collection: get_record_state::IsSet,
     St::Rkey: get_record_state::IsSet,
+    St::Collection: get_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetRecord<S> {

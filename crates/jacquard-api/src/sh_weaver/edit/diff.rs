@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -38,10 +38,7 @@ use crate::sh_weaver::edit::DocRef;
     rename_all = "camelCase",
     rename = "sh.weaver.edit.diff",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Diff<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,13 +61,7 @@ pub struct Diff<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct DiffGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -174,37 +165,37 @@ pub mod diff_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Root;
         type Doc;
+        type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Root = Unset;
         type Doc = Unset;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoot<St> {}
-    impl<St: State> State for SetRoot<St> {
-        type Root = Set<members::root>;
-        type Doc = St::Doc;
+        type Root = Unset;
     }
     ///State transition - sets the `doc` field to Set
     pub struct SetDoc<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDoc<St> {}
     impl<St: State> State for SetDoc<St> {
-        type Root = St::Root;
         type Doc = Set<members::doc>;
+        type Root = St::Root;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoot<St> {}
+    impl<St: State> State for SetRoot<St> {
+        type Doc = St::Doc;
+        type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `doc` field
         pub struct doc(());
+        ///Marker type for the `root` field
+        pub struct root(());
     }
 }
 
@@ -333,8 +324,8 @@ impl<S: BosStr, St: diff_state::State> DiffBuilder<S, St> {
 impl<S: BosStr, St> DiffBuilder<S, St>
 where
     St: diff_state::State,
-    St::Root: diff_state::IsSet,
     St::Doc: diff_state::IsSet,
+    St::Root: diff_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Diff<S> {

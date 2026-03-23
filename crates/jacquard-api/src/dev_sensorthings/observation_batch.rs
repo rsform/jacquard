@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,13 +30,7 @@ use serde::{Serialize, Deserialize};
 use crate::dev_sensorthings::observation_batch;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BatchEntry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub q: Option<BatchEntryQ<S>>,
@@ -133,13 +127,7 @@ where
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum BatchEntryResult<S: BosStr = DefaultStr> {}
 /// A batch of observations for a single Datastream, covering a contiguous time window. Trades individual addressability for reduced commit overhead.
 
@@ -148,10 +136,7 @@ pub enum BatchEntryResult<S: BosStr = DefaultStr> {}
     rename_all = "camelCase",
     rename = "dev.sensorthings.observationBatch",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ObservationBatch<S: BosStr = DefaultStr> {
     pub datastream: AtUri<S>,
@@ -166,13 +151,7 @@ pub struct ObservationBatch<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ObservationBatchGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -264,37 +243,37 @@ pub mod batch_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Result;
         type T;
+        type Result;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Result = Unset;
         type T = Unset;
-    }
-    ///State transition - sets the `result` field to Set
-    pub struct SetResult<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetResult<St> {}
-    impl<St: State> State for SetResult<St> {
-        type Result = Set<members::result>;
-        type T = St::T;
+        type Result = Unset;
     }
     ///State transition - sets the `t` field to Set
     pub struct SetT<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetT<St> {}
     impl<St: State> State for SetT<St> {
-        type Result = St::Result;
         type T = Set<members::t>;
+        type Result = St::Result;
+    }
+    ///State transition - sets the `result` field to Set
+    pub struct SetResult<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResult<St> {}
+    impl<St: State> State for SetResult<St> {
+        type T = St::T;
+        type Result = Set<members::result>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `result` field
-        pub struct result(());
         ///Marker type for the `t` field
         pub struct t(());
+        ///Marker type for the `result` field
+        pub struct result(());
     }
 }
 
@@ -377,8 +356,8 @@ where
 impl<S: BosStr, St> BatchEntryBuilder<S, St>
 where
     St: batch_entry_state::State,
-    St::Result: batch_entry_state::IsSet,
     St::T: batch_entry_state::IsSet,
+    St::Result: batch_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BatchEntry<S> {
@@ -538,65 +517,65 @@ pub mod observation_batch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WindowEnd;
-        type Datastream;
         type WindowStart;
+        type Datastream;
+        type WindowEnd;
         type Observations;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WindowEnd = Unset;
-        type Datastream = Unset;
         type WindowStart = Unset;
+        type Datastream = Unset;
+        type WindowEnd = Unset;
         type Observations = Unset;
     }
-    ///State transition - sets the `window_end` field to Set
-    pub struct SetWindowEnd<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWindowEnd<St> {}
-    impl<St: State> State for SetWindowEnd<St> {
-        type WindowEnd = Set<members::window_end>;
+    ///State transition - sets the `window_start` field to Set
+    pub struct SetWindowStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWindowStart<St> {}
+    impl<St: State> State for SetWindowStart<St> {
+        type WindowStart = Set<members::window_start>;
         type Datastream = St::Datastream;
-        type WindowStart = St::WindowStart;
+        type WindowEnd = St::WindowEnd;
         type Observations = St::Observations;
     }
     ///State transition - sets the `datastream` field to Set
     pub struct SetDatastream<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDatastream<St> {}
     impl<St: State> State for SetDatastream<St> {
-        type WindowEnd = St::WindowEnd;
-        type Datastream = Set<members::datastream>;
         type WindowStart = St::WindowStart;
+        type Datastream = Set<members::datastream>;
+        type WindowEnd = St::WindowEnd;
         type Observations = St::Observations;
     }
-    ///State transition - sets the `window_start` field to Set
-    pub struct SetWindowStart<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWindowStart<St> {}
-    impl<St: State> State for SetWindowStart<St> {
-        type WindowEnd = St::WindowEnd;
+    ///State transition - sets the `window_end` field to Set
+    pub struct SetWindowEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWindowEnd<St> {}
+    impl<St: State> State for SetWindowEnd<St> {
+        type WindowStart = St::WindowStart;
         type Datastream = St::Datastream;
-        type WindowStart = Set<members::window_start>;
+        type WindowEnd = Set<members::window_end>;
         type Observations = St::Observations;
     }
     ///State transition - sets the `observations` field to Set
     pub struct SetObservations<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetObservations<St> {}
     impl<St: State> State for SetObservations<St> {
-        type WindowEnd = St::WindowEnd;
-        type Datastream = St::Datastream;
         type WindowStart = St::WindowStart;
+        type Datastream = St::Datastream;
+        type WindowEnd = St::WindowEnd;
         type Observations = Set<members::observations>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `window_end` field
-        pub struct window_end(());
-        ///Marker type for the `datastream` field
-        pub struct datastream(());
         ///Marker type for the `window_start` field
         pub struct window_start(());
+        ///Marker type for the `datastream` field
+        pub struct datastream(());
+        ///Marker type for the `window_end` field
+        pub struct window_end(());
         ///Marker type for the `observations` field
         pub struct observations(());
     }
@@ -711,9 +690,9 @@ where
 impl<S: BosStr, St> ObservationBatchBuilder<S, St>
 where
     St: observation_batch_state::State,
-    St::WindowEnd: observation_batch_state::IsSet,
-    St::Datastream: observation_batch_state::IsSet,
     St::WindowStart: observation_batch_state::IsSet,
+    St::Datastream: observation_batch_state::IsSet,
+    St::WindowEnd: observation_batch_state::IsSet,
     St::Observations: observation_batch_state::IsSet,
 {
     /// Build the final struct.

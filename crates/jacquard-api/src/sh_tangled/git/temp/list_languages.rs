@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::temp::list_languages;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Language<S: BosStr = DefaultStr> {
     ///Hex color code for this language
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,13 +50,7 @@ pub struct Language<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListLanguages<S: BosStr = DefaultStr> {
     ///Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
@@ -73,13 +61,7 @@ pub struct ListLanguages<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListLanguagesOutput<S: BosStr = DefaultStr> {
     pub languages: Vec<list_languages::Language<S>>,
     ///The git reference used
@@ -206,49 +188,49 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Size;
+        type Name;
         type Percentage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Size = Unset;
+        type Name = Unset;
         type Percentage = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Size = St::Size;
-        type Percentage = St::Percentage;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSize<St> {}
     impl<St: State> State for SetSize<St> {
-        type Name = St::Name;
         type Size = Set<members::size>;
+        type Name = St::Name;
+        type Percentage = St::Percentage;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Size = St::Size;
+        type Name = Set<members::name>;
         type Percentage = St::Percentage;
     }
     ///State transition - sets the `percentage` field to Set
     pub struct SetPercentage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPercentage<St> {}
     impl<St: State> State for SetPercentage<St> {
-        type Name = St::Name;
         type Size = St::Size;
+        type Name = St::Name;
         type Percentage = Set<members::percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `percentage` field
         pub struct percentage(());
     }
@@ -385,8 +367,8 @@ where
 impl<S: BosStr, St> LanguageBuilder<S, St>
 where
     St: language_state::State,
-    St::Name: language_state::IsSet,
     St::Size: language_state::IsSet,
+    St::Name: language_state::IsSet,
     St::Percentage: language_state::IsSet,
 {
     /// Build the final struct.

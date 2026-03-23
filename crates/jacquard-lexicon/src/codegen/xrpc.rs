@@ -314,11 +314,23 @@ impl<'c> CodeGenerator<'c> {
 
                 let doc = self.generate_doc_comment(union.description.as_ref());
 
+                let bosstr_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+                let default_str_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+                let bosstr_serde =
+                    resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
+                let de_serde =
+                    resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
+                let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
+
                 // Generate decode_framed method for DAG-CBOR subscriptions
                 let decode_framed_impl = quote! {
-                    impl<'a> #enum_ident<'a> {
+                    impl<S: #bosstr_path> #enum_ident<S> {
                         /// Decode a framed DAG-CBOR message (header + body).
-                        pub fn decode_framed<'de: 'a>(bytes: &'de [u8]) -> Result<#enum_ident<'a>, jacquard_common::error::DecodeError> {
+                        pub fn decode_framed<'de>(bytes: &'de [u8]) -> Result<#enum_ident<S>, jacquard_common::error::DecodeError>
+                        where S: serde::Deserialize<'de>
+                        {
                             let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
                             match header.t.as_str() {
                                 #(#decode_arms)*
@@ -337,9 +349,8 @@ impl<'c> CodeGenerator<'c> {
                     #doc
                     #open_union_attr
                     #derive_attr
-                    #[serde(tag = "$type")]
-                    #[serde(bound(deserialize = "'de: 'a"))]
-                    pub enum #enum_ident<'a> {
+                    #[serde(tag = "$type",bound(deserialize = #serde_de_bound))]
+                    pub enum #enum_ident<S: #bosstr_path = #default_str_path> {
                         #(#variants,)*
                     }
 
@@ -356,18 +367,30 @@ impl<'c> CodeGenerator<'c> {
                     self.generate_object_fields("", &struct_name, obj, false, resolved)?;
                 let doc = self.generate_doc_comment(obj.description.as_ref());
 
-                // Subscription message structs always get a lifetime since they have the #[lexicon] attribute
-                // which adds extra_data: BTreeMap<..., Data<'a>>.
-                let lexicon_attr =
-                    resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
+                let bosstr_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+                let default_str_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+                let bosstr_serde =
+                    resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
+                let de_serde =
+                    resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
+                let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
+                let smolstr_type = resolved.type_tokens(&super::prettify::CommonType::SmolStr);
+                let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
+                let btree_map = resolved.btree_map_path();
+                let is_none_path = resolved.option_is_none_path();
+                let extra_data_type =
+                    resolved.option_type(quote! { #btree_map<#smolstr_type, #data_type> });
                 let derive_attr = resolved.derive_standard();
                 let struct_def = quote! {
                     #doc
-                    #lexicon_attr
                     #derive_attr
-                    #[serde(rename_all = "camelCase")]
-                    pub struct #struct_ident<'a> {
+                    #[serde(rename_all = "camelCase", bound(deserialize = #serde_de_bound))]
+                    pub struct #struct_ident<S: #bosstr_path = #default_str_path> {
                         #fields
+                        #[serde(flatten, default, skip_serializing_if = #is_none_path)]
+                        pub extra_data: #extra_data_type,
                     }
                     #(#default_fns)*
                 };
@@ -408,14 +431,12 @@ impl<'c> CodeGenerator<'c> {
                 let rust_type = self.ref_to_rust_type(&ref_type.r#ref, resolved)?;
                 let doc = self.generate_doc_comment(ref_type.description.as_ref());
 
-                let bosstr_path =
-                    resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
                 let default_str_path =
                     resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
                 let type_alias = if self.ref_needs_type_param(&ref_type.r#ref) {
                     quote! {
                         #doc
-                        pub type #ident<S: #bosstr_path = #default_str_path> = #rust_type;
+                        pub type #ident<S = #default_str_path> = #rust_type;
                     }
                 } else {
                     quote! {
@@ -506,15 +527,11 @@ impl<'c> CodeGenerator<'c> {
         let needs_type_param = self.params_need_type_param(p);
 
         let derives = resolved.derive_standard();
-        let bosstr_path =
-            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+        let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
         let default_str_path =
             resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
-        let bosstr_serde =
-            resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
-        let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+        let bosstr_serde = resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
         let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-        let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
         // Since BosStr includes FromStaticStr, the serde bound is the same whether
         // or not there are string defaults with static values.
         let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
@@ -541,10 +558,7 @@ impl<'c> CodeGenerator<'c> {
             quote! {
                 #doc
                 #derives
-                #[serde(rename_all = "camelCase", bound(
-                    serialize = #serde_ser_bound,
-                    deserialize = #serde_de_bound
-                ))]
+                #[serde(rename_all = "camelCase", bound(deserialize = #serde_de_bound))]
                 #struct_body
             }
         } else {
@@ -555,7 +569,6 @@ impl<'c> CodeGenerator<'c> {
                 #struct_body
             }
         };
-
 
         let type_name = ident.to_string();
         let ctx = super::builder_gen::BuilderGenContext::from_parameters(
@@ -637,11 +650,8 @@ impl<'c> CodeGenerator<'c> {
                 resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
             let bosstr_serde =
                 resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
-            let ser_serde =
-                resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
             let de_serde =
                 resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-            let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
             let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
             let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
             let smol_str_type = resolved.type_tokens(&super::prettify::CommonType::SmolStr);
@@ -652,10 +662,7 @@ impl<'c> CodeGenerator<'c> {
             quote! {
                 #doc
                 #derive_attr
-                #[serde(rename_all = "camelCase", bound(
-                    serialize = #serde_ser_bound,
-                    deserialize = #serde_de_bound
-                ))]
+                #[serde(rename_all = "camelCase", bound(deserialize = #serde_de_bound))]
                 pub struct #ident<S: #bosstr_path = #default_str_path> {
                     #fields
                     #[serde(flatten, default, skip_serializing_if = #is_none_path)]
@@ -769,11 +776,8 @@ impl<'c> CodeGenerator<'c> {
                 resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
             let bosstr_serde =
                 resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
-            let ser_serde =
-                resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
             let de_serde =
                 resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-            let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
             let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
             let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
             let smol_str_type = resolved.type_tokens(&super::prettify::CommonType::SmolStr);
@@ -784,10 +788,7 @@ impl<'c> CodeGenerator<'c> {
             quote! {
                 #doc
                 #derive_attr
-                #[serde(rename_all = "camelCase", bound(
-                    serialize = #serde_ser_bound,
-                    deserialize = #serde_de_bound
-                ))]
+                #[serde(rename_all = "camelCase", bound(deserialize = #serde_de_bound))]
                 pub struct #ident<S: #bosstr_path = #default_str_path> {
                     #fields
                     #[serde(flatten, default, skip_serializing_if = #is_none_path)]
@@ -1228,8 +1229,7 @@ impl<'c> CodeGenerator<'c> {
             proc_macro2::Span::call_site(),
         );
 
-        let bosstr_path =
-            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+        let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
         let ser_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
         let de_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
         let decode_error_path =
@@ -1331,7 +1331,6 @@ impl<'c> CodeGenerator<'c> {
             let (impl_generics, impl_target, endpoint_request_type) = if params_has_lifetime {
                 (
                     quote! { <S: #bosstr_path> },
-                    //quote! { <S: #bosstr_path + #ser_path> },
                     quote! { #request_ident<S> },
                     quote! { #request_ident<S> },
                 )
@@ -1419,12 +1418,13 @@ impl<'c> CodeGenerator<'c> {
             proc_macro2::Span::call_site(),
         );
 
+        let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
         let message_type = if has_message {
             let msg_ident = syn::Ident::new(
                 &format!("{}Message", type_base),
                 proc_macro2::Span::call_site(),
             );
-            quote! { #msg_ident<'de> }
+            quote! { #msg_ident<S> }
         } else {
             quote! { () }
         };
@@ -1455,8 +1455,14 @@ impl<'c> CodeGenerator<'c> {
                 &format!("{}Message", type_base),
                 proc_macro2::Span::call_site(),
             );
+            let decode_error_path =
+                resolved.external_type_tokens(&super::prettify::ExternalImport::DecodeError);
             quote! {
-                fn decode_message<'de>(bytes: &'de [u8]) -> Result<Self::Message<'de>, jacquard_common::error::DecodeError> {
+                fn decode_message<'de, S>(bytes: &'de [u8]) -> Result<Self::Message<S>, #decode_error_path>
+                where
+                    S: #bosstr_path + serde::Deserialize<'de>,
+                    Self::Message<S>: serde::Deserialize<'de>,
+                {
                     #msg_ident::decode_framed(bytes)
                 }
             }
@@ -1473,7 +1479,7 @@ impl<'c> CodeGenerator<'c> {
                 const NSID: &'static str = #nsid;
                 const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
 
-                type Message<'de> = #message_type;
+                type Message<S: #bosstr_path> = #message_type;
                 type Error = #error_type;
 
                 #decode_message_override
@@ -1513,7 +1519,7 @@ impl<'c> CodeGenerator<'c> {
                     const PATH: &'static str = #endpoint_path;
                     const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
 
-                    type Params<'de> = #marker;
+                    type Params<S: #bosstr_path> = #marker;
                     type Stream = #stream_ident;
                 }
             });
@@ -1522,9 +1528,9 @@ impl<'c> CodeGenerator<'c> {
         let (impl_generics, impl_target, endpoint_params_type) =
             if has_params && params_has_lifetime {
                 (
-                    quote! { <'a> },
-                    quote! { #params_ident<'a> },
-                    quote! { #params_ident<'de> },
+                    quote! { <S: #bosstr_path > },
+                    quote! { #params_ident<S> },
+                    quote! { #params_ident<S> },
                 )
             } else {
                 (
@@ -1557,7 +1563,7 @@ impl<'c> CodeGenerator<'c> {
                 const PATH: &'static str = #endpoint_path;
                 const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
 
-                type Params<'de> = #endpoint_params_type;
+                type Params<S: #bosstr_path> = #endpoint_params_type;
                 type Stream = #stream_ident;
             }
         })

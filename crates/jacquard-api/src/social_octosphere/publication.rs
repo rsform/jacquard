@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "social.octosphere.publication",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Publication<S: BosStr = DefaultStr> {
     ///Public Octopus URL for the publication version.
@@ -282,13 +279,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PublicationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -365,267 +356,267 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Status;
-        type PublicationType;
         type CreatedAt;
-        type VersionId;
+        type UpdatedAt;
         type Citations;
-        type OctopusId;
-        type Title;
-        type ContentHtml;
-        type LinkedTo;
         type ContentText;
+        type Status;
+        type LinkedTo;
         type LinkedFrom;
+        type VersionId;
+        type PublicationType;
+        type ContentHtml;
+        type Title;
+        type OctopusId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type Status = Unset;
-        type PublicationType = Unset;
         type CreatedAt = Unset;
-        type VersionId = Unset;
+        type UpdatedAt = Unset;
         type Citations = Unset;
-        type OctopusId = Unset;
-        type Title = Unset;
-        type ContentHtml = Unset;
-        type LinkedTo = Unset;
         type ContentText = Unset;
+        type Status = Unset;
+        type LinkedTo = Unset;
         type LinkedFrom = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
-        type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
-        type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
-        type ContentText = St::ContentText;
-        type LinkedFrom = St::LinkedFrom;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = Set<members::status>;
-        type PublicationType = St::PublicationType;
-        type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
-        type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
-        type ContentText = St::ContentText;
-        type LinkedFrom = St::LinkedFrom;
-    }
-    ///State transition - sets the `publication_type` field to Set
-    pub struct SetPublicationType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPublicationType<St> {}
-    impl<St: State> State for SetPublicationType<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = Set<members::publication_type>;
-        type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
-        type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
-        type ContentText = St::ContentText;
-        type LinkedFrom = St::LinkedFrom;
+        type VersionId = Unset;
+        type PublicationType = Unset;
+        type ContentHtml = Unset;
+        type Title = Unset;
+        type OctopusId = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
         type CreatedAt = Set<members::created_at>;
-        type VersionId = St::VersionId;
-        type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
-        type ContentText = St::ContentText;
-        type LinkedFrom = St::LinkedFrom;
-    }
-    ///State transition - sets the `version_id` field to Set
-    pub struct SetVersionId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVersionId<St> {}
-    impl<St: State> State for SetVersionId<St> {
         type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
-        type CreatedAt = St::CreatedAt;
-        type VersionId = Set<members::version_id>;
         type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
         type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
         type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = Set<members::updated_at>;
+        type Citations = St::Citations;
+        type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
+        type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
     }
     ///State transition - sets the `citations` field to Set
     pub struct SetCitations<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCitations<St> {}
     impl<St: State> State for SetCitations<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
         type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
+        type UpdatedAt = St::UpdatedAt;
         type Citations = Set<members::citations>;
-        type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
         type ContentText = St::ContentText;
-        type LinkedFrom = St::LinkedFrom;
-    }
-    ///State transition - sets the `octopus_id` field to Set
-    pub struct SetOctopusId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOctopusId<St> {}
-    impl<St: State> State for SetOctopusId<St> {
-        type UpdatedAt = St::UpdatedAt;
         type Status = St::Status;
-        type PublicationType = St::PublicationType;
-        type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
-        type Citations = St::Citations;
-        type OctopusId = Set<members::octopus_id>;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
         type LinkedTo = St::LinkedTo;
-        type ContentText = St::ContentText;
         type LinkedFrom = St::LinkedFrom;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
-        type CreatedAt = St::CreatedAt;
         type VersionId = St::VersionId;
-        type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
-        type Title = Set<members::title>;
+        type PublicationType = St::PublicationType;
         type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
-        type ContentText = St::ContentText;
-        type LinkedFrom = St::LinkedFrom;
-    }
-    ///State transition - sets the `content_html` field to Set
-    pub struct SetContentHtml<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContentHtml<St> {}
-    impl<St: State> State for SetContentHtml<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
-        type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
-        type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
         type Title = St::Title;
-        type ContentHtml = Set<members::content_html>;
-        type LinkedTo = St::LinkedTo;
-        type ContentText = St::ContentText;
-        type LinkedFrom = St::LinkedFrom;
-    }
-    ///State transition - sets the `linked_to` field to Set
-    pub struct SetLinkedTo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLinkedTo<St> {}
-    impl<St: State> State for SetLinkedTo<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
-        type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
-        type Citations = St::Citations;
         type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = Set<members::linked_to>;
-        type ContentText = St::ContentText;
-        type LinkedFrom = St::LinkedFrom;
     }
     ///State transition - sets the `content_text` field to Set
     pub struct SetContentText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContentText<St> {}
     impl<St: State> State for SetContentText<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
         type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
+        type UpdatedAt = St::UpdatedAt;
         type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
         type ContentText = Set<members::content_text>;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
         type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Citations = St::Citations;
+        type ContentText = St::ContentText;
+        type Status = Set<members::status>;
+        type LinkedTo = St::LinkedTo;
+        type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
+    }
+    ///State transition - sets the `linked_to` field to Set
+    pub struct SetLinkedTo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLinkedTo<St> {}
+    impl<St: State> State for SetLinkedTo<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Citations = St::Citations;
+        type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = Set<members::linked_to>;
+        type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
     }
     ///State transition - sets the `linked_from` field to Set
     pub struct SetLinkedFrom<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLinkedFrom<St> {}
     impl<St: State> State for SetLinkedFrom<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type PublicationType = St::PublicationType;
         type CreatedAt = St::CreatedAt;
-        type VersionId = St::VersionId;
+        type UpdatedAt = St::UpdatedAt;
         type Citations = St::Citations;
-        type OctopusId = St::OctopusId;
-        type Title = St::Title;
-        type ContentHtml = St::ContentHtml;
-        type LinkedTo = St::LinkedTo;
         type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
         type LinkedFrom = Set<members::linked_from>;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
+    }
+    ///State transition - sets the `version_id` field to Set
+    pub struct SetVersionId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVersionId<St> {}
+    impl<St: State> State for SetVersionId<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Citations = St::Citations;
+        type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
+        type LinkedFrom = St::LinkedFrom;
+        type VersionId = Set<members::version_id>;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
+    }
+    ///State transition - sets the `publication_type` field to Set
+    pub struct SetPublicationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublicationType<St> {}
+    impl<St: State> State for SetPublicationType<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Citations = St::Citations;
+        type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
+        type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = Set<members::publication_type>;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
+    }
+    ///State transition - sets the `content_html` field to Set
+    pub struct SetContentHtml<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContentHtml<St> {}
+    impl<St: State> State for SetContentHtml<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Citations = St::Citations;
+        type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
+        type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = Set<members::content_html>;
+        type Title = St::Title;
+        type OctopusId = St::OctopusId;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Citations = St::Citations;
+        type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
+        type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = Set<members::title>;
+        type OctopusId = St::OctopusId;
+    }
+    ///State transition - sets the `octopus_id` field to Set
+    pub struct SetOctopusId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOctopusId<St> {}
+    impl<St: State> State for SetOctopusId<St> {
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Citations = St::Citations;
+        type ContentText = St::ContentText;
+        type Status = St::Status;
+        type LinkedTo = St::LinkedTo;
+        type LinkedFrom = St::LinkedFrom;
+        type VersionId = St::VersionId;
+        type PublicationType = St::PublicationType;
+        type ContentHtml = St::ContentHtml;
+        type Title = St::Title;
+        type OctopusId = Set<members::octopus_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `publication_type` field
-        pub struct publication_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `version_id` field
-        pub struct version_id(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `citations` field
         pub struct citations(());
-        ///Marker type for the `octopus_id` field
-        pub struct octopus_id(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `content_html` field
-        pub struct content_html(());
-        ///Marker type for the `linked_to` field
-        pub struct linked_to(());
         ///Marker type for the `content_text` field
         pub struct content_text(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `linked_to` field
+        pub struct linked_to(());
         ///Marker type for the `linked_from` field
         pub struct linked_from(());
+        ///Marker type for the `version_id` field
+        pub struct version_id(());
+        ///Marker type for the `publication_type` field
+        pub struct publication_type(());
+        ///Marker type for the `content_html` field
+        pub struct content_html(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `octopus_id` field
+        pub struct octopus_id(());
     }
 }
 
@@ -971,18 +962,18 @@ where
 impl<S: BosStr, St> PublicationBuilder<S, St>
 where
     St: publication_state::State,
-    St::UpdatedAt: publication_state::IsSet,
-    St::Status: publication_state::IsSet,
-    St::PublicationType: publication_state::IsSet,
     St::CreatedAt: publication_state::IsSet,
-    St::VersionId: publication_state::IsSet,
+    St::UpdatedAt: publication_state::IsSet,
     St::Citations: publication_state::IsSet,
-    St::OctopusId: publication_state::IsSet,
-    St::Title: publication_state::IsSet,
-    St::ContentHtml: publication_state::IsSet,
-    St::LinkedTo: publication_state::IsSet,
     St::ContentText: publication_state::IsSet,
+    St::Status: publication_state::IsSet,
+    St::LinkedTo: publication_state::IsSet,
     St::LinkedFrom: publication_state::IsSet,
+    St::VersionId: publication_state::IsSet,
+    St::PublicationType: publication_state::IsSet,
+    St::ContentHtml: publication_state::IsSet,
+    St::Title: publication_state::IsSet,
+    St::OctopusId: publication_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Publication<S> {

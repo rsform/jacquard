@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,13 +25,7 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Address<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub addr: Option<S>,
@@ -45,13 +39,7 @@ pub struct Address<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Coordinates<S: BosStr = DefaultStr> {
     pub lat: i64,
     pub lng: i64,
@@ -61,13 +49,7 @@ pub struct Coordinates<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventComponent<S: BosStr = DefaultStr> {
     pub data: Data<S>,
     pub r#type: S,
@@ -77,13 +59,7 @@ pub struct EventComponent<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventInstance<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end: Option<S>,
@@ -183,13 +159,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OnlineVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
@@ -202,13 +172,7 @@ pub struct OnlineVenue<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PhysicalVenue<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address: Option<Data<S>>,
@@ -223,13 +187,7 @@ pub struct PhysicalVenue<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnknownVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
@@ -240,13 +198,7 @@ pub struct UnknownVenue<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Event<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub components: Option<Vec<Data<S>>>,
@@ -267,13 +219,7 @@ pub struct Event<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum EventVenuesItem<S: BosStr = DefaultStr> {}
 impl<S: BosStr> LexiconSchema for Address<S> {
     fn nsid() -> &'static str {
@@ -717,37 +663,37 @@ pub mod coordinates_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lng;
         type Lat;
+        type Lng;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lng = Unset;
         type Lat = Unset;
-    }
-    ///State transition - sets the `lng` field to Set
-    pub struct SetLng<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLng<St> {}
-    impl<St: State> State for SetLng<St> {
-        type Lng = Set<members::lng>;
-        type Lat = St::Lat;
+        type Lng = Unset;
     }
     ///State transition - sets the `lat` field to Set
     pub struct SetLat<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLat<St> {}
     impl<St: State> State for SetLat<St> {
-        type Lng = St::Lng;
         type Lat = Set<members::lat>;
+        type Lng = St::Lng;
+    }
+    ///State transition - sets the `lng` field to Set
+    pub struct SetLng<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLng<St> {}
+    impl<St: State> State for SetLng<St> {
+        type Lat = St::Lat;
+        type Lng = Set<members::lng>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lng` field
-        pub struct lng(());
         ///Marker type for the `lat` field
         pub struct lat(());
+        ///Marker type for the `lng` field
+        pub struct lng(());
     }
 }
 
@@ -817,8 +763,8 @@ where
 impl<S: BosStr, St> CoordinatesBuilder<S, St>
 where
     St: coordinates_state::State,
-    St::Lng: coordinates_state::IsSet,
     St::Lat: coordinates_state::IsSet,
+    St::Lng: coordinates_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Coordinates<S> {
@@ -986,50 +932,50 @@ pub mod online_venue_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Type;
-        type Id;
         type Name;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Type = Unset;
-        type Id = Unset;
         type Name = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
+        type Name = St::Name;
         type Id = St::Id;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Type = St::Type;
-        type Id = Set<members::id>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Type = St::Type;
-        type Id = St::Id;
         type Name = Set<members::name>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Type = St::Type;
+        type Name = St::Name;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -1132,8 +1078,8 @@ impl<S: BosStr, St> OnlineVenueBuilder<S, St>
 where
     St: online_venue_state::State,
     St::Type: online_venue_state::IsSet,
-    St::Id: online_venue_state::IsSet,
     St::Name: online_venue_state::IsSet,
+    St::Id: online_venue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OnlineVenue<S> {
@@ -1170,51 +1116,51 @@ pub mod physical_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Id;
         type Type;
+        type Id;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Id = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Id = St::Id;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Name = St::Name;
-        type Id = Set<members::id>;
-        type Type = St::Type;
+        type Id = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Name = St::Name;
-        type Id = St::Id;
         type Type = Set<members::r#type>;
+        type Id = St::Id;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Type = St::Type;
+        type Id = Set<members::id>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Type = St::Type;
+        type Id = St::Id;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1329,9 +1275,9 @@ where
 impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
 where
     St: physical_venue_state::State,
-    St::Name: physical_venue_state::IsSet,
-    St::Id: physical_venue_state::IsSet,
     St::Type: physical_venue_state::IsSet,
+    St::Id: physical_venue_state::IsSet,
+    St::Name: physical_venue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PhysicalVenue<S> {
@@ -1370,51 +1316,51 @@ pub mod unknown_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Name;
         type Type;
+        type Name;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Name = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Name = St::Name;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Id = St::Id;
-        type Name = Set<members::name>;
-        type Type = St::Type;
+        type Name = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Id = St::Id;
-        type Name = St::Name;
         type Type = Set<members::r#type>;
+        type Name = St::Name;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Type = St::Type;
+        type Name = Set<members::name>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Type = St::Type;
+        type Name = St::Name;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -1503,9 +1449,9 @@ where
 impl<S: BosStr, St> UnknownVenueBuilder<S, St>
 where
     St: unknown_venue_state::State,
-    St::Id: unknown_venue_state::IsSet,
-    St::Name: unknown_venue_state::IsSet,
     St::Type: unknown_venue_state::IsSet,
+    St::Name: unknown_venue_state::IsSet,
+    St::Id: unknown_venue_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UnknownVenue<S> {
@@ -1540,37 +1486,37 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type V;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type V = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type V = St::V;
+        type Name = Unset;
     }
     ///State transition - sets the `v` field to Set
     pub struct SetV<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetV<St> {}
     impl<St: State> State for SetV<St> {
-        type Name = St::Name;
         type V = Set<members::v>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type V = St::V;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `v` field
         pub struct v(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1710,8 +1656,8 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
 impl<S: BosStr, St> EventBuilder<S, St>
 where
     St: event_state::State,
-    St::Name: event_state::IsSet,
     St::V: event_state::IsSet,
+    St::Name: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {

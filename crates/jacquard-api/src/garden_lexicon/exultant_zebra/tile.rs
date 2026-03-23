@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,13 +35,7 @@ use crate::garden_lexicon::exultant_zebra::tile;
 /// Declares the AT Protocol interactions a tile performs. Methods listed here gate which XRPC calls the tile is allowed to attempt (the user must still grant per-method consent). Collections and services are informational metadata for display and auditing.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Interactions<S: BosStr = DefaultStr> {
     ///Repository collection NSIDs this tile reads from or writes to.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,10 +57,7 @@ pub struct Interactions<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "garden.lexicon.exultant-zebra.tile",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Tile<S: BosStr = DefaultStr> {
     ///Declared aspect ratio for tile rendering.
@@ -192,13 +183,7 @@ where
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum TileContent<S: BosStr = DefaultStr> {
     #[serde(rename = "garden.lexicon.exultant-zebra.masl#resource")]
     MaslResource(Box<Resource<S>>),
@@ -209,13 +194,7 @@ pub enum TileContent<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct TileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -226,13 +205,7 @@ pub struct TileGetRecordOutput<S: BosStr = DefaultStr> {
 /// Declares an input parameter for a tile, similar to XRPC query parameters.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Param<S: BosStr = DefaultStr> {
     ///Default value for this parameter, encoded as a string.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -794,37 +767,37 @@ pub mod tile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Content;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Content = St::Content;
+        type Name = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type Name = St::Name;
         type Content = Set<members::content>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Content = St::Content;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -998,8 +971,8 @@ impl<S: BosStr, St: tile_state::State> TileBuilder<S, St> {
 impl<S: BosStr, St> TileBuilder<S, St>
 where
     St: tile_state::State,
-    St::Name: tile_state::IsSet,
     St::Content: tile_state::IsSet,
+    St::Name: tile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tile<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
@@ -19,13 +19,7 @@ use serde::{Serialize, Deserialize};
 use crate::community_lexicon::calendar::rsvp::Rsvp;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRsvp<S: BosStr = DefaultStr> {
     pub event: AtUri<S>,
     pub identity: Did<S>,
@@ -33,13 +27,7 @@ pub struct GetRsvp<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRsvpOutput<S: BosStr = DefaultStr> {
     ///CID of the RSVP record.
     pub cid: S,
@@ -127,37 +115,37 @@ pub mod get_rsvp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Identity;
         type Event;
+        type Identity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Identity = Unset;
         type Event = Unset;
-    }
-    ///State transition - sets the `identity` field to Set
-    pub struct SetIdentity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIdentity<St> {}
-    impl<St: State> State for SetIdentity<St> {
-        type Identity = Set<members::identity>;
-        type Event = St::Event;
+        type Identity = Unset;
     }
     ///State transition - sets the `event` field to Set
     pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEvent<St> {}
     impl<St: State> State for SetEvent<St> {
-        type Identity = St::Identity;
         type Event = Set<members::event>;
+        type Identity = St::Identity;
+    }
+    ///State transition - sets the `identity` field to Set
+    pub struct SetIdentity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentity<St> {}
+    impl<St: State> State for SetIdentity<St> {
+        type Event = St::Event;
+        type Identity = Set<members::identity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `identity` field
-        pub struct identity(());
         ///Marker type for the `event` field
         pub struct event(());
+        ///Marker type for the `identity` field
+        pub struct identity(());
     }
 }
 
@@ -227,8 +215,8 @@ where
 impl<S: BosStr, St> GetRsvpBuilder<S, St>
 where
     St: get_rsvp_state::State,
-    St::Identity: get_rsvp_state::IsSet,
     St::Event: get_rsvp_state::IsSet,
+    St::Identity: get_rsvp_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetRsvp<S> {

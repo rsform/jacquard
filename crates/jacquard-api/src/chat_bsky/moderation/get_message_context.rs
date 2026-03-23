@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -19,13 +19,7 @@ use crate::chat_bsky::convo::DeletedMessageView;
 use crate::chat_bsky::convo::MessageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMessageContext<S: BosStr = DefaultStr> {
     ///Defaults to `5`.
     #[serde(default = "_default_after")]
@@ -42,13 +36,7 @@ pub struct GetMessageContext<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMessageContextOutput<S: BosStr = DefaultStr> {
     pub messages: Vec<GetMessageContextOutputMessagesItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -58,13 +46,7 @@ pub struct GetMessageContextOutput<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum GetMessageContextOutputMessagesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<MessageView<S>>),

@@ -12,7 +12,7 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["std", "service-auth", "reqwest-client", "crypto"]
+default = ["std", "service-auth", "reqwest-client", "crypto", "websocket"]
 std = [
     "dep:tokio",
     "dep:tokio-util",

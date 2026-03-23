@@ -21,7 +21,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -40,13 +40,7 @@ use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::edit;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DocRef<S: BosStr = DefaultStr> {
     pub value: DocRefValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -56,13 +50,7 @@ pub struct DocRef<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum DocRefValue<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.edit.defs#notebookRef")]
     NotebookRef(Box<edit::NotebookRef<S>>),
@@ -74,13 +62,7 @@ pub enum DocRefValue<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftRef<S: BosStr = DefaultStr> {
     pub draft_key: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -90,13 +72,7 @@ pub struct DraftRef<S: BosStr = DefaultStr> {
 /// A branch/fork in edit history (for when collaborators diverge).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EditBranchView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     ///Common ancestor if this is a fork
@@ -117,13 +93,7 @@ pub struct EditBranchView<S: BosStr = DefaultStr> {
 /// Summary of an edit (root or diff) for history queries.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EditHistoryEntry<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -225,13 +195,7 @@ where
 /// Full tree structure showing all branches for a resource.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EditTreeView<S: BosStr = DefaultStr> {
     pub branches: Vec<edit::EditBranchView<S>>,
     ///Diffs where branches diverge
@@ -248,13 +212,7 @@ pub struct EditTreeView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EntryRef<S: BosStr = DefaultStr> {
     pub entry: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -263,13 +221,7 @@ pub struct EntryRef<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotebookRef<S: BosStr = DefaultStr> {
     pub notebook: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -817,66 +769,66 @@ pub mod edit_branch_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Author;
-        type Length;
-        type Head;
         type LastUpdated;
+        type Head;
+        type Length;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Author = Unset;
-        type Length = Unset;
-        type Head = Unset;
         type LastUpdated = Unset;
+        type Head = Unset;
+        type Length = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthor<St> {}
     impl<St: State> State for SetAuthor<St> {
         type Author = Set<members::author>;
-        type Length = St::Length;
+        type LastUpdated = St::LastUpdated;
         type Head = St::Head;
-        type LastUpdated = St::LastUpdated;
-    }
-    ///State transition - sets the `length` field to Set
-    pub struct SetLength<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLength<St> {}
-    impl<St: State> State for SetLength<St> {
-        type Author = St::Author;
-        type Length = Set<members::length>;
-        type Head = St::Head;
-        type LastUpdated = St::LastUpdated;
-    }
-    ///State transition - sets the `head` field to Set
-    pub struct SetHead<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHead<St> {}
-    impl<St: State> State for SetHead<St> {
-        type Author = St::Author;
         type Length = St::Length;
-        type Head = Set<members::head>;
-        type LastUpdated = St::LastUpdated;
     }
     ///State transition - sets the `last_updated` field to Set
     pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
     impl<St: State> State for SetLastUpdated<St> {
         type Author = St::Author;
-        type Length = St::Length;
-        type Head = St::Head;
         type LastUpdated = Set<members::last_updated>;
+        type Head = St::Head;
+        type Length = St::Length;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHead<St> {}
+    impl<St: State> State for SetHead<St> {
+        type Author = St::Author;
+        type LastUpdated = St::LastUpdated;
+        type Head = Set<members::head>;
+        type Length = St::Length;
+    }
+    ///State transition - sets the `length` field to Set
+    pub struct SetLength<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLength<St> {}
+    impl<St: State> State for SetLength<St> {
+        type Author = St::Author;
+        type LastUpdated = St::LastUpdated;
+        type Head = St::Head;
+        type Length = Set<members::length>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `length` field
-        pub struct length(());
-        ///Marker type for the `head` field
-        pub struct head(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
+        ///Marker type for the `head` field
+        pub struct head(());
+        ///Marker type for the `length` field
+        pub struct length(());
     }
 }
 
@@ -1032,9 +984,9 @@ impl<S: BosStr, St> EditBranchViewBuilder<S, St>
 where
     St: edit_branch_view_state::State,
     St::Author: edit_branch_view_state::IsSet,
-    St::Length: edit_branch_view_state::IsSet,
-    St::Head: edit_branch_view_state::IsSet,
     St::LastUpdated: edit_branch_view_state::IsSet,
+    St::Head: edit_branch_view_state::IsSet,
+    St::Length: edit_branch_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> EditBranchView<S> {

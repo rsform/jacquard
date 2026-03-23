@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,13 +33,7 @@ use crate::place_stream::metadata::distribution_policy::DistributionPolicy;
 use crate::place_stream::segment;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Audio<S: BosStr = DefaultStr> {
     pub channels: i64,
     pub codec: S,
@@ -50,13 +44,7 @@ pub struct Audio<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Framerate<S: BosStr = DefaultStr> {
     pub den: i64,
     pub num: i64,
@@ -71,10 +59,7 @@ pub struct Framerate<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "place.stream.segment",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Segment<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -107,13 +92,7 @@ pub struct Segment<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct SegmentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -123,13 +102,7 @@ pub struct SegmentGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SegmentView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub record: Data<S>,
@@ -139,13 +112,7 @@ pub struct SegmentView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Video<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bframes: Option<bool>,
@@ -277,50 +244,50 @@ pub mod audio_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Channels;
-        type Rate;
         type Codec;
+        type Rate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Channels = Unset;
-        type Rate = Unset;
         type Codec = Unset;
+        type Rate = Unset;
     }
     ///State transition - sets the `channels` field to Set
     pub struct SetChannels<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetChannels<St> {}
     impl<St: State> State for SetChannels<St> {
         type Channels = Set<members::channels>;
+        type Codec = St::Codec;
         type Rate = St::Rate;
-        type Codec = St::Codec;
-    }
-    ///State transition - sets the `rate` field to Set
-    pub struct SetRate<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRate<St> {}
-    impl<St: State> State for SetRate<St> {
-        type Channels = St::Channels;
-        type Rate = Set<members::rate>;
-        type Codec = St::Codec;
     }
     ///State transition - sets the `codec` field to Set
     pub struct SetCodec<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCodec<St> {}
     impl<St: State> State for SetCodec<St> {
         type Channels = St::Channels;
-        type Rate = St::Rate;
         type Codec = Set<members::codec>;
+        type Rate = St::Rate;
+    }
+    ///State transition - sets the `rate` field to Set
+    pub struct SetRate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRate<St> {}
+    impl<St: State> State for SetRate<St> {
+        type Channels = St::Channels;
+        type Codec = St::Codec;
+        type Rate = Set<members::rate>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `channels` field
         pub struct channels(());
-        ///Marker type for the `rate` field
-        pub struct rate(());
         ///Marker type for the `codec` field
         pub struct codec(());
+        ///Marker type for the `rate` field
+        pub struct rate(());
     }
 }
 
@@ -410,8 +377,8 @@ impl<S: BosStr, St> AudioBuilder<S, St>
 where
     St: audio_state::State,
     St::Channels: audio_state::IsSet,
-    St::Rate: audio_state::IsSet,
     St::Codec: audio_state::IsSet,
+    St::Rate: audio_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Audio<S> {
@@ -715,37 +682,37 @@ pub mod framerate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Num;
         type Den;
+        type Num;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Num = Unset;
         type Den = Unset;
-    }
-    ///State transition - sets the `num` field to Set
-    pub struct SetNum<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNum<St> {}
-    impl<St: State> State for SetNum<St> {
-        type Num = Set<members::num>;
-        type Den = St::Den;
+        type Num = Unset;
     }
     ///State transition - sets the `den` field to Set
     pub struct SetDen<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDen<St> {}
     impl<St: State> State for SetDen<St> {
-        type Num = St::Num;
         type Den = Set<members::den>;
+        type Num = St::Num;
+    }
+    ///State transition - sets the `num` field to Set
+    pub struct SetNum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNum<St> {}
+    impl<St: State> State for SetNum<St> {
+        type Den = St::Den;
+        type Num = Set<members::num>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `num` field
-        pub struct num(());
         ///Marker type for the `den` field
         pub struct den(());
+        ///Marker type for the `num` field
+        pub struct num(());
     }
 }
 
@@ -815,8 +782,8 @@ where
 impl<S: BosStr, St> FramerateBuilder<S, St>
 where
     St: framerate_state::State,
-    St::Num: framerate_state::IsSet,
     St::Den: framerate_state::IsSet,
+    St::Num: framerate_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Framerate<S> {
@@ -1314,51 +1281,51 @@ pub mod video_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Codec;
         type Width;
         type Height;
-        type Codec;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Codec = Unset;
         type Width = Unset;
         type Height = Unset;
-        type Codec = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWidth<St> {}
-    impl<St: State> State for SetWidth<St> {
-        type Width = Set<members::width>;
-        type Height = St::Height;
-        type Codec = St::Codec;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHeight<St> {}
-    impl<St: State> State for SetHeight<St> {
-        type Width = St::Width;
-        type Height = Set<members::height>;
-        type Codec = St::Codec;
     }
     ///State transition - sets the `codec` field to Set
     pub struct SetCodec<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCodec<St> {}
     impl<St: State> State for SetCodec<St> {
+        type Codec = Set<members::codec>;
         type Width = St::Width;
         type Height = St::Height;
-        type Codec = Set<members::codec>;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Codec = St::Codec;
+        type Width = Set<members::width>;
+        type Height = St::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Codec = St::Codec;
+        type Width = St::Width;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `codec` field
+        pub struct codec(());
         ///Marker type for the `width` field
         pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
-        ///Marker type for the `codec` field
-        pub struct codec(());
     }
 }
 
@@ -1479,9 +1446,9 @@ where
 impl<S: BosStr, St> VideoBuilder<S, St>
 where
     St: video_state::State,
+    St::Codec: video_state::IsSet,
     St::Width: video_state::IsSet,
     St::Height: video_state::IsSet,
-    St::Codec: video_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Video<S> {

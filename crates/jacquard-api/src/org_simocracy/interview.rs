@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::org_simocracy::interview;
     rename_all = "camelCase",
     rename = "org.simocracy.interview",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Interview<S: BosStr = DefaultStr> {
     ///Timestamp when the interview was completed
@@ -57,13 +54,7 @@ pub struct Interview<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct InterviewGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -74,13 +65,7 @@ pub struct InterviewGetRecordOutput<S: BosStr = DefaultStr> {
 /// A single open-ended interview answer.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OpenAnswer<S: BosStr = DefaultStr> {
     ///The transcribed voice answer
     pub answer: S,
@@ -93,13 +78,7 @@ pub struct OpenAnswer<S: BosStr = DefaultStr> {
 /// A yes/no response to a value statement.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ValueResponse<S: BosStr = DefaultStr> {
     ///Whether the interviewee agreed (true) or disagreed (false)
     pub answer: bool,
@@ -243,67 +222,67 @@ pub mod interview_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type YesNoAnswers;
-        type OpenAnswers;
-        type CreatedAt;
         type Sim;
+        type YesNoAnswers;
+        type CreatedAt;
+        type OpenAnswers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type YesNoAnswers = Unset;
-        type OpenAnswers = Unset;
-        type CreatedAt = Unset;
         type Sim = Unset;
-    }
-    ///State transition - sets the `yes_no_answers` field to Set
-    pub struct SetYesNoAnswers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetYesNoAnswers<St> {}
-    impl<St: State> State for SetYesNoAnswers<St> {
-        type YesNoAnswers = Set<members::yes_no_answers>;
-        type OpenAnswers = St::OpenAnswers;
-        type CreatedAt = St::CreatedAt;
-        type Sim = St::Sim;
-    }
-    ///State transition - sets the `open_answers` field to Set
-    pub struct SetOpenAnswers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOpenAnswers<St> {}
-    impl<St: State> State for SetOpenAnswers<St> {
-        type YesNoAnswers = St::YesNoAnswers;
-        type OpenAnswers = Set<members::open_answers>;
-        type CreatedAt = St::CreatedAt;
-        type Sim = St::Sim;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type YesNoAnswers = St::YesNoAnswers;
-        type OpenAnswers = St::OpenAnswers;
-        type CreatedAt = Set<members::created_at>;
-        type Sim = St::Sim;
+        type YesNoAnswers = Unset;
+        type CreatedAt = Unset;
+        type OpenAnswers = Unset;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSim<St> {}
     impl<St: State> State for SetSim<St> {
-        type YesNoAnswers = St::YesNoAnswers;
-        type OpenAnswers = St::OpenAnswers;
-        type CreatedAt = St::CreatedAt;
         type Sim = Set<members::sim>;
+        type YesNoAnswers = St::YesNoAnswers;
+        type CreatedAt = St::CreatedAt;
+        type OpenAnswers = St::OpenAnswers;
+    }
+    ///State transition - sets the `yes_no_answers` field to Set
+    pub struct SetYesNoAnswers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetYesNoAnswers<St> {}
+    impl<St: State> State for SetYesNoAnswers<St> {
+        type Sim = St::Sim;
+        type YesNoAnswers = Set<members::yes_no_answers>;
+        type CreatedAt = St::CreatedAt;
+        type OpenAnswers = St::OpenAnswers;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Sim = St::Sim;
+        type YesNoAnswers = St::YesNoAnswers;
+        type CreatedAt = Set<members::created_at>;
+        type OpenAnswers = St::OpenAnswers;
+    }
+    ///State transition - sets the `open_answers` field to Set
+    pub struct SetOpenAnswers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOpenAnswers<St> {}
+    impl<St: State> State for SetOpenAnswers<St> {
+        type Sim = St::Sim;
+        type YesNoAnswers = St::YesNoAnswers;
+        type CreatedAt = St::CreatedAt;
+        type OpenAnswers = Set<members::open_answers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `yes_no_answers` field
-        pub struct yes_no_answers(());
-        ///Marker type for the `open_answers` field
-        pub struct open_answers(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `sim` field
         pub struct sim(());
+        ///Marker type for the `yes_no_answers` field
+        pub struct yes_no_answers(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `open_answers` field
+        pub struct open_answers(());
     }
 }
 
@@ -416,10 +395,10 @@ where
 impl<S: BosStr, St> InterviewBuilder<S, St>
 where
     St: interview_state::State,
-    St::YesNoAnswers: interview_state::IsSet,
-    St::OpenAnswers: interview_state::IsSet,
-    St::CreatedAt: interview_state::IsSet,
     St::Sim: interview_state::IsSet,
+    St::YesNoAnswers: interview_state::IsSet,
+    St::CreatedAt: interview_state::IsSet,
+    St::OpenAnswers: interview_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Interview<S> {
@@ -624,37 +603,37 @@ pub mod value_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Statement;
         type Answer;
+        type Statement;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Statement = Unset;
         type Answer = Unset;
-    }
-    ///State transition - sets the `statement` field to Set
-    pub struct SetStatement<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatement<St> {}
-    impl<St: State> State for SetStatement<St> {
-        type Statement = Set<members::statement>;
-        type Answer = St::Answer;
+        type Statement = Unset;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAnswer<St> {}
     impl<St: State> State for SetAnswer<St> {
-        type Statement = St::Statement;
         type Answer = Set<members::answer>;
+        type Statement = St::Statement;
+    }
+    ///State transition - sets the `statement` field to Set
+    pub struct SetStatement<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatement<St> {}
+    impl<St: State> State for SetStatement<St> {
+        type Answer = St::Answer;
+        type Statement = Set<members::statement>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `statement` field
-        pub struct statement(());
         ///Marker type for the `answer` field
         pub struct answer(());
+        ///Marker type for the `statement` field
+        pub struct statement(());
     }
 }
 
@@ -724,8 +703,8 @@ where
 impl<S: BosStr, St> ValueResponseBuilder<S, St>
 where
     St: value_response_state::State,
-    St::Statement: value_response_state::IsSet,
     St::Answer: value_response_state::IsSet,
+    St::Statement: value_response_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ValueResponse<S> {

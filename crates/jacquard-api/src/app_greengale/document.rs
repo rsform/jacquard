@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,13 +33,7 @@ use crate::app_greengale::blog::Theme;
 /// Reference to external content via AT-URI. Used in site.standard.document content union.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContentRef<S: BosStr = DefaultStr> {
     ///AT-URI pointing to the full document content
     pub uri: AtUri<S>,
@@ -54,10 +48,7 @@ pub struct ContentRef<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "app.greengale.document",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Document<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -96,13 +87,7 @@ pub struct Document<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct DocumentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -556,85 +541,85 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PublishedAt;
+        type Content;
         type Url;
         type Path;
+        type PublishedAt;
         type Title;
-        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PublishedAt = Unset;
+        type Content = Unset;
         type Url = Unset;
         type Path = Unset;
+        type PublishedAt = Unset;
         type Title = Unset;
-        type Content = Unset;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
-    impl<St: State> State for SetPublishedAt<St> {
-        type PublishedAt = Set<members::published_at>;
-        type Url = St::Url;
-        type Path = St::Path;
-        type Title = St::Title;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type PublishedAt = St::PublishedAt;
-        type Url = Set<members::url>;
-        type Path = St::Path;
-        type Title = St::Title;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPath<St> {}
-    impl<St: State> State for SetPath<St> {
-        type PublishedAt = St::PublishedAt;
-        type Url = St::Url;
-        type Path = Set<members::path>;
-        type Title = St::Title;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type PublishedAt = St::PublishedAt;
-        type Url = St::Url;
-        type Path = St::Path;
-        type Title = Set<members::title>;
-        type Content = St::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type PublishedAt = St::PublishedAt;
+        type Content = Set<members::content>;
         type Url = St::Url;
         type Path = St::Path;
+        type PublishedAt = St::PublishedAt;
         type Title = St::Title;
-        type Content = Set<members::content>;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Content = St::Content;
+        type Url = Set<members::url>;
+        type Path = St::Path;
+        type PublishedAt = St::PublishedAt;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
+        type Content = St::Content;
+        type Url = St::Url;
+        type Path = Set<members::path>;
+        type PublishedAt = St::PublishedAt;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
+    impl<St: State> State for SetPublishedAt<St> {
+        type Content = St::Content;
+        type Url = St::Url;
+        type Path = St::Path;
+        type PublishedAt = Set<members::published_at>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Content = St::Content;
+        type Url = St::Url;
+        type Path = St::Path;
+        type PublishedAt = St::PublishedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `content` field
-        pub struct content(());
     }
 }
 
@@ -878,11 +863,11 @@ impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
 impl<S: BosStr, St> DocumentBuilder<S, St>
 where
     St: document_state::State,
-    St::PublishedAt: document_state::IsSet,
+    St::Content: document_state::IsSet,
     St::Url: document_state::IsSet,
     St::Path: document_state::IsSet,
+    St::PublishedAt: document_state::IsSet,
     St::Title: document_state::IsSet,
-    St::Content: document_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Document<S> {
@@ -898,7 +883,7 @@ where
             theme: self._fields.8,
             title: self._fields.9.unwrap(),
             url: self._fields.10.unwrap(),
-            visibility: self._fields.11.or_else(|| Some(SmolStr::from("public"))),
+            visibility: self._fields.11.or_else(|| Some(S::from_static("public"))),
             extra_data: Default::default(),
         }
     }
@@ -916,7 +901,7 @@ where
             theme: self._fields.8,
             title: self._fields.9.unwrap(),
             url: self._fields.10.unwrap(),
-            visibility: self._fields.11.or_else(|| Some(SmolStr::from("public"))),
+            visibility: self._fields.11.or_else(|| Some(S::from_static("public"))),
             extra_data: Some(extra_data),
         }
     }

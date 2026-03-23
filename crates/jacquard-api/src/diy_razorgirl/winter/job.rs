@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,13 +30,7 @@ use serde::{Serialize, Deserialize};
 use crate::diy_razorgirl::winter::job;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IntervalSchedule<S: BosStr = DefaultStr> {
     pub seconds: i64,
     pub r#type: S,
@@ -50,10 +44,7 @@ pub struct IntervalSchedule<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "diy.razorgirl.winter.job",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Job<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -77,13 +68,7 @@ pub struct Job<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum JobSchedule<S: BosStr = DefaultStr> {
     #[serde(rename = "diy.razorgirl.winter.job#onceSchedule")]
     OnceSchedule(Box<job::OnceSchedule<S>>),
@@ -180,13 +165,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct JobGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -196,13 +175,7 @@ pub struct JobGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OnceSchedule<S: BosStr = DefaultStr> {
     pub run_at: Datetime,
     pub r#type: S,
@@ -603,67 +576,67 @@ pub mod job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Schedule;
-        type Name;
         type Instructions;
+        type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Schedule = Unset;
-        type Name = Unset;
         type Instructions = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Schedule = St::Schedule;
-        type Name = St::Name;
-        type Instructions = St::Instructions;
+        type Name = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSchedule<St> {}
     impl<St: State> State for SetSchedule<St> {
-        type CreatedAt = St::CreatedAt;
         type Schedule = Set<members::schedule>;
+        type Instructions = St::Instructions;
         type Name = St::Name;
-        type Instructions = St::Instructions;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
         type CreatedAt = St::CreatedAt;
-        type Schedule = St::Schedule;
-        type Name = Set<members::name>;
-        type Instructions = St::Instructions;
     }
     ///State transition - sets the `instructions` field to Set
     pub struct SetInstructions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetInstructions<St> {}
     impl<St: State> State for SetInstructions<St> {
-        type CreatedAt = St::CreatedAt;
         type Schedule = St::Schedule;
-        type Name = St::Name;
         type Instructions = Set<members::instructions>;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Schedule = St::Schedule;
+        type Instructions = St::Instructions;
+        type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Schedule = St::Schedule;
+        type Instructions = St::Instructions;
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `instructions` field
         pub struct instructions(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -829,10 +802,10 @@ impl<S: BosStr, St: job_state::State> JobBuilder<S, St> {
 impl<S: BosStr, St> JobBuilder<S, St>
 where
     St: job_state::State,
-    St::CreatedAt: job_state::IsSet,
     St::Schedule: job_state::IsSet,
-    St::Name: job_state::IsSet,
     St::Instructions: job_state::IsSet,
+    St::Name: job_state::IsSet,
+    St::CreatedAt: job_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Job<S> {
@@ -874,37 +847,37 @@ pub mod once_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RunAt;
         type Type;
+        type RunAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RunAt = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `run_at` field to Set
-    pub struct SetRunAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRunAt<St> {}
-    impl<St: State> State for SetRunAt<St> {
-        type RunAt = Set<members::run_at>;
-        type Type = St::Type;
+        type RunAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type RunAt = St::RunAt;
         type Type = Set<members::r#type>;
+        type RunAt = St::RunAt;
+    }
+    ///State transition - sets the `run_at` field to Set
+    pub struct SetRunAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRunAt<St> {}
+    impl<St: State> State for SetRunAt<St> {
+        type Type = St::Type;
+        type RunAt = Set<members::run_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `run_at` field
-        pub struct run_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `run_at` field
+        pub struct run_at(());
     }
 }
 
@@ -974,8 +947,8 @@ where
 impl<S: BosStr, St> OnceScheduleBuilder<S, St>
 where
     St: once_schedule_state::State,
-    St::RunAt: once_schedule_state::IsSet,
     St::Type: once_schedule_state::IsSet,
+    St::RunAt: once_schedule_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OnceSchedule<S> {

@@ -16,7 +16,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,13 +41,7 @@ use crate::app_bsky::draft;
 /// A draft containing an array of draft posts.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Draft<S: BosStr = DefaultStr> {
     ///UUIDv4 identifier of the device that created this draft.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,13 +67,7 @@ pub struct Draft<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum DraftThreadgateAllowItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     ThreadgateMentionRule(Box<MentionRule<S>>),
@@ -93,13 +81,7 @@ pub enum DraftThreadgateAllowItem<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftEmbedCaption<S: BosStr = DefaultStr> {
     pub content: S,
     pub lang: Language,
@@ -109,13 +91,7 @@ pub struct DraftEmbedCaption<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftEmbedExternal<S: BosStr = DefaultStr> {
     pub uri: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -124,13 +100,7 @@ pub struct DraftEmbedExternal<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftEmbedImage<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -141,13 +111,7 @@ pub struct DraftEmbedImage<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftEmbedLocalRef<S: BosStr = DefaultStr> {
     ///Local, on-device ref to file to be embedded. Embeds are currently device-bound for drafts.
     pub path: S,
@@ -157,13 +121,7 @@ pub struct DraftEmbedLocalRef<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftEmbedRecord<S: BosStr = DefaultStr> {
     pub record: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -172,13 +130,7 @@ pub struct DraftEmbedRecord<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftEmbedVideo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -192,13 +144,7 @@ pub struct DraftEmbedVideo<S: BosStr = DefaultStr> {
 /// One of the posts that compose a draft.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftPost<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed_externals: Option<Vec<draft::DraftEmbedExternal<S>>>,
@@ -220,13 +166,7 @@ pub struct DraftPost<S: BosStr = DefaultStr> {
 /// View to present drafts data to users.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftView<S: BosStr = DefaultStr> {
     ///The time the draft was created.
     pub created_at: Datetime,
@@ -242,13 +182,7 @@ pub struct DraftView<S: BosStr = DefaultStr> {
 /// A draft with an identifier, used to store drafts in private storage (stash).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftWithId<S: BosStr = DefaultStr> {
     pub draft: draft::Draft<S>,
     ///A TID to be used as a draft identifier.
@@ -1865,8 +1799,8 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Id;
+        type CreatedAt;
         type UpdatedAt;
         type Draft;
     }
@@ -1874,26 +1808,26 @@ pub mod draft_view_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Id = Unset;
+        type CreatedAt = Unset;
         type UpdatedAt = Unset;
         type Draft = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Id = St::Id;
-        type UpdatedAt = St::UpdatedAt;
-        type Draft = St::Draft;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type CreatedAt = St::CreatedAt;
         type Id = Set<members::id>;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Draft = St::Draft;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Id = St::Id;
+        type CreatedAt = Set<members::created_at>;
         type UpdatedAt = St::UpdatedAt;
         type Draft = St::Draft;
     }
@@ -1901,8 +1835,8 @@ pub mod draft_view_state {
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
-        type CreatedAt = St::CreatedAt;
         type Id = St::Id;
+        type CreatedAt = St::CreatedAt;
         type UpdatedAt = Set<members::updated_at>;
         type Draft = St::Draft;
     }
@@ -1910,18 +1844,18 @@ pub mod draft_view_state {
     pub struct SetDraft<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDraft<St> {}
     impl<St: State> State for SetDraft<St> {
-        type CreatedAt = St::CreatedAt;
         type Id = St::Id;
+        type CreatedAt = St::CreatedAt;
         type UpdatedAt = St::UpdatedAt;
         type Draft = Set<members::draft>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `draft` field
@@ -2033,8 +1967,8 @@ where
 impl<S: BosStr, St> DraftViewBuilder<S, St>
 where
     St: draft_view_state::State,
-    St::CreatedAt: draft_view_state::IsSet,
     St::Id: draft_view_state::IsSet,
+    St::CreatedAt: draft_view_state::IsSet,
     St::UpdatedAt: draft_view_state::IsSet,
     St::Draft: draft_view_state::IsSet,
 {
@@ -2073,37 +2007,37 @@ pub mod draft_with_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Draft;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Draft = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Draft = St::Draft;
+        type Id = Unset;
     }
     ///State transition - sets the `draft` field to Set
     pub struct SetDraft<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDraft<St> {}
     impl<St: State> State for SetDraft<St> {
-        type Id = St::Id;
         type Draft = Set<members::draft>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Draft = St::Draft;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `draft` field
         pub struct draft(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -2173,8 +2107,8 @@ where
 impl<S: BosStr, St> DraftWithIdBuilder<S, St>
 where
     St: draft_with_id_state::State,
-    St::Id: draft_with_id_state::IsSet,
     St::Draft: draft_with_id_state::IsSet,
+    St::Id: draft_with_id_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DraftWithId<S> {

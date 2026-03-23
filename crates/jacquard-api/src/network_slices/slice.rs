@@ -28,7 +28,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -53,10 +53,7 @@ use crate::network_slices::slice;
     rename_all = "camelCase",
     rename = "network.slices.slice",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Slice<S: BosStr = DefaultStr> {
     ///When the slice was created
@@ -72,13 +69,7 @@ pub struct Slice<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct SliceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -88,13 +79,7 @@ pub struct SliceGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SliceView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub created_at: Datetime,
@@ -129,13 +114,7 @@ pub struct SliceView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SparklinePoint<S: BosStr = DefaultStr> {
     pub count: i64,
     pub timestamp: Datetime,
@@ -263,51 +242,51 @@ pub mod slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Domain;
         type Name;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Domain = Unset;
         type Name = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDomain<St> {}
-    impl<St: State> State for SetDomain<St> {
-        type Domain = Set<members::domain>;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Domain = St::Domain;
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Domain = St::Domain;
         type Name = St::Name;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDomain<St> {}
+    impl<St: State> State for SetDomain<St> {
+        type CreatedAt = St::CreatedAt;
+        type Domain = Set<members::domain>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Domain = St::Domain;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `domain` field
         pub struct domain(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -396,9 +375,9 @@ where
 impl<S: BosStr, St> SliceBuilder<S, St>
 where
     St: slice_state::State,
+    St::CreatedAt: slice_state::IsSet,
     St::Domain: slice_state::IsSet,
     St::Name: slice_state::IsSet,
-    St::CreatedAt: slice_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Slice<S> {
@@ -497,105 +476,105 @@ pub mod slice_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
+        type Creator;
+        type Cid;
+        type Name;
         type Domain;
         type CreatedAt;
-        type Name;
-        type Creator;
-        type Uri;
-        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
+        type Creator = Unset;
+        type Cid = Unset;
+        type Name = Unset;
         type Domain = Unset;
         type CreatedAt = Unset;
-        type Name = Unset;
-        type Creator = Unset;
-        type Uri = Unset;
-        type Cid = Unset;
-    }
-    ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDomain<St> {}
-    impl<St: State> State for SetDomain<St> {
-        type Domain = Set<members::domain>;
-        type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
-        type Creator = St::Creator;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Domain = St::Domain;
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
-        type Creator = St::Creator;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Domain = St::Domain;
-        type CreatedAt = St::CreatedAt;
-        type Name = Set<members::name>;
-        type Creator = St::Creator;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreator<St> {}
-    impl<St: State> State for SetCreator<St> {
-        type Domain = St::Domain;
-        type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
-        type Creator = Set<members::creator>;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
+        type Uri = Set<members::uri>;
+        type Creator = St::Creator;
+        type Cid = St::Cid;
+        type Name = St::Name;
         type Domain = St::Domain;
         type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
-        type Creator = St::Creator;
-        type Uri = Set<members::uri>;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreator<St> {}
+    impl<St: State> State for SetCreator<St> {
+        type Uri = St::Uri;
+        type Creator = Set<members::creator>;
         type Cid = St::Cid;
+        type Name = St::Name;
+        type Domain = St::Domain;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Creator = St::Creator;
+        type Cid = Set<members::cid>;
+        type Name = St::Name;
         type Domain = St::Domain;
         type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
-        type Creator = St::Creator;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Uri = St::Uri;
-        type Cid = Set<members::cid>;
+        type Creator = St::Creator;
+        type Cid = St::Cid;
+        type Name = Set<members::name>;
+        type Domain = St::Domain;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDomain<St> {}
+    impl<St: State> State for SetDomain<St> {
+        type Uri = St::Uri;
+        type Creator = St::Creator;
+        type Cid = St::Cid;
+        type Name = St::Name;
+        type Domain = Set<members::domain>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Uri = St::Uri;
+        type Creator = St::Creator;
+        type Cid = St::Cid;
+        type Name = St::Name;
+        type Domain = St::Domain;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `domain` field
         pub struct domain(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
     }
 }
 
@@ -851,12 +830,12 @@ impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
 impl<S: BosStr, St> SliceViewBuilder<S, St>
 where
     St: slice_view_state::State,
+    St::Uri: slice_view_state::IsSet,
+    St::Creator: slice_view_state::IsSet,
+    St::Cid: slice_view_state::IsSet,
+    St::Name: slice_view_state::IsSet,
     St::Domain: slice_view_state::IsSet,
     St::CreatedAt: slice_view_state::IsSet,
-    St::Name: slice_view_state::IsSet,
-    St::Creator: slice_view_state::IsSet,
-    St::Uri: slice_view_state::IsSet,
-    St::Cid: slice_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SliceView<S> {

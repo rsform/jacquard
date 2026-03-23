@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,10 +39,7 @@ use crate::org_hypercerts::context::evaluation;
     rename_all = "camelCase",
     rename = "org.hypercerts.context.evaluation",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Evaluation<S: BosStr = DefaultStr> {
     ///Evaluation data (URIs or blobs) containing detailed reports or methodology
@@ -73,13 +70,7 @@ pub struct Evaluation<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum EvaluationContentItem<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
@@ -90,13 +81,7 @@ pub enum EvaluationContentItem<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct EvaluationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -107,13 +92,7 @@ pub struct EvaluationGetRecordOutput<S: BosStr = DefaultStr> {
 /// Overall score for an evaluation on a numeric scale.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Score<S: BosStr = DefaultStr> {
     ///Maximum value of the scale, e.g. 5 or 10.
     pub max: i64,
@@ -253,51 +232,51 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Summary;
         type CreatedAt;
         type Evaluators;
-        type Summary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Summary = Unset;
         type CreatedAt = Unset;
         type Evaluators = Unset;
-        type Summary = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Evaluators = St::Evaluators;
-        type Summary = St::Summary;
-    }
-    ///State transition - sets the `evaluators` field to Set
-    pub struct SetEvaluators<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEvaluators<St> {}
-    impl<St: State> State for SetEvaluators<St> {
-        type CreatedAt = St::CreatedAt;
-        type Evaluators = Set<members::evaluators>;
-        type Summary = St::Summary;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSummary<St> {}
     impl<St: State> State for SetSummary<St> {
+        type Summary = Set<members::summary>;
         type CreatedAt = St::CreatedAt;
         type Evaluators = St::Evaluators;
-        type Summary = Set<members::summary>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Summary = St::Summary;
+        type CreatedAt = Set<members::created_at>;
+        type Evaluators = St::Evaluators;
+    }
+    ///State transition - sets the `evaluators` field to Set
+    pub struct SetEvaluators<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvaluators<St> {}
+    impl<St: State> State for SetEvaluators<St> {
+        type Summary = St::Summary;
+        type CreatedAt = St::CreatedAt;
+        type Evaluators = Set<members::evaluators>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `summary` field
+        pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `evaluators` field
         pub struct evaluators(());
-        ///Marker type for the `summary` field
-        pub struct summary(());
     }
 }
 
@@ -466,9 +445,9 @@ where
 impl<S: BosStr, St> EvaluationBuilder<S, St>
 where
     St: evaluation_state::State,
+    St::Summary: evaluation_state::IsSet,
     St::CreatedAt: evaluation_state::IsSet,
     St::Evaluators: evaluation_state::IsSet,
-    St::Summary: evaluation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Evaluation<S> {
@@ -689,49 +668,49 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Min;
         type Max;
+        type Min;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Min = Unset;
         type Max = Unset;
+        type Min = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `min` field to Set
-    pub struct SetMin<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMin<St> {}
-    impl<St: State> State for SetMin<St> {
-        type Min = Set<members::min>;
-        type Max = St::Max;
-        type Value = St::Value;
     }
     ///State transition - sets the `max` field to Set
     pub struct SetMax<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMax<St> {}
     impl<St: State> State for SetMax<St> {
-        type Min = St::Min;
         type Max = Set<members::max>;
+        type Min = St::Min;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `min` field to Set
+    pub struct SetMin<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMin<St> {}
+    impl<St: State> State for SetMin<St> {
+        type Max = St::Max;
+        type Min = Set<members::min>;
         type Value = St::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Min = St::Min;
         type Max = St::Max;
+        type Min = St::Min;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `min` field
-        pub struct min(());
         ///Marker type for the `max` field
         pub struct max(());
+        ///Marker type for the `min` field
+        pub struct min(());
         ///Marker type for the `value` field
         pub struct value(());
     }
@@ -822,8 +801,8 @@ where
 impl<S: BosStr, St> ScoreBuilder<S, St>
 where
     St: score_state::State,
-    St::Min: score_state::IsSet,
     St::Max: score_state::IsSet,
+    St::Min: score_state::IsSet,
     St::Value: score_state::IsSet,
 {
     /// Build the final struct.

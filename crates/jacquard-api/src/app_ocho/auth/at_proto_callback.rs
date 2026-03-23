@@ -10,20 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AtProtoCallback<S: BosStr = DefaultStr> {
     pub code: S,
     pub iss: S,
@@ -64,49 +58,49 @@ pub mod at_proto_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Iss;
         type State;
+        type Iss;
         type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Iss = Unset;
         type State = Unset;
+        type Iss = Unset;
         type Code = Unset;
-    }
-    ///State transition - sets the `iss` field to Set
-    pub struct SetIss<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIss<St> {}
-    impl<St: State> State for SetIss<St> {
-        type Iss = Set<members::iss>;
-        type State = St::State;
-        type Code = St::Code;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetState<St> {}
     impl<St: State> State for SetState<St> {
-        type Iss = St::Iss;
         type State = Set<members::state>;
+        type Iss = St::Iss;
+        type Code = St::Code;
+    }
+    ///State transition - sets the `iss` field to Set
+    pub struct SetIss<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIss<St> {}
+    impl<St: State> State for SetIss<St> {
+        type State = St::State;
+        type Iss = Set<members::iss>;
         type Code = St::Code;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCode<St> {}
     impl<St: State> State for SetCode<St> {
-        type Iss = St::Iss;
         type State = St::State;
+        type Iss = St::Iss;
         type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `iss` field
-        pub struct iss(());
         ///Marker type for the `state` field
         pub struct state(());
+        ///Marker type for the `iss` field
+        pub struct iss(());
         ///Marker type for the `code` field
         pub struct code(());
     }
@@ -197,8 +191,8 @@ where
 impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
 where
     St: at_proto_callback_state::State,
-    St::Iss: at_proto_callback_state::IsSet,
     St::State: at_proto_callback_state::IsSet,
+    St::Iss: at_proto_callback_state::IsSet,
     St::Code: at_proto_callback_state::IsSet,
 {
     /// Build the final struct.

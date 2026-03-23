@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -52,10 +52,7 @@ use crate::games_gamesgamesgamesgames::richtext::facet::Facet;
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.game",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Game<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -122,13 +119,7 @@ pub struct Game<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct GameGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -195,50 +186,50 @@ pub mod game_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type ApplicationType;
         type CreatedAt;
+        type ApplicationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type ApplicationType = Unset;
         type CreatedAt = Unset;
+        type ApplicationType = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
         type ApplicationType = St::ApplicationType;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `application_type` field to Set
-    pub struct SetApplicationType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetApplicationType<St> {}
-    impl<St: State> State for SetApplicationType<St> {
-        type Name = St::Name;
-        type ApplicationType = Set<members::application_type>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Name = St::Name;
-        type ApplicationType = St::ApplicationType;
         type CreatedAt = Set<members::created_at>;
+        type ApplicationType = St::ApplicationType;
+    }
+    ///State transition - sets the `application_type` field to Set
+    pub struct SetApplicationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetApplicationType<St> {}
+    impl<St: State> State for SetApplicationType<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type ApplicationType = Set<members::application_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `application_type` field
-        pub struct application_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `application_type` field
+        pub struct application_type(());
     }
 }
 
@@ -735,8 +726,8 @@ impl<S: BosStr, St> GameBuilder<S, St>
 where
     St: game_state::State,
     St::Name: game_state::IsSet,
-    St::ApplicationType: game_state::IsSet,
     St::CreatedAt: game_state::IsSet,
+    St::ApplicationType: game_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Game<S> {

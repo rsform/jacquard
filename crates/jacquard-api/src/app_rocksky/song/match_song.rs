@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,13 +18,7 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::song::SongViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MatchSong<S: BosStr = DefaultStr> {
     pub artist: S,
     pub title: S,
@@ -32,13 +26,7 @@ pub struct MatchSong<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MatchSongOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: SongViewDetailed<S>,
@@ -80,37 +68,37 @@ pub mod match_song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
         type Title;
+        type Artist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetArtist<St> {}
-    impl<St: State> State for SetArtist<St> {
-        type Artist = Set<members::artist>;
-        type Title = St::Title;
+        type Artist = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Artist = St::Artist;
         type Title = Set<members::title>;
+        type Artist = St::Artist;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
+        type Title = St::Title;
+        type Artist = Set<members::artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
     }
 }
 
@@ -180,8 +168,8 @@ where
 impl<S: BosStr, St> MatchSongBuilder<S, St>
 where
     St: match_song_state::State,
-    St::Artist: match_song_state::IsSet,
     St::Title: match_song_state::IsSet,
+    St::Artist: match_song_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MatchSong<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -36,10 +36,7 @@ use crate::com_germnetwork::declaration;
     rename_all = "camelCase",
     rename = "com.germnetwork.declaration",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Declaration<S: BosStr = DefaultStr> {
     ///Array of opaque values to allow for key rolling
@@ -64,13 +61,7 @@ pub struct Declaration<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct DeclarationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -80,13 +71,7 @@ pub struct DeclarationGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageMe<S: BosStr = DefaultStr> {
     ///A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
     pub message_me_url: UriValue<S>,
@@ -330,37 +315,37 @@ pub mod declaration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CurrentKey;
         type Version;
+        type CurrentKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CurrentKey = Unset;
         type Version = Unset;
-    }
-    ///State transition - sets the `current_key` field to Set
-    pub struct SetCurrentKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCurrentKey<St> {}
-    impl<St: State> State for SetCurrentKey<St> {
-        type CurrentKey = Set<members::current_key>;
-        type Version = St::Version;
+        type CurrentKey = Unset;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVersion<St> {}
     impl<St: State> State for SetVersion<St> {
-        type CurrentKey = St::CurrentKey;
         type Version = Set<members::version>;
+        type CurrentKey = St::CurrentKey;
+    }
+    ///State transition - sets the `current_key` field to Set
+    pub struct SetCurrentKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCurrentKey<St> {}
+    impl<St: State> State for SetCurrentKey<St> {
+        type Version = St::Version;
+        type CurrentKey = Set<members::current_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `current_key` field
-        pub struct current_key(());
         ///Marker type for the `version` field
         pub struct version(());
+        ///Marker type for the `current_key` field
+        pub struct current_key(());
     }
 }
 
@@ -478,8 +463,8 @@ where
 impl<S: BosStr, St> DeclarationBuilder<S, St>
 where
     St: declaration_state::State,
-    St::CurrentKey: declaration_state::IsSet,
     St::Version: declaration_state::IsSet,
+    St::CurrentKey: declaration_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Declaration<S> {

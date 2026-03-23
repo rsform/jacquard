@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use serde::{Serialize, Deserialize};
 use crate::place_wisp::fs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Directory<S: BosStr = DefaultStr> {
     pub entries: Vec<fs::Entry<S>>,
     pub r#type: S,
@@ -47,13 +41,7 @@ pub struct Directory<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Entry<S: BosStr = DefaultStr> {
     pub name: S,
     pub node: EntryNode<S>,
@@ -64,13 +52,7 @@ pub struct Entry<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum EntryNode<S: BosStr = DefaultStr> {
     #[serde(rename = "place.wisp.fs#file")]
     File(Box<fs::File<S>>),
@@ -82,13 +64,7 @@ pub enum EntryNode<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct File<S: BosStr = DefaultStr> {
     ///True if blob content is base64-encoded (used to bypass PDS content sniffing)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -113,10 +89,7 @@ pub struct File<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "place.wisp.fs",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Fs<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -131,13 +104,7 @@ pub struct Fs<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct FsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -147,13 +114,7 @@ pub struct FsGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Subfs<S: BosStr = DefaultStr> {
     ///If true, the subfs record's root entries are merged (flattened) into the parent directory, replacing the subfs entry. If false (default), the subfs entries are placed in a subdirectory with the subfs entry's name. Flat merging is useful for splitting large directories across multiple records while maintaining a flat structure.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -709,37 +670,37 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Name;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNode<St> {}
-    impl<St: State> State for SetNode<St> {
-        type Node = Set<members::node>;
-        type Name = St::Name;
+        type Node = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Node = St::Node;
         type Name = Set<members::name>;
+        type Node = St::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNode<St> {}
+    impl<St: State> State for SetNode<St> {
+        type Name = St::Name;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
@@ -809,8 +770,8 @@ where
 impl<S: BosStr, St> EntryBuilder<S, St>
 where
     St: entry_state::State,
-    St::Node: entry_state::IsSet,
     St::Name: entry_state::IsSet,
+    St::Node: entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Entry<S> {
@@ -840,37 +801,37 @@ pub mod file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type Type;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlob<St> {}
-    impl<St: State> State for SetBlob<St> {
-        type Blob = Set<members::blob>;
-        type Type = St::Type;
+        type Blob = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Blob = St::Blob;
         type Type = Set<members::r#type>;
+        type Blob = St::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
+        type Type = St::Type;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
@@ -979,8 +940,8 @@ where
 impl<S: BosStr, St> FileBuilder<S, St>
 where
     St: file_state::State,
-    St::Blob: file_state::IsSet,
     St::Type: file_state::IsSet,
+    St::Blob: file_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> File<S> {
@@ -1016,51 +977,51 @@ pub mod fs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Root;
         type Site;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Root = Unset;
         type Site = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Root = St::Root;
-        type Site = St::Site;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRoot<St> {}
     impl<St: State> State for SetRoot<St> {
-        type CreatedAt = St::CreatedAt;
         type Root = Set<members::root>;
         type Site = St::Site;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSite<St> {}
     impl<St: State> State for SetSite<St> {
-        type CreatedAt = St::CreatedAt;
         type Root = St::Root;
         type Site = Set<members::site>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Root = St::Root;
+        type Site = St::Site;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1159,9 +1120,9 @@ where
 impl<S: BosStr, St> FsBuilder<S, St>
 where
     St: fs_state::State,
-    St::CreatedAt: fs_state::IsSet,
     St::Root: fs_state::IsSet,
     St::Site: fs_state::IsSet,
+    St::CreatedAt: fs_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Fs<S> {

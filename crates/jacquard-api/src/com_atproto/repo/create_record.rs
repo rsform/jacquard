@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Nsid, Cid, RecordKey, Rkey};
@@ -20,13 +20,7 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::CommitMeta;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateRecord<S: BosStr = DefaultStr> {
     ///The NSID of the record collection.
     pub collection: Nsid<S>,
@@ -49,13 +43,7 @@ pub struct CreateRecord<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateRecordOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -234,50 +222,50 @@ pub mod create_record_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Record;
-        type Repo;
         type Collection;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Record = Unset;
-        type Repo = Unset;
         type Collection = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
         type Record = Set<members::record>;
+        type Collection = St::Collection;
         type Repo = St::Repo;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Record = St::Record;
-        type Repo = Set<members::repo>;
-        type Collection = St::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Record = St::Record;
-        type Repo = St::Repo;
         type Collection = Set<members::collection>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Record = St::Record;
+        type Collection = St::Collection;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `record` field
         pub struct record(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -413,8 +401,8 @@ impl<S: BosStr, St> CreateRecordBuilder<S, St>
 where
     St: create_record_state::State,
     St::Record: create_record_state::IsSet,
-    St::Repo: create_record_state::IsSet,
     St::Collection: create_record_state::IsSet,
+    St::Repo: create_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateRecord<S> {

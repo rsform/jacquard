@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,13 +33,7 @@ use crate::blue_backyard::feed::post;
 /// Width and height of the media, used for layout before the blob is loaded.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -50,13 +44,7 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// An inline URL embed (link preview).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EmbedBlock<S: BosStr = DefaultStr> {
     ///The URL to embed as a link preview.
     pub url: UriValue<S>,
@@ -67,13 +55,7 @@ pub struct EmbedBlock<S: BosStr = DefaultStr> {
 /// An inline image or video.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageBlock<S: BosStr = DefaultStr> {
     ///Alt text description for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -94,10 +76,7 @@ pub struct ImageBlock<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "blue.backyard.feed.post",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Post<S: BosStr = DefaultStr> {
     ///Ordered array of content blocks. Each block is a text block, image block, or embed block.
@@ -116,13 +95,7 @@ pub struct Post<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum PostContentItem<S: BosStr = DefaultStr> {
     #[serde(rename = "blue.backyard.feed.post#textBlock")]
     TextBlock(Box<post::TextBlock<S>>),
@@ -135,13 +108,7 @@ pub enum PostContentItem<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -152,13 +119,7 @@ pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
 /// A block of rich text content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TextBlock<S: BosStr = DefaultStr> {
     ///Annotations of text (mentions, URLs, hashtags, formatting).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -459,37 +420,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Width;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Width = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHeight<St> {}
-    impl<St: State> State for SetHeight<St> {
-        type Height = Set<members::height>;
-        type Width = St::Width;
+        type Height = Unset;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWidth<St> {}
     impl<St: State> State for SetWidth<St> {
-        type Height = St::Height;
         type Width = Set<members::width>;
+        type Height = St::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Width = St::Width;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
@@ -559,8 +520,8 @@ where
 impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
     St: aspect_ratio_state::State,
-    St::Height: aspect_ratio_state::IsSet,
     St::Width: aspect_ratio_state::IsSet,
+    St::Height: aspect_ratio_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AspectRatio<S> {
@@ -944,37 +905,37 @@ pub mod image_block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MimeType;
         type Blob;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MimeType = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMimeType<St> {}
-    impl<St: State> State for SetMimeType<St> {
-        type MimeType = Set<members::mime_type>;
-        type Blob = St::Blob;
+        type MimeType = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlob<St> {}
     impl<St: State> State for SetBlob<St> {
-        type MimeType = St::MimeType;
         type Blob = Set<members::blob>;
+        type MimeType = St::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMimeType<St> {}
+    impl<St: State> State for SetMimeType<St> {
+        type Blob = St::Blob;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
@@ -1073,8 +1034,8 @@ where
 impl<S: BosStr, St> ImageBlockBuilder<S, St>
 where
     St: image_block_state::State,
-    St::MimeType: image_block_state::IsSet,
     St::Blob: image_block_state::IsSet,
+    St::MimeType: image_block_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ImageBlock<S> {

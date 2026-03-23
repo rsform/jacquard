@@ -15,7 +15,7 @@ pub mod follow;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Represents the provenance or source of a record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Provenance<S: BosStr = DefaultStr> {
     ///Strong reference to the card that led to this record.
     #[serde(skip_serializing_if = "Option::is_none")]

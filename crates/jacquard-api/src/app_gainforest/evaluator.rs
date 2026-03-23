@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,13 +33,7 @@ use crate::app_gainforest::evaluator;
 /// A candidate taxon identification with confidence score and rank.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CandidateTaxon<S: BosStr = DefaultStr> {
     ///Confidence score (0-1000, where 1000 = 100.0%).
     pub confidence: i64,
@@ -66,13 +60,7 @@ pub struct CandidateTaxon<S: BosStr = DefaultStr> {
 /// Generic categorical classification result (e.g., conservation priority, habitat type).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ClassificationResult<S: BosStr = DefaultStr> {
     ///The classification category (e.g., 'conservation-priority', 'habitat-type').
     pub category: S,
@@ -88,13 +76,7 @@ pub struct ClassificationResult<S: BosStr = DefaultStr> {
 /// Data quality assessment result with per-field quality flags.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DataQualityResult<S: BosStr = DefaultStr> {
     ///Overall completeness score (0-1000, where 1000 = 100.0%).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -111,13 +93,7 @@ pub struct DataQualityResult<S: BosStr = DefaultStr> {
 /// A single measurement derived by an evaluator from source data.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DerivedMeasurement<S: BosStr = DefaultStr> {
     ///Description of the method used to obtain the measurement.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -136,13 +112,7 @@ pub struct DerivedMeasurement<S: BosStr = DefaultStr> {
 /// Derived measurements produced by an evaluator from source data (e.g., remote sensing metrics).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MeasurementResult<S: BosStr = DefaultStr> {
     ///List of derived measurements.
     pub measurements: Vec<evaluator::DerivedMeasurement<S>>,
@@ -156,13 +126,7 @@ pub struct MeasurementResult<S: BosStr = DefaultStr> {
 /// Provenance metadata describing the method used to produce an evaluation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MethodInfo<S: BosStr = DefaultStr> {
     ///Identifier for the specific model checkpoint used (e.g., date or hash).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -182,13 +146,7 @@ pub struct MethodInfo<S: BosStr = DefaultStr> {
 /// A single data quality flag indicating an issue with a specific field.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QualityFlag<S: BosStr = DefaultStr> {
     ///The field name that has the quality issue.
     pub field: S,
@@ -287,13 +245,7 @@ where
 /// AI or human species recognition result with ranked candidate identifications.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpeciesIdResult<S: BosStr = DefaultStr> {
     ///Ranked list of candidate species identifications.
     pub candidates: Vec<evaluator::CandidateTaxon<S>>,
@@ -310,13 +262,7 @@ pub struct SpeciesIdResult<S: BosStr = DefaultStr> {
 /// Reference to a target record that is being evaluated.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubjectRef<S: BosStr = DefaultStr> {
     ///CID pinning the exact version of the target record.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -330,13 +276,7 @@ pub struct SubjectRef<S: BosStr = DefaultStr> {
 /// Expert verification result for a previous identification or evaluation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationResult<S: BosStr = DefaultStr> {
     ///Notes about the verification decision.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1026,51 +966,51 @@ pub mod candidate_taxon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScientificName;
-        type Rank;
         type Confidence;
+        type Rank;
+        type ScientificName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScientificName = Unset;
-        type Rank = Unset;
         type Confidence = Unset;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScientificName<St> {}
-    impl<St: State> State for SetScientificName<St> {
-        type ScientificName = Set<members::scientific_name>;
-        type Rank = St::Rank;
-        type Confidence = St::Confidence;
-    }
-    ///State transition - sets the `rank` field to Set
-    pub struct SetRank<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRank<St> {}
-    impl<St: State> State for SetRank<St> {
-        type ScientificName = St::ScientificName;
-        type Rank = Set<members::rank>;
-        type Confidence = St::Confidence;
+        type Rank = Unset;
+        type ScientificName = Unset;
     }
     ///State transition - sets the `confidence` field to Set
     pub struct SetConfidence<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConfidence<St> {}
     impl<St: State> State for SetConfidence<St> {
-        type ScientificName = St::ScientificName;
-        type Rank = St::Rank;
         type Confidence = Set<members::confidence>;
+        type Rank = St::Rank;
+        type ScientificName = St::ScientificName;
+    }
+    ///State transition - sets the `rank` field to Set
+    pub struct SetRank<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRank<St> {}
+    impl<St: State> State for SetRank<St> {
+        type Confidence = St::Confidence;
+        type Rank = Set<members::rank>;
+        type ScientificName = St::ScientificName;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScientificName<St> {}
+    impl<St: State> State for SetScientificName<St> {
+        type Confidence = St::Confidence;
+        type Rank = St::Rank;
+        type ScientificName = Set<members::scientific_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scientific_name` field
-        pub struct scientific_name(());
-        ///Marker type for the `rank` field
-        pub struct rank(());
         ///Marker type for the `confidence` field
         pub struct confidence(());
+        ///Marker type for the `rank` field
+        pub struct rank(());
+        ///Marker type for the `scientific_name` field
+        pub struct scientific_name(());
     }
 }
 
@@ -1219,9 +1159,9 @@ where
 impl<S: BosStr, St> CandidateTaxonBuilder<S, St>
 where
     St: candidate_taxon_state::State,
-    St::ScientificName: candidate_taxon_state::IsSet,
-    St::Rank: candidate_taxon_state::IsSet,
     St::Confidence: candidate_taxon_state::IsSet,
+    St::Rank: candidate_taxon_state::IsSet,
+    St::ScientificName: candidate_taxon_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CandidateTaxon<S> {

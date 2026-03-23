@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,10 +33,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "network.slices.lexicon",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Lexicon<S: BosStr = DefaultStr> {
     ///When the lexicon was created
@@ -64,13 +61,7 @@ pub struct Lexicon<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct LexiconGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -161,67 +152,67 @@ pub mod lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Definitions;
         type CreatedAt;
         type Slice;
         type Nsid;
+        type Definitions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Definitions = Unset;
         type CreatedAt = Unset;
         type Slice = Unset;
         type Nsid = Unset;
-    }
-    ///State transition - sets the `definitions` field to Set
-    pub struct SetDefinitions<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDefinitions<St> {}
-    impl<St: State> State for SetDefinitions<St> {
-        type Definitions = Set<members::definitions>;
-        type CreatedAt = St::CreatedAt;
-        type Slice = St::Slice;
-        type Nsid = St::Nsid;
+        type Definitions = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Definitions = St::Definitions;
         type CreatedAt = Set<members::created_at>;
         type Slice = St::Slice;
         type Nsid = St::Nsid;
+        type Definitions = St::Definitions;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSlice<St> {}
     impl<St: State> State for SetSlice<St> {
-        type Definitions = St::Definitions;
         type CreatedAt = St::CreatedAt;
         type Slice = Set<members::slice>;
         type Nsid = St::Nsid;
+        type Definitions = St::Definitions;
     }
     ///State transition - sets the `nsid` field to Set
     pub struct SetNsid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNsid<St> {}
     impl<St: State> State for SetNsid<St> {
-        type Definitions = St::Definitions;
         type CreatedAt = St::CreatedAt;
         type Slice = St::Slice;
         type Nsid = Set<members::nsid>;
+        type Definitions = St::Definitions;
+    }
+    ///State transition - sets the `definitions` field to Set
+    pub struct SetDefinitions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDefinitions<St> {}
+    impl<St: State> State for SetDefinitions<St> {
+        type CreatedAt = St::CreatedAt;
+        type Slice = St::Slice;
+        type Nsid = St::Nsid;
+        type Definitions = Set<members::definitions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `definitions` field
-        pub struct definitions(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `slice` field
         pub struct slice(());
         ///Marker type for the `nsid` field
         pub struct nsid(());
+        ///Marker type for the `definitions` field
+        pub struct definitions(());
     }
 }
 
@@ -376,10 +367,10 @@ impl<S: BosStr, St: lexicon_state::State> LexiconBuilder<S, St> {
 impl<S: BosStr, St> LexiconBuilder<S, St>
 where
     St: lexicon_state::State,
-    St::Definitions: lexicon_state::IsSet,
     St::CreatedAt: lexicon_state::IsSet,
     St::Slice: lexicon_state::IsSet,
     St::Nsid: lexicon_state::IsSet,
+    St::Definitions: lexicon_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Lexicon<S> {

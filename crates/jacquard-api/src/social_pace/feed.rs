@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -242,13 +242,7 @@ where
 /// A split within an activity, like a mile split or kilometer split.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Split<S: BosStr = DefaultStr> {
     ///The distance covered in this split. Follows the units defined in the parent.
     pub distance: S,
@@ -286,50 +280,50 @@ pub mod split_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Distance;
-        type Duration;
         type Order;
+        type Duration;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Distance = Unset;
-        type Duration = Unset;
         type Order = Unset;
+        type Duration = Unset;
     }
     ///State transition - sets the `distance` field to Set
     pub struct SetDistance<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDistance<St> {}
     impl<St: State> State for SetDistance<St> {
         type Distance = Set<members::distance>;
+        type Order = St::Order;
         type Duration = St::Duration;
-        type Order = St::Order;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDuration<St> {}
-    impl<St: State> State for SetDuration<St> {
-        type Distance = St::Distance;
-        type Duration = Set<members::duration>;
-        type Order = St::Order;
     }
     ///State transition - sets the `order` field to Set
     pub struct SetOrder<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOrder<St> {}
     impl<St: State> State for SetOrder<St> {
         type Distance = St::Distance;
-        type Duration = St::Duration;
         type Order = Set<members::order>;
+        type Duration = St::Duration;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
+        type Distance = St::Distance;
+        type Order = St::Order;
+        type Duration = Set<members::duration>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `distance` field
         pub struct distance(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `order` field
         pub struct order(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
     }
 }
 
@@ -419,8 +413,8 @@ impl<S: BosStr, St> SplitBuilder<S, St>
 where
     St: split_state::State,
     St::Distance: split_state::IsSet,
-    St::Duration: split_state::IsSet,
     St::Order: split_state::IsSet,
+    St::Duration: split_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Split<S> {

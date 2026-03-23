@@ -128,11 +128,8 @@ impl<'c> CodeGenerator<'c> {
                     resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
                 let bosstr_serde =
                     resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
-                let ser_serde =
-                    resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
                 let de_serde =
                     resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-                let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
                 let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
 
                 // Generate the extra_data field directly instead of using #[lexicon] attribute.
@@ -146,7 +143,6 @@ impl<'c> CodeGenerator<'c> {
                     #doc
                     #derive_attr
                     #[serde(rename_all = "camelCase", rename = #nsid, tag = "$type", bound(
-                        serialize = #serde_ser_bound,
                         deserialize = #serde_de_bound
                     ))]
                     pub struct #ident<S: #bosstr_path = #default_str_path> {
@@ -183,10 +179,7 @@ impl<'c> CodeGenerator<'c> {
                 let output_wrapper = quote! {
                     /// Typed wrapper for GetRecord response with this collection's record type.
                     #derive_attr
-                    #[serde(rename_all = "camelCase", bound(
-                        serialize = #serde_ser_bound,
-                        deserialize = #serde_de_bound
-                    ))]
+                    #[serde(rename_all = "camelCase")]
                     pub struct #output_type_ident<S: #bosstr_path = #default_str_path> {
                         #[serde(skip_serializing_if = #is_none_path)]
                         pub cid: #option_cid,
@@ -337,15 +330,11 @@ impl<'c> CodeGenerator<'c> {
         let manual_default = self.generate_manual_default(&type_name, obj, resolved);
         let use_derive_default = manual_default.is_none() && decision.has_default;
 
-        let bosstr_path =
-            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+        let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
         let default_str_path =
             resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
-        let bosstr_serde =
-            resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
-        let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+        let bosstr_serde = resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
         let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-        let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
         let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
         let derive_attr = if use_derive_default {
             resolved.derive_standard_with(quote! { Default })
@@ -363,10 +352,7 @@ impl<'c> CodeGenerator<'c> {
         let struct_def = quote! {
             #doc
             #derive_attr
-            #[serde(rename_all = "camelCase", bound(
-                serialize = #serde_ser_bound,
-                deserialize = #serde_de_bound
-            ))]
+            #[serde(rename_all = "camelCase", bound(deserialize = #serde_de_bound))]
             pub struct #ident<S: #bosstr_path = #default_str_path> {
                 #fields
                 #[serde(flatten, default, skip_serializing_if = #is_none_path)]
@@ -637,8 +623,8 @@ impl<'c> CodeGenerator<'c> {
                 // The default function is generic over S: FromStaticStr.
                 // Type inference picks up S from the field's expected type,
                 // and the serde(bound) on the struct ensures the bound is met.
-                let from_static_path = resolved
-                    .external_type_tokens(&super::prettify::ExternalImport::FromStaticStr);
+                let from_static_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::FromStaticStr);
                 if is_optional {
                     (
                         Some(doc),
@@ -781,22 +767,15 @@ impl<'c> CodeGenerator<'c> {
         // Only add open_union if not closed.
         let is_open = closed != Some(true);
         let derive_attr = resolved.derive_standard();
-        let bosstr_path =
-            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+        let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
         let default_str_path =
             resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
-        let bosstr_serde =
-            resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
-        let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+        let bosstr_serde = resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
         let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-        let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
         let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
 
         let serde_bound = quote! {
-            #[serde(tag = "$type", bound(
-                serialize = #serde_ser_bound,
-                deserialize = #serde_de_bound
-            ))]
+            #[serde(tag = "$type", bound(deserialize = #serde_de_bound))]
         };
 
         let enum_def = if is_open {
@@ -888,8 +867,7 @@ impl<'c> CodeGenerator<'c> {
             self.generate_into_static_for_enum(&type_name, &variant_info, true, false, resolved);
 
         let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
-        let bosstr_path =
-            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+        let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
         let default_str_path =
             resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
         let ser_serde = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
@@ -1019,8 +997,7 @@ impl<'c> CodeGenerator<'c> {
             self.generate_into_static_for_enum(type_name, &variant_info, true, false, resolved);
 
         let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
-        let bosstr_path =
-            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+        let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
         let default_str_path =
             resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
         let ser_serde = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
@@ -1188,8 +1165,7 @@ impl<'c> CodeGenerator<'c> {
         resolved: &super::prettify::ResolvedImports,
     ) -> TokenStream {
         let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
-        let bosstr_path =
-            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+        let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
 
         if has_type_param {
             let variant_conversions: Vec<_> = variant_info

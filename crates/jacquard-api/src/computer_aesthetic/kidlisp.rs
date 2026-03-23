@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "computer.aesthetic.kidlisp",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Kidlisp<S: BosStr = DefaultStr> {
     ///Short alphanumeric code for easy lookup
@@ -55,13 +52,7 @@ pub struct Kidlisp<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct KidlispGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -160,65 +151,65 @@ pub mod kidlisp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Code;
         type When;
         type Source;
-        type Code;
         type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Code = Unset;
         type When = Unset;
         type Source = Unset;
-        type Code = Unset;
         type Ref = Unset;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCode<St> {}
+    impl<St: State> State for SetCode<St> {
+        type Code = Set<members::code>;
+        type When = St::When;
+        type Source = St::Source;
+        type Ref = St::Ref;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWhen<St> {}
     impl<St: State> State for SetWhen<St> {
+        type Code = St::Code;
         type When = Set<members::when>;
         type Source = St::Source;
-        type Code = St::Code;
         type Ref = St::Ref;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSource<St> {}
     impl<St: State> State for SetSource<St> {
+        type Code = St::Code;
         type When = St::When;
         type Source = Set<members::source>;
-        type Code = St::Code;
-        type Ref = St::Ref;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCode<St> {}
-    impl<St: State> State for SetCode<St> {
-        type When = St::When;
-        type Source = St::Source;
-        type Code = Set<members::code>;
         type Ref = St::Ref;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRef<St> {}
     impl<St: State> State for SetRef<St> {
+        type Code = St::Code;
         type When = St::When;
         type Source = St::Source;
-        type Code = St::Code;
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `code` field
+        pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `source` field
         pub struct source(());
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
     }
@@ -328,9 +319,9 @@ where
 impl<S: BosStr, St> KidlispBuilder<S, St>
 where
     St: kidlisp_state::State,
+    St::Code: kidlisp_state::IsSet,
     St::When: kidlisp_state::IsSet,
     St::Source: kidlisp_state::IsSet,
-    St::Code: kidlisp_state::IsSet,
     St::Ref: kidlisp_state::IsSet,
 {
     /// Build the final struct.

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use serde::{Serialize, Deserialize};
 use crate::blue_recipes::feed::recipe;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Ingredient<S: BosStr = DefaultStr> {
     ///The amount of the ingredient needed.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,10 +49,7 @@ pub struct Ingredient<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "blue.recipes.feed.recipe",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Recipe<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -85,13 +76,7 @@ pub struct Recipe<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct RecipeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -101,13 +86,7 @@ pub struct RecipeGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Step<S: BosStr = DefaultStr> {
     ///The instruction to provide to the user.
     pub text: S,
@@ -493,49 +472,49 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ingredients;
         type Steps;
+        type Ingredients;
         type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ingredients = Unset;
         type Steps = Unset;
+        type Ingredients = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `ingredients` field to Set
-    pub struct SetIngredients<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIngredients<St> {}
-    impl<St: State> State for SetIngredients<St> {
-        type Ingredients = Set<members::ingredients>;
-        type Steps = St::Steps;
-        type Title = St::Title;
     }
     ///State transition - sets the `steps` field to Set
     pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSteps<St> {}
     impl<St: State> State for SetSteps<St> {
-        type Ingredients = St::Ingredients;
         type Steps = Set<members::steps>;
+        type Ingredients = St::Ingredients;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `ingredients` field to Set
+    pub struct SetIngredients<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIngredients<St> {}
+    impl<St: State> State for SetIngredients<St> {
+        type Steps = St::Steps;
+        type Ingredients = Set<members::ingredients>;
         type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Ingredients = St::Ingredients;
         type Steps = St::Steps;
+        type Ingredients = St::Ingredients;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ingredients` field
-        pub struct ingredients(());
         ///Marker type for the `steps` field
         pub struct steps(());
+        ///Marker type for the `ingredients` field
+        pub struct ingredients(());
         ///Marker type for the `title` field
         pub struct title(());
     }
@@ -700,8 +679,8 @@ where
 impl<S: BosStr, St> RecipeBuilder<S, St>
 where
     St: recipe_state::State,
-    St::Ingredients: recipe_state::IsSet,
     St::Steps: recipe_state::IsSet,
+    St::Ingredients: recipe_state::IsSet,
     St::Title: recipe_state::IsSet,
 {
     /// Build the final struct.

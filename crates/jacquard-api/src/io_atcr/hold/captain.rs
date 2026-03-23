@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "io.atcr.hold.captain",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Captain<S: BosStr = DefaultStr> {
     ///Allow any authenticated user to register as crew
@@ -63,13 +60,7 @@ pub struct Captain<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CaptainGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -145,83 +136,83 @@ pub mod captain_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EnableBlueskyPosts;
-        type Public;
         type AllowAllCrew;
+        type EnableBlueskyPosts;
         type Owner;
+        type Public;
         type DeployedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EnableBlueskyPosts = Unset;
-        type Public = Unset;
         type AllowAllCrew = Unset;
+        type EnableBlueskyPosts = Unset;
         type Owner = Unset;
+        type Public = Unset;
         type DeployedAt = Unset;
-    }
-    ///State transition - sets the `enable_bluesky_posts` field to Set
-    pub struct SetEnableBlueskyPosts<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEnableBlueskyPosts<St> {}
-    impl<St: State> State for SetEnableBlueskyPosts<St> {
-        type EnableBlueskyPosts = Set<members::enable_bluesky_posts>;
-        type Public = St::Public;
-        type AllowAllCrew = St::AllowAllCrew;
-        type Owner = St::Owner;
-        type DeployedAt = St::DeployedAt;
-    }
-    ///State transition - sets the `public` field to Set
-    pub struct SetPublic<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPublic<St> {}
-    impl<St: State> State for SetPublic<St> {
-        type EnableBlueskyPosts = St::EnableBlueskyPosts;
-        type Public = Set<members::public>;
-        type AllowAllCrew = St::AllowAllCrew;
-        type Owner = St::Owner;
-        type DeployedAt = St::DeployedAt;
     }
     ///State transition - sets the `allow_all_crew` field to Set
     pub struct SetAllowAllCrew<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAllowAllCrew<St> {}
     impl<St: State> State for SetAllowAllCrew<St> {
-        type EnableBlueskyPosts = St::EnableBlueskyPosts;
-        type Public = St::Public;
         type AllowAllCrew = Set<members::allow_all_crew>;
+        type EnableBlueskyPosts = St::EnableBlueskyPosts;
         type Owner = St::Owner;
+        type Public = St::Public;
+        type DeployedAt = St::DeployedAt;
+    }
+    ///State transition - sets the `enable_bluesky_posts` field to Set
+    pub struct SetEnableBlueskyPosts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEnableBlueskyPosts<St> {}
+    impl<St: State> State for SetEnableBlueskyPosts<St> {
+        type AllowAllCrew = St::AllowAllCrew;
+        type EnableBlueskyPosts = Set<members::enable_bluesky_posts>;
+        type Owner = St::Owner;
+        type Public = St::Public;
         type DeployedAt = St::DeployedAt;
     }
     ///State transition - sets the `owner` field to Set
     pub struct SetOwner<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOwner<St> {}
     impl<St: State> State for SetOwner<St> {
-        type EnableBlueskyPosts = St::EnableBlueskyPosts;
-        type Public = St::Public;
         type AllowAllCrew = St::AllowAllCrew;
+        type EnableBlueskyPosts = St::EnableBlueskyPosts;
         type Owner = Set<members::owner>;
+        type Public = St::Public;
+        type DeployedAt = St::DeployedAt;
+    }
+    ///State transition - sets the `public` field to Set
+    pub struct SetPublic<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublic<St> {}
+    impl<St: State> State for SetPublic<St> {
+        type AllowAllCrew = St::AllowAllCrew;
+        type EnableBlueskyPosts = St::EnableBlueskyPosts;
+        type Owner = St::Owner;
+        type Public = Set<members::public>;
         type DeployedAt = St::DeployedAt;
     }
     ///State transition - sets the `deployed_at` field to Set
     pub struct SetDeployedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDeployedAt<St> {}
     impl<St: State> State for SetDeployedAt<St> {
-        type EnableBlueskyPosts = St::EnableBlueskyPosts;
-        type Public = St::Public;
         type AllowAllCrew = St::AllowAllCrew;
+        type EnableBlueskyPosts = St::EnableBlueskyPosts;
         type Owner = St::Owner;
+        type Public = St::Public;
         type DeployedAt = Set<members::deployed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `enable_bluesky_posts` field
-        pub struct enable_bluesky_posts(());
-        ///Marker type for the `public` field
-        pub struct public(());
         ///Marker type for the `allow_all_crew` field
         pub struct allow_all_crew(());
+        ///Marker type for the `enable_bluesky_posts` field
+        pub struct enable_bluesky_posts(());
         ///Marker type for the `owner` field
         pub struct owner(());
+        ///Marker type for the `public` field
+        pub struct public(());
         ///Marker type for the `deployed_at` field
         pub struct deployed_at(());
     }
@@ -384,10 +375,10 @@ impl<S: BosStr, St: captain_state::State> CaptainBuilder<S, St> {
 impl<S: BosStr, St> CaptainBuilder<S, St>
 where
     St: captain_state::State,
-    St::EnableBlueskyPosts: captain_state::IsSet,
-    St::Public: captain_state::IsSet,
     St::AllowAllCrew: captain_state::IsSet,
+    St::EnableBlueskyPosts: captain_state::IsSet,
     St::Owner: captain_state::IsSet,
+    St::Public: captain_state::IsSet,
     St::DeployedAt: captain_state::IsSet,
 {
     /// Build the final struct.

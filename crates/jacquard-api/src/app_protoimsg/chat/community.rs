@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::app_protoimsg::chat::community;
 /// A named group of community members.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CommunityGroup<S: BosStr = DefaultStr> {
     ///Whether this is an inner circle group for presence visibility.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,13 +48,7 @@ pub struct CommunityGroup<S: BosStr = DefaultStr> {
 /// A member in a community group.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CommunityMember<S: BosStr = DefaultStr> {
     ///When this member was added.
     pub added_at: Datetime,
@@ -77,10 +65,7 @@ pub struct CommunityMember<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "app.protoimsg.chat.community",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Community<S: BosStr = DefaultStr> {
     ///Named groups of community members, like AIM's buddy list categories.
@@ -92,13 +77,7 @@ pub struct Community<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CommunityGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -231,37 +210,37 @@ pub mod community_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Members;
         type Name;
+        type Members;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Members = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `members` field to Set
-    pub struct SetMembers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMembers<St> {}
-    impl<St: State> State for SetMembers<St> {
-        type Members = Set<members::members>;
-        type Name = St::Name;
+        type Members = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Members = St::Members;
         type Name = Set<members::name>;
+        type Members = St::Members;
+    }
+    ///State transition - sets the `members` field to Set
+    pub struct SetMembers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMembers<St> {}
+    impl<St: State> State for SetMembers<St> {
+        type Name = St::Name;
+        type Members = Set<members::members>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `members` field
-        pub struct members(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `members` field
+        pub struct members(());
     }
 }
 
@@ -344,8 +323,8 @@ where
 impl<S: BosStr, St> CommunityGroupBuilder<S, St>
 where
     St: community_group_state::State,
-    St::Members: community_group_state::IsSet,
     St::Name: community_group_state::IsSet,
+    St::Members: community_group_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CommunityGroup<S> {
@@ -513,37 +492,37 @@ pub mod community_member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
         type Did;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
-    impl<St: State> State for SetAddedAt<St> {
-        type AddedAt = Set<members::added_at>;
-        type Did = St::Did;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type AddedAt = St::AddedAt;
         type Did = Set<members::did>;
+        type AddedAt = St::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
+    impl<St: State> State for SetAddedAt<St> {
+        type Did = St::Did;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
@@ -613,8 +592,8 @@ where
 impl<S: BosStr, St> CommunityMemberBuilder<S, St>
 where
     St: community_member_state::State,
-    St::AddedAt: community_member_state::IsSet,
     St::Did: community_member_state::IsSet,
+    St::AddedAt: community_member_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CommunityMember<S> {

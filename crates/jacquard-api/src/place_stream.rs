@@ -28,7 +28,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -47,13 +47,7 @@ use crate::app_bsky::graph::block::Block;
 use crate::place_stream;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlockView<S: BosStr = DefaultStr> {
     pub blocker: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -66,13 +60,7 @@ pub struct BlockView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Rendition<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -81,13 +69,7 @@ pub struct Rendition<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Renditions<S: BosStr = DefaultStr> {
     pub renditions: Vec<place_stream::Rendition<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -149,85 +131,85 @@ pub mod block_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Blocker;
-        type Record;
         type IndexedAt;
         type Cid;
+        type Uri;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Blocker = Unset;
-        type Record = Unset;
         type IndexedAt = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Blocker = St::Blocker;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
+        type Uri = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `blocker` field to Set
     pub struct SetBlocker<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlocker<St> {}
     impl<St: State> State for SetBlocker<St> {
-        type Uri = St::Uri;
         type Blocker = Set<members::blocker>;
-        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
         type Uri = St::Uri;
-        type Blocker = St::Blocker;
-        type Record = Set<members::record>;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
+        type Record = St::Record;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
         type Blocker = St::Blocker;
-        type Record = St::Record;
         type IndexedAt = Set<members::indexed_at>;
         type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Record = St::Record;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type Blocker = St::Blocker;
-        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
         type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Blocker = St::Blocker;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Blocker = St::Blocker;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `blocker` field
         pub struct blocker(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -360,11 +342,11 @@ where
 impl<S: BosStr, St> BlockViewBuilder<S, St>
 where
     St: block_view_state::State,
-    St::Uri: block_view_state::IsSet,
     St::Blocker: block_view_state::IsSet,
-    St::Record: block_view_state::IsSet,
     St::IndexedAt: block_view_state::IsSet,
     St::Cid: block_view_state::IsSet,
+    St::Uri: block_view_state::IsSet,
+    St::Record: block_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BlockView<S> {

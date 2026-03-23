@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,13 +25,7 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Rgb<S: BosStr = DefaultStr> {
     pub b: i64,
     pub g: i64,
@@ -42,13 +36,7 @@ pub struct Rgb<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Rgba<S: BosStr = DefaultStr> {
     pub a: i64,
     pub b: i64,
@@ -239,50 +227,50 @@ pub mod rgb_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type R;
-        type B;
         type G;
+        type B;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type R = Unset;
-        type B = Unset;
         type G = Unset;
+        type B = Unset;
     }
     ///State transition - sets the `r` field to Set
     pub struct SetR<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetR<St> {}
     impl<St: State> State for SetR<St> {
         type R = Set<members::r>;
+        type G = St::G;
         type B = St::B;
-        type G = St::G;
-    }
-    ///State transition - sets the `b` field to Set
-    pub struct SetB<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetB<St> {}
-    impl<St: State> State for SetB<St> {
-        type R = St::R;
-        type B = Set<members::b>;
-        type G = St::G;
     }
     ///State transition - sets the `g` field to Set
     pub struct SetG<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetG<St> {}
     impl<St: State> State for SetG<St> {
         type R = St::R;
-        type B = St::B;
         type G = Set<members::g>;
+        type B = St::B;
+    }
+    ///State transition - sets the `b` field to Set
+    pub struct SetB<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetB<St> {}
+    impl<St: State> State for SetB<St> {
+        type R = St::R;
+        type G = St::G;
+        type B = Set<members::b>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `r` field
         pub struct r(());
-        ///Marker type for the `b` field
-        pub struct b(());
         ///Marker type for the `g` field
         pub struct g(());
+        ///Marker type for the `b` field
+        pub struct b(());
     }
 }
 
@@ -363,8 +351,8 @@ impl<S: BosStr, St> RgbBuilder<S, St>
 where
     St: rgb_state::State,
     St::R: rgb_state::IsSet,
-    St::B: rgb_state::IsSet,
     St::G: rgb_state::IsSet,
+    St::B: rgb_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Rgb<S> {
@@ -502,65 +490,65 @@ pub mod rgba_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type G;
         type R;
         type A;
+        type G;
         type B;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type G = Unset;
         type R = Unset;
         type A = Unset;
+        type G = Unset;
         type B = Unset;
-    }
-    ///State transition - sets the `g` field to Set
-    pub struct SetG<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetG<St> {}
-    impl<St: State> State for SetG<St> {
-        type G = Set<members::g>;
-        type R = St::R;
-        type A = St::A;
-        type B = St::B;
     }
     ///State transition - sets the `r` field to Set
     pub struct SetR<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetR<St> {}
     impl<St: State> State for SetR<St> {
-        type G = St::G;
         type R = Set<members::r>;
         type A = St::A;
+        type G = St::G;
         type B = St::B;
     }
     ///State transition - sets the `a` field to Set
     pub struct SetA<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetA<St> {}
     impl<St: State> State for SetA<St> {
-        type G = St::G;
         type R = St::R;
         type A = Set<members::a>;
+        type G = St::G;
+        type B = St::B;
+    }
+    ///State transition - sets the `g` field to Set
+    pub struct SetG<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetG<St> {}
+    impl<St: State> State for SetG<St> {
+        type R = St::R;
+        type A = St::A;
+        type G = Set<members::g>;
         type B = St::B;
     }
     ///State transition - sets the `b` field to Set
     pub struct SetB<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetB<St> {}
     impl<St: State> State for SetB<St> {
-        type G = St::G;
         type R = St::R;
         type A = St::A;
+        type G = St::G;
         type B = Set<members::b>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `g` field
-        pub struct g(());
         ///Marker type for the `r` field
         pub struct r(());
         ///Marker type for the `a` field
         pub struct a(());
+        ///Marker type for the `g` field
+        pub struct g(());
         ///Marker type for the `b` field
         pub struct b(());
     }
@@ -658,9 +646,9 @@ where
 impl<S: BosStr, St> RgbaBuilder<S, St>
 where
     St: rgba_state::State,
-    St::G: rgba_state::IsSet,
     St::R: rgba_state::IsSet,
     St::A: rgba_state::IsSet,
+    St::G: rgba_state::IsSet,
     St::B: rgba_state::IsSet,
 {
     /// Build the final struct.

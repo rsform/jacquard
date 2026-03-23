@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateCrewTier<S: BosStr = DefaultStr> {
     ///Tier rank index (0-based, maps to hold tier list by position).
     pub tier_rank: i64,
@@ -36,13 +30,7 @@ pub struct UpdateCrewTier<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateCrewTierOutput<S: BosStr = DefaultStr> {
     ///Resolved tier name on this hold.
     pub tier_name: S,
@@ -141,37 +129,37 @@ pub mod update_crew_tier_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TierRank;
         type UserDid;
+        type TierRank;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TierRank = Unset;
         type UserDid = Unset;
-    }
-    ///State transition - sets the `tier_rank` field to Set
-    pub struct SetTierRank<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTierRank<St> {}
-    impl<St: State> State for SetTierRank<St> {
-        type TierRank = Set<members::tier_rank>;
-        type UserDid = St::UserDid;
+        type TierRank = Unset;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUserDid<St> {}
     impl<St: State> State for SetUserDid<St> {
-        type TierRank = St::TierRank;
         type UserDid = Set<members::user_did>;
+        type TierRank = St::TierRank;
+    }
+    ///State transition - sets the `tier_rank` field to Set
+    pub struct SetTierRank<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTierRank<St> {}
+    impl<St: State> State for SetTierRank<St> {
+        type UserDid = St::UserDid;
+        type TierRank = Set<members::tier_rank>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tier_rank` field
-        pub struct tier_rank(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
+        ///Marker type for the `tier_rank` field
+        pub struct tier_rank(());
     }
 }
 
@@ -241,8 +229,8 @@ where
 impl<S: BosStr, St> UpdateCrewTierBuilder<S, St>
 where
     St: update_crew_tier_state::State,
-    St::TierRank: update_crew_tier_state::IsSet,
     St::UserDid: update_crew_tier_state::IsSet,
+    St::TierRank: update_crew_tier_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateCrewTier<S> {

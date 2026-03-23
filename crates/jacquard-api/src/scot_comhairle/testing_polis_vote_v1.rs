@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::scot_comhairle::testing_polis_vote_v1;
     rename_all = "camelCase",
     rename = "scot.comhairle.testingPolisVoteV1",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct TestingPolisVoteV1<S: BosStr = DefaultStr> {
     ///Timestamp when the vote was created
@@ -56,13 +53,7 @@ pub struct TestingPolisVoteV1<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct TestingPolisVoteV1GetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -73,13 +64,7 @@ pub struct TestingPolisVoteV1GetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a poll record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PollRef<S: BosStr = DefaultStr> {
     ///Content identifier of the poll record
     pub cid: Cid<S>,
@@ -92,13 +77,7 @@ pub struct PollRef<S: BosStr = DefaultStr> {
 /// Reference to a statement record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatementRef<S: BosStr = DefaultStr> {
     ///Content identifier of the statement record
     pub cid: Cid<S>,
@@ -196,65 +175,65 @@ pub mod testing_polis_vote_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Value;
         type Poll;
+        type Value;
+        type Subject;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Value = Unset;
         type Poll = Unset;
+        type Value = Unset;
+        type Subject = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPoll<St> {}
+    impl<St: State> State for SetPoll<St> {
+        type Poll = Set<members::poll>;
         type Value = St::Value;
-        type Poll = St::Poll;
+        type Subject = St::Subject;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Subject = St::Subject;
-        type Value = Set<members::value>;
         type Poll = St::Poll;
+        type Value = Set<members::value>;
+        type Subject = St::Subject;
         type CreatedAt = St::CreatedAt;
     }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPoll<St> {}
-    impl<St: State> State for SetPoll<St> {
-        type Subject = St::Subject;
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Poll = St::Poll;
         type Value = St::Value;
-        type Poll = Set<members::poll>;
+        type Subject = Set<members::subject>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
-        type Value = St::Value;
         type Poll = St::Poll;
+        type Value = St::Value;
+        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `poll` field
         pub struct poll(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -369,9 +348,9 @@ where
 impl<S: BosStr, St> TestingPolisVoteV1Builder<S, St>
 where
     St: testing_polis_vote_v1_state::State,
-    St::Subject: testing_polis_vote_v1_state::IsSet,
-    St::Value: testing_polis_vote_v1_state::IsSet,
     St::Poll: testing_polis_vote_v1_state::IsSet,
+    St::Value: testing_polis_vote_v1_state::IsSet,
+    St::Subject: testing_polis_vote_v1_state::IsSet,
     St::CreatedAt: testing_polis_vote_v1_state::IsSet,
 {
     /// Build the final struct.

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "dev.fudgeu.experimental.atforumv1.forum.category",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Category<S: BosStr = DefaultStr> {
     pub category_type: S,
@@ -52,13 +49,7 @@ pub struct Category<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CategoryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -167,51 +158,51 @@ pub mod category_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CategoryType;
         type Group;
         type Name;
-        type CategoryType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CategoryType = Unset;
         type Group = Unset;
         type Name = Unset;
-        type CategoryType = Unset;
-    }
-    ///State transition - sets the `group` field to Set
-    pub struct SetGroup<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGroup<St> {}
-    impl<St: State> State for SetGroup<St> {
-        type Group = Set<members::group>;
-        type Name = St::Name;
-        type CategoryType = St::CategoryType;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Group = St::Group;
-        type Name = Set<members::name>;
-        type CategoryType = St::CategoryType;
     }
     ///State transition - sets the `category_type` field to Set
     pub struct SetCategoryType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCategoryType<St> {}
     impl<St: State> State for SetCategoryType<St> {
+        type CategoryType = Set<members::category_type>;
         type Group = St::Group;
         type Name = St::Name;
-        type CategoryType = Set<members::category_type>;
+    }
+    ///State transition - sets the `group` field to Set
+    pub struct SetGroup<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGroup<St> {}
+    impl<St: State> State for SetGroup<St> {
+        type CategoryType = St::CategoryType;
+        type Group = Set<members::group>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CategoryType = St::CategoryType;
+        type Group = St::Group;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `category_type` field
+        pub struct category_type(());
         ///Marker type for the `group` field
         pub struct group(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `category_type` field
-        pub struct category_type(());
     }
 }
 
@@ -313,9 +304,9 @@ where
 impl<S: BosStr, St> CategoryBuilder<S, St>
 where
     St: category_state::State,
+    St::CategoryType: category_state::IsSet,
     St::Group: category_state::IsSet,
     St::Name: category_state::IsSet,
-    St::CategoryType: category_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Category<S> {

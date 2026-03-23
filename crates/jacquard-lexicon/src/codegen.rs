@@ -238,12 +238,12 @@ impl<'c> CodeGenerator<'c> {
                 let rust_type = self.string_to_rust_type(s, resolved);
                 let doc = self.generate_doc_comment(s.description.as_ref());
                 let needs_param = self.string_needs_type_param(s);
-                let bosstr_path = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
-                let default_str_path = resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
+                let default_str_path =
+                    resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
                 let tokens = if needs_param {
                     quote! {
                         #doc
-                        pub type #ident<S: #bosstr_path = #default_str_path> = #rust_type;
+                        pub type #ident<S = #default_str_path> = #rust_type;
                     }
                 } else {
                     quote! {
@@ -278,12 +278,12 @@ impl<'c> CodeGenerator<'c> {
 
                     let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                     let union_tokens = union_generated.into_tokens();
-                    let bosstr_path = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
-                    let default_str_path = resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
+                    let default_str_path =
+                        resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
                     let type_alias = if needs_lifetime {
                         quote! {
                             #doc
-                            pub type #ident<S: #bosstr_path = #default_str_path> = Vec<#union_ident<S>>;
+                            pub type #ident<S = #default_str_path> = Vec<#union_ident<S>>;
                         }
                     } else {
                         quote! {
@@ -301,12 +301,12 @@ impl<'c> CodeGenerator<'c> {
                 } else {
                     // Regular array item type
                     let item_type = self.array_item_to_rust_type(nsid, &array.items, resolved)?;
-                    let bosstr_path = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
-                    let default_str_path = resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
+                    let default_str_path =
+                        resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
                     let tokens = if needs_lifetime {
                         quote! {
                             #doc
-                            pub type #ident<S: #bosstr_path = #default_str_path> = Vec<#item_type>;
+                            pub type #ident<S = #default_str_path> = Vec<#item_type>;
                         }
                     } else {
                         quote! {
@@ -340,11 +340,11 @@ impl<'c> CodeGenerator<'c> {
                     }
                     _ => unreachable!(),
                 };
-                let bosstr_path = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
-                let default_str_path = resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
+                let default_str_path =
+                    resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
                 let tokens = if needs_lifetime {
                     quote! {
-                        pub type #ident<S: #bosstr_path = #default_str_path> = #rust_type;
+                        pub type #ident<S = #default_str_path> = #rust_type;
                     }
                 } else {
                     quote! {

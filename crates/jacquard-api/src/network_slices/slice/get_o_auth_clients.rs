@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,26 +27,14 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_o_auth_clients;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOAuthClients<S: BosStr = DefaultStr> {
     pub slice: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOAuthClientsOutput<S: BosStr = DefaultStr> {
     pub clients: Vec<get_o_auth_clients::OauthClientDetails<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -55,13 +43,7 @@ pub struct GetOAuthClientsOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OauthClientDetails<S: BosStr = DefaultStr> {
     ///OAuth client ID
     pub client_id: S,
@@ -237,127 +219,127 @@ pub mod oauth_client_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedByDid;
-        type ClientName;
-        type RedirectUris;
-        type CreatedAt;
         type GrantTypes;
+        type CreatedAt;
         type ResponseTypes;
+        type ClientName;
+        type CreatedByDid;
         type ClientId;
+        type RedirectUris;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedByDid = Unset;
-        type ClientName = Unset;
-        type RedirectUris = Unset;
-        type CreatedAt = Unset;
         type GrantTypes = Unset;
+        type CreatedAt = Unset;
         type ResponseTypes = Unset;
+        type ClientName = Unset;
+        type CreatedByDid = Unset;
         type ClientId = Unset;
-    }
-    ///State transition - sets the `created_by_did` field to Set
-    pub struct SetCreatedByDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedByDid<St> {}
-    impl<St: State> State for SetCreatedByDid<St> {
-        type CreatedByDid = Set<members::created_by_did>;
-        type ClientName = St::ClientName;
-        type RedirectUris = St::RedirectUris;
-        type CreatedAt = St::CreatedAt;
-        type GrantTypes = St::GrantTypes;
-        type ResponseTypes = St::ResponseTypes;
-        type ClientId = St::ClientId;
-    }
-    ///State transition - sets the `client_name` field to Set
-    pub struct SetClientName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetClientName<St> {}
-    impl<St: State> State for SetClientName<St> {
-        type CreatedByDid = St::CreatedByDid;
-        type ClientName = Set<members::client_name>;
-        type RedirectUris = St::RedirectUris;
-        type CreatedAt = St::CreatedAt;
-        type GrantTypes = St::GrantTypes;
-        type ResponseTypes = St::ResponseTypes;
-        type ClientId = St::ClientId;
-    }
-    ///State transition - sets the `redirect_uris` field to Set
-    pub struct SetRedirectUris<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRedirectUris<St> {}
-    impl<St: State> State for SetRedirectUris<St> {
-        type CreatedByDid = St::CreatedByDid;
-        type ClientName = St::ClientName;
-        type RedirectUris = Set<members::redirect_uris>;
-        type CreatedAt = St::CreatedAt;
-        type GrantTypes = St::GrantTypes;
-        type ResponseTypes = St::ResponseTypes;
-        type ClientId = St::ClientId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedByDid = St::CreatedByDid;
-        type ClientName = St::ClientName;
-        type RedirectUris = St::RedirectUris;
-        type CreatedAt = Set<members::created_at>;
-        type GrantTypes = St::GrantTypes;
-        type ResponseTypes = St::ResponseTypes;
-        type ClientId = St::ClientId;
+        type RedirectUris = Unset;
     }
     ///State transition - sets the `grant_types` field to Set
     pub struct SetGrantTypes<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGrantTypes<St> {}
     impl<St: State> State for SetGrantTypes<St> {
-        type CreatedByDid = St::CreatedByDid;
-        type ClientName = St::ClientName;
-        type RedirectUris = St::RedirectUris;
-        type CreatedAt = St::CreatedAt;
         type GrantTypes = Set<members::grant_types>;
+        type CreatedAt = St::CreatedAt;
         type ResponseTypes = St::ResponseTypes;
+        type ClientName = St::ClientName;
+        type CreatedByDid = St::CreatedByDid;
         type ClientId = St::ClientId;
+        type RedirectUris = St::RedirectUris;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type GrantTypes = St::GrantTypes;
+        type CreatedAt = Set<members::created_at>;
+        type ResponseTypes = St::ResponseTypes;
+        type ClientName = St::ClientName;
+        type CreatedByDid = St::CreatedByDid;
+        type ClientId = St::ClientId;
+        type RedirectUris = St::RedirectUris;
     }
     ///State transition - sets the `response_types` field to Set
     pub struct SetResponseTypes<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetResponseTypes<St> {}
     impl<St: State> State for SetResponseTypes<St> {
-        type CreatedByDid = St::CreatedByDid;
-        type ClientName = St::ClientName;
-        type RedirectUris = St::RedirectUris;
-        type CreatedAt = St::CreatedAt;
         type GrantTypes = St::GrantTypes;
+        type CreatedAt = St::CreatedAt;
         type ResponseTypes = Set<members::response_types>;
+        type ClientName = St::ClientName;
+        type CreatedByDid = St::CreatedByDid;
         type ClientId = St::ClientId;
+        type RedirectUris = St::RedirectUris;
+    }
+    ///State transition - sets the `client_name` field to Set
+    pub struct SetClientName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClientName<St> {}
+    impl<St: State> State for SetClientName<St> {
+        type GrantTypes = St::GrantTypes;
+        type CreatedAt = St::CreatedAt;
+        type ResponseTypes = St::ResponseTypes;
+        type ClientName = Set<members::client_name>;
+        type CreatedByDid = St::CreatedByDid;
+        type ClientId = St::ClientId;
+        type RedirectUris = St::RedirectUris;
+    }
+    ///State transition - sets the `created_by_did` field to Set
+    pub struct SetCreatedByDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedByDid<St> {}
+    impl<St: State> State for SetCreatedByDid<St> {
+        type GrantTypes = St::GrantTypes;
+        type CreatedAt = St::CreatedAt;
+        type ResponseTypes = St::ResponseTypes;
+        type ClientName = St::ClientName;
+        type CreatedByDid = Set<members::created_by_did>;
+        type ClientId = St::ClientId;
+        type RedirectUris = St::RedirectUris;
     }
     ///State transition - sets the `client_id` field to Set
     pub struct SetClientId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClientId<St> {}
     impl<St: State> State for SetClientId<St> {
-        type CreatedByDid = St::CreatedByDid;
-        type ClientName = St::ClientName;
-        type RedirectUris = St::RedirectUris;
-        type CreatedAt = St::CreatedAt;
         type GrantTypes = St::GrantTypes;
+        type CreatedAt = St::CreatedAt;
         type ResponseTypes = St::ResponseTypes;
+        type ClientName = St::ClientName;
+        type CreatedByDid = St::CreatedByDid;
         type ClientId = Set<members::client_id>;
+        type RedirectUris = St::RedirectUris;
+    }
+    ///State transition - sets the `redirect_uris` field to Set
+    pub struct SetRedirectUris<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRedirectUris<St> {}
+    impl<St: State> State for SetRedirectUris<St> {
+        type GrantTypes = St::GrantTypes;
+        type CreatedAt = St::CreatedAt;
+        type ResponseTypes = St::ResponseTypes;
+        type ClientName = St::ClientName;
+        type CreatedByDid = St::CreatedByDid;
+        type ClientId = St::ClientId;
+        type RedirectUris = Set<members::redirect_uris>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_by_did` field
-        pub struct created_by_did(());
-        ///Marker type for the `client_name` field
-        pub struct client_name(());
-        ///Marker type for the `redirect_uris` field
-        pub struct redirect_uris(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `grant_types` field
         pub struct grant_types(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `response_types` field
         pub struct response_types(());
+        ///Marker type for the `client_name` field
+        pub struct client_name(());
+        ///Marker type for the `created_by_did` field
+        pub struct created_by_did(());
         ///Marker type for the `client_id` field
         pub struct client_id(());
+        ///Marker type for the `redirect_uris` field
+        pub struct redirect_uris(());
     }
 }
 
@@ -628,13 +610,13 @@ impl<S: BosStr, St: oauth_client_details_state::State> OauthClientDetailsBuilder
 impl<S: BosStr, St> OauthClientDetailsBuilder<S, St>
 where
     St: oauth_client_details_state::State,
-    St::CreatedByDid: oauth_client_details_state::IsSet,
-    St::ClientName: oauth_client_details_state::IsSet,
-    St::RedirectUris: oauth_client_details_state::IsSet,
-    St::CreatedAt: oauth_client_details_state::IsSet,
     St::GrantTypes: oauth_client_details_state::IsSet,
+    St::CreatedAt: oauth_client_details_state::IsSet,
     St::ResponseTypes: oauth_client_details_state::IsSet,
+    St::ClientName: oauth_client_details_state::IsSet,
+    St::CreatedByDid: oauth_client_details_state::IsSet,
     St::ClientId: oauth_client_details_state::IsSet,
+    St::RedirectUris: oauth_client_details_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OauthClientDetails<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::social_showcase::ItemImage;
     rename_all = "camelCase",
     rename = "social.showcase.library.item",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Item<S: BosStr = DefaultStr> {
     ///Category/type of item
@@ -159,13 +156,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ItemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -309,85 +300,85 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Tags;
         type Images;
-        type Visibility;
         type Title;
-        type CreatedAt;
+        type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Tags = Unset;
         type Images = Unset;
-        type Visibility = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTags<St> {}
-    impl<St: State> State for SetTags<St> {
-        type Tags = Set<members::tags>;
-        type Images = St::Images;
-        type Visibility = St::Visibility;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `images` field to Set
-    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetImages<St> {}
-    impl<St: State> State for SetImages<St> {
-        type Tags = St::Tags;
-        type Images = Set<members::images>;
-        type Visibility = St::Visibility;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVisibility<St> {}
-    impl<St: State> State for SetVisibility<St> {
-        type Tags = St::Tags;
-        type Images = St::Images;
-        type Visibility = Set<members::visibility>;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Tags = St::Tags;
-        type Images = St::Images;
-        type Visibility = St::Visibility;
-        type Title = Set<members::title>;
-        type CreatedAt = St::CreatedAt;
+        type Visibility = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Tags = St::Tags;
         type Images = St::Images;
-        type Visibility = St::Visibility;
         type Title = St::Title;
-        type CreatedAt = Set<members::created_at>;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type CreatedAt = St::CreatedAt;
+        type Tags = Set<members::tags>;
+        type Images = St::Images;
+        type Title = St::Title;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Images = Set<members::images>;
+        type Title = St::Title;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Images = St::Images;
+        type Title = Set<members::title>;
+        type Visibility = St::Visibility;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Images = St::Images;
+        type Title = St::Title;
+        type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `tags` field
         pub struct tags(());
         ///Marker type for the `images` field
         pub struct images(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
     }
 }
 
@@ -631,11 +622,11 @@ where
 impl<S: BosStr, St> ItemBuilder<S, St>
 where
     St: item_state::State,
+    St::CreatedAt: item_state::IsSet,
     St::Tags: item_state::IsSet,
     St::Images: item_state::IsSet,
-    St::Visibility: item_state::IsSet,
     St::Title: item_state::IsSet,
-    St::CreatedAt: item_state::IsSet,
+    St::Visibility: item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Item<S> {

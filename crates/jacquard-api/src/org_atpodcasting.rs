@@ -13,7 +13,7 @@ pub mod podcast;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,13 +30,7 @@ use serde::{Serialize, Deserialize};
 /// A podcast category from the Apple Podcasts taxonomy.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AppleCategory<S: BosStr = DefaultStr> {
     ///The category value. Subcategories use the format 'Category > Subcategory'.
     pub value: AppleCategoryValue<S>,
@@ -680,13 +674,7 @@ where
 /// Identifies a podcast episode by its podcast GUID and feed item identifier, independent of which repository currently holds the record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EpisodeRef<S: BosStr = DefaultStr> {
     ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item.
     pub feed_item_guid: S,
@@ -702,13 +690,7 @@ pub struct EpisodeRef<S: BosStr = DefaultStr> {
 /// Identifies a podcast by its Podcasting 2.0 GUID, independent of which repository currently holds the record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PodcastRef<S: BosStr = DefaultStr> {
     ///URL of the podcast's RSS feed.
     #[serde(skip_serializing_if = "Option::is_none")]

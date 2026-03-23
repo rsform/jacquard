@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "app.protoimsg.chat.role",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Role<S: BosStr = DefaultStr> {
     ///Timestamp of role assignment.
@@ -134,13 +131,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct RoleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -206,67 +197,67 @@ pub mod role_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
-        type Role;
-        type CreatedAt;
         type Subject;
+        type Role;
+        type Room;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
-        type Role = Unset;
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoom<St> {}
-    impl<St: State> State for SetRoom<St> {
-        type Room = Set<members::room>;
-        type Role = St::Role;
-        type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRole<St> {}
-    impl<St: State> State for SetRole<St> {
-        type Room = St::Room;
-        type Role = Set<members::role>;
-        type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Room = St::Room;
-        type Role = St::Role;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
+        type Role = Unset;
+        type Room = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type Room = St::Room;
-        type Role = St::Role;
-        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type Role = St::Role;
+        type Room = St::Room;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRole<St> {}
+    impl<St: State> State for SetRole<St> {
+        type Subject = St::Subject;
+        type Role = Set<members::role>;
+        type Room = St::Room;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
+        type Subject = St::Subject;
+        type Role = St::Role;
+        type Room = Set<members::room>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type Role = St::Role;
+        type Room = St::Room;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
-        ///Marker type for the `role` field
-        pub struct role(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `role` field
+        pub struct role(());
+        ///Marker type for the `room` field
+        pub struct room(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -374,10 +365,10 @@ where
 impl<S: BosStr, St> RoleBuilder<S, St>
 where
     St: role_state::State,
-    St::Room: role_state::IsSet,
-    St::Role: role_state::IsSet,
-    St::CreatedAt: role_state::IsSet,
     St::Subject: role_state::IsSet,
+    St::Role: role_state::IsSet,
+    St::Room: role_state::IsSet,
+    St::CreatedAt: role_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Role<S> {

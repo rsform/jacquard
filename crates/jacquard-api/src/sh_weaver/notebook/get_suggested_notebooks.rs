@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,13 +39,7 @@ pub struct GetSuggestedNotebooks {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedNotebooksOutput<S: BosStr = DefaultStr> {
     pub notebooks: Vec<get_suggested_notebooks::SuggestedNotebook<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -54,13 +48,7 @@ pub struct GetSuggestedNotebooksOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SuggestedNotebook<S: BosStr = DefaultStr> {
     pub notebook: NotebookView<S>,
     pub reason: get_suggested_notebooks::SuggestionReason<S>,
@@ -74,13 +62,7 @@ pub struct SuggestedNotebook<S: BosStr = DefaultStr> {
 /// Why this notebook was suggested.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SuggestionReason<S: BosStr = DefaultStr> {
     ///If followed-author, the author.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -334,37 +316,37 @@ pub mod suggested_notebook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reason;
         type Notebook;
+        type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reason = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReason<St> {}
-    impl<St: State> State for SetReason<St> {
-        type Reason = Set<members::reason>;
-        type Notebook = St::Notebook;
+        type Reason = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNotebook<St> {}
     impl<St: State> State for SetNotebook<St> {
-        type Reason = St::Reason;
         type Notebook = Set<members::notebook>;
+        type Reason = St::Reason;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReason<St> {}
+    impl<St: State> State for SetReason<St> {
+        type Notebook = St::Notebook;
+        type Reason = Set<members::reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
     }
 }
 
@@ -451,8 +433,8 @@ impl<S: BosStr, St: suggested_notebook_state::State> SuggestedNotebookBuilder<S,
 impl<S: BosStr, St> SuggestedNotebookBuilder<S, St>
 where
     St: suggested_notebook_state::State,
-    St::Reason: suggested_notebook_state::IsSet,
     St::Notebook: suggested_notebook_state::IsSet,
+    St::Reason: suggested_notebook_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SuggestedNotebook<S> {

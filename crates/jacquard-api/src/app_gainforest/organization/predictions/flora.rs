@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "app.gainforest.organization.predictions.flora",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Flora<S: BosStr = DefaultStr> {
     ///The date and time of the creation of the record
@@ -51,13 +48,7 @@ pub struct Flora<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct FloraGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -123,37 +114,37 @@ pub mod flora_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GbifTaxonKeys;
         type CreatedAt;
+        type GbifTaxonKeys;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GbifTaxonKeys = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `gbif_taxon_keys` field to Set
-    pub struct SetGbifTaxonKeys<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGbifTaxonKeys<St> {}
-    impl<St: State> State for SetGbifTaxonKeys<St> {
-        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
-        type CreatedAt = St::CreatedAt;
+        type GbifTaxonKeys = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type GbifTaxonKeys = St::GbifTaxonKeys;
         type CreatedAt = Set<members::created_at>;
+        type GbifTaxonKeys = St::GbifTaxonKeys;
+    }
+    ///State transition - sets the `gbif_taxon_keys` field to Set
+    pub struct SetGbifTaxonKeys<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGbifTaxonKeys<St> {}
+    impl<St: State> State for SetGbifTaxonKeys<St> {
+        type CreatedAt = St::CreatedAt;
+        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `gbif_taxon_keys` field
-        pub struct gbif_taxon_keys(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `gbif_taxon_keys` field
+        pub struct gbif_taxon_keys(());
     }
 }
 
@@ -223,8 +214,8 @@ where
 impl<S: BosStr, St> FloraBuilder<S, St>
 where
     St: flora_state::State,
-    St::GbifTaxonKeys: flora_state::IsSet,
     St::CreatedAt: flora_state::IsSet,
+    St::GbifTaxonKeys: flora_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Flora<S> {

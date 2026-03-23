@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,26 +28,14 @@ use crate::app_bsky::unspecced::ThreadItemPost;
 use crate::app_bsky::unspecced::get_post_thread_other_v2;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThreadOtherV2<S: BosStr = DefaultStr> {
     pub anchor: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThreadOtherV2Output<S: BosStr = DefaultStr> {
     ///A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
     pub thread: Vec<get_post_thread_other_v2::ThreadItem<S>>,
@@ -57,13 +45,7 @@ pub struct GetPostThreadOtherV2Output<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThreadItem<S: BosStr = DefaultStr> {
     ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
     pub depth: i64,
@@ -217,51 +199,51 @@ pub mod thread_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Depth;
         type Value;
+        type Depth;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Depth = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Depth = St::Depth;
-        type Value = St::Value;
-    }
-    ///State transition - sets the `depth` field to Set
-    pub struct SetDepth<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDepth<St> {}
-    impl<St: State> State for SetDepth<St> {
-        type Uri = St::Uri;
-        type Depth = Set<members::depth>;
-        type Value = St::Value;
+        type Depth = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Uri = St::Uri;
-        type Depth = St::Depth;
         type Value = Set<members::value>;
+        type Depth = St::Depth;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `depth` field to Set
+    pub struct SetDepth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDepth<St> {}
+    impl<St: State> State for SetDepth<St> {
+        type Value = St::Value;
+        type Depth = Set<members::depth>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Value = St::Value;
+        type Depth = St::Depth;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `depth` field
-        pub struct depth(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `depth` field
+        pub struct depth(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -350,9 +332,9 @@ where
 impl<S: BosStr, St> ThreadItemBuilder<S, St>
 where
     St: thread_item_state::State,
-    St::Uri: thread_item_state::IsSet,
-    St::Depth: thread_item_state::IsSet,
     St::Value: thread_item_state::IsSet,
+    St::Depth: thread_item_state::IsSet,
+    St::Uri: thread_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ThreadItem<S> {

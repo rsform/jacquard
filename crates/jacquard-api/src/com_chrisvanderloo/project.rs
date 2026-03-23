@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "com.chrisvanderloo.project",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Project<S: BosStr = DefaultStr> {
     pub description: S,
@@ -53,13 +50,7 @@ pub struct Project<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ProjectGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -179,67 +170,67 @@ pub mod project_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
-        type Description;
-        type Language;
         type Title;
+        type Language;
+        type Description;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
-        type Description = Unset;
-        type Language = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Repo = Set<members::repo>;
-        type Description = St::Description;
-        type Language = St::Language;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDescription<St> {}
-    impl<St: State> State for SetDescription<St> {
-        type Repo = St::Repo;
-        type Description = Set<members::description>;
-        type Language = St::Language;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLanguage<St> {}
-    impl<St: State> State for SetLanguage<St> {
-        type Repo = St::Repo;
-        type Description = St::Description;
-        type Language = Set<members::language>;
-        type Title = St::Title;
+        type Language = Unset;
+        type Description = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Repo = St::Repo;
-        type Description = St::Description;
-        type Language = St::Language;
         type Title = Set<members::title>;
+        type Language = St::Language;
+        type Description = St::Description;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLanguage<St> {}
+    impl<St: State> State for SetLanguage<St> {
+        type Title = St::Title;
+        type Language = Set<members::language>;
+        type Description = St::Description;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Title = St::Title;
+        type Language = St::Language;
+        type Description = Set<members::description>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Title = St::Title;
+        type Language = St::Language;
+        type Description = St::Description;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `language` field
-        pub struct language(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `language` field
+        pub struct language(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -360,10 +351,10 @@ where
 impl<S: BosStr, St> ProjectBuilder<S, St>
 where
     St: project_state::State,
-    St::Repo: project_state::IsSet,
-    St::Description: project_state::IsSet,
-    St::Language: project_state::IsSet,
     St::Title: project_state::IsSet,
+    St::Language: project_state::IsSet,
+    St::Description: project_state::IsSet,
+    St::Repo: project_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Project<S> {

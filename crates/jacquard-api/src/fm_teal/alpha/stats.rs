@@ -17,7 +17,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ArtistView<S: BosStr = DefaultStr> {
     ///MusicBrainz artist ID
     pub mbid: S,
@@ -52,13 +46,7 @@ pub struct ArtistView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordingView<S: BosStr = DefaultStr> {
     ///MusicBrainz recording ID
     pub mbid: S,
@@ -72,13 +60,7 @@ pub struct RecordingView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReleaseView<S: BosStr = DefaultStr> {
     ///MusicBrainz release ID
     pub mbid: S,
@@ -145,51 +127,51 @@ pub mod artist_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PlayCount;
-        type Name;
         type Mbid;
+        type Name;
+        type PlayCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PlayCount = Unset;
-        type Name = Unset;
         type Mbid = Unset;
-    }
-    ///State transition - sets the `play_count` field to Set
-    pub struct SetPlayCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlayCount<St> {}
-    impl<St: State> State for SetPlayCount<St> {
-        type PlayCount = Set<members::play_count>;
-        type Name = St::Name;
-        type Mbid = St::Mbid;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type PlayCount = St::PlayCount;
-        type Name = Set<members::name>;
-        type Mbid = St::Mbid;
+        type Name = Unset;
+        type PlayCount = Unset;
     }
     ///State transition - sets the `mbid` field to Set
     pub struct SetMbid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMbid<St> {}
     impl<St: State> State for SetMbid<St> {
-        type PlayCount = St::PlayCount;
-        type Name = St::Name;
         type Mbid = Set<members::mbid>;
+        type Name = St::Name;
+        type PlayCount = St::PlayCount;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Mbid = St::Mbid;
+        type Name = Set<members::name>;
+        type PlayCount = St::PlayCount;
+    }
+    ///State transition - sets the `play_count` field to Set
+    pub struct SetPlayCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlayCount<St> {}
+    impl<St: State> State for SetPlayCount<St> {
+        type Mbid = St::Mbid;
+        type Name = St::Name;
+        type PlayCount = Set<members::play_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `play_count` field
-        pub struct play_count(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `mbid` field
         pub struct mbid(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `play_count` field
+        pub struct play_count(());
     }
 }
 
@@ -278,9 +260,9 @@ where
 impl<S: BosStr, St> ArtistViewBuilder<S, St>
 where
     St: artist_view_state::State,
-    St::PlayCount: artist_view_state::IsSet,
-    St::Name: artist_view_state::IsSet,
     St::Mbid: artist_view_state::IsSet,
+    St::Name: artist_view_state::IsSet,
+    St::PlayCount: artist_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ArtistView<S> {
@@ -620,51 +602,51 @@ pub mod release_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mbid;
         type Name;
         type PlayCount;
+        type Mbid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mbid = Unset;
         type Name = Unset;
         type PlayCount = Unset;
-    }
-    ///State transition - sets the `mbid` field to Set
-    pub struct SetMbid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMbid<St> {}
-    impl<St: State> State for SetMbid<St> {
-        type Mbid = Set<members::mbid>;
-        type Name = St::Name;
-        type PlayCount = St::PlayCount;
+        type Mbid = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Mbid = St::Mbid;
         type Name = Set<members::name>;
         type PlayCount = St::PlayCount;
+        type Mbid = St::Mbid;
     }
     ///State transition - sets the `play_count` field to Set
     pub struct SetPlayCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlayCount<St> {}
     impl<St: State> State for SetPlayCount<St> {
-        type Mbid = St::Mbid;
         type Name = St::Name;
         type PlayCount = Set<members::play_count>;
+        type Mbid = St::Mbid;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMbid<St> {}
+    impl<St: State> State for SetMbid<St> {
+        type Name = St::Name;
+        type PlayCount = St::PlayCount;
+        type Mbid = Set<members::mbid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mbid` field
-        pub struct mbid(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `play_count` field
         pub struct play_count(());
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
     }
 }
 
@@ -753,9 +735,9 @@ where
 impl<S: BosStr, St> ReleaseViewBuilder<S, St>
 where
     St: release_view_state::State,
-    St::Mbid: release_view_state::IsSet,
     St::Name: release_view_state::IsSet,
     St::PlayCount: release_view_state::IsSet,
+    St::Mbid: release_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ReleaseView<S> {

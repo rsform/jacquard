@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::buzz_bookhive::BookProgress;
     rename_all = "camelCase",
     rename = "buzz.bookhive.book",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Book<S: BosStr = DefaultStr> {
     ///The authors of the book (tab separated)
@@ -166,13 +163,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct BookGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -352,67 +343,67 @@ pub mod book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type HiveId;
         type Title;
+        type HiveId;
         type Authors;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type HiveId = Unset;
         type Title = Unset;
+        type HiveId = Unset;
         type Authors = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type HiveId = St::HiveId;
-        type Title = St::Title;
-        type Authors = St::Authors;
-    }
-    ///State transition - sets the `hive_id` field to Set
-    pub struct SetHiveId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHiveId<St> {}
-    impl<St: State> State for SetHiveId<St> {
-        type CreatedAt = St::CreatedAt;
-        type HiveId = Set<members::hive_id>;
-        type Title = St::Title;
-        type Authors = St::Authors;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type CreatedAt = St::CreatedAt;
-        type HiveId = St::HiveId;
         type Title = Set<members::title>;
+        type HiveId = St::HiveId;
         type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHiveId<St> {}
+    impl<St: State> State for SetHiveId<St> {
+        type Title = St::Title;
+        type HiveId = Set<members::hive_id>;
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
-        type CreatedAt = St::CreatedAt;
-        type HiveId = St::HiveId;
         type Title = St::Title;
+        type HiveId = St::HiveId;
         type Authors = Set<members::authors>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
+        type HiveId = St::HiveId;
+        type Authors = St::Authors;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `hive_id` field
-        pub struct hive_id(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `hive_id` field
+        pub struct hive_id(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -623,10 +614,10 @@ where
 impl<S: BosStr, St> BookBuilder<S, St>
 where
     St: book_state::State,
-    St::CreatedAt: book_state::IsSet,
-    St::HiveId: book_state::IsSet,
     St::Title: book_state::IsSet,
+    St::HiveId: book_state::IsSet,
     St::Authors: book_state::IsSet,
+    St::CreatedAt: book_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Book<S> {

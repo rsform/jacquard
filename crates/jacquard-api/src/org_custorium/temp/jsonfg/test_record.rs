@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "org.custorium.temp.jsonfg.testRecord",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct TestRecord<S: BosStr = DefaultStr> {
     pub geometry: TestRecordGeometry<S>,
@@ -49,24 +46,12 @@ pub struct TestRecord<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum TestRecordGeometry<S: BosStr = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct TestRecordGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -143,37 +128,37 @@ pub mod test_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Geometry;
         type Text;
+        type Geometry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Geometry = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `geometry` field to Set
-    pub struct SetGeometry<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGeometry<St> {}
-    impl<St: State> State for SetGeometry<St> {
-        type Geometry = Set<members::geometry>;
-        type Text = St::Text;
+        type Geometry = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
-        type Geometry = St::Geometry;
         type Text = Set<members::text>;
+        type Geometry = St::Geometry;
+    }
+    ///State transition - sets the `geometry` field to Set
+    pub struct SetGeometry<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGeometry<St> {}
+    impl<St: State> State for SetGeometry<St> {
+        type Text = St::Text;
+        type Geometry = Set<members::geometry>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `geometry` field
-        pub struct geometry(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `geometry` field
+        pub struct geometry(());
     }
 }
 
@@ -243,8 +228,8 @@ where
 impl<S: BosStr, St> TestRecordBuilder<S, St>
 where
     St: test_record_state::State,
-    St::Geometry: test_record_state::IsSet,
     St::Text: test_record_state::IsSet,
+    St::Geometry: test_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TestRecord<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,26 +27,14 @@ use serde::{Serialize, Deserialize};
 use crate::chat_bsky::moderation::get_actor_metadata;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorMetadata<S: BosStr = DefaultStr> {
     pub actor: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorMetadataOutput<S: BosStr = DefaultStr> {
     pub all: get_actor_metadata::Metadata<S>,
     pub day: get_actor_metadata::Metadata<S>,
@@ -57,13 +45,7 @@ pub struct GetActorMetadataOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Metadata<S: BosStr = DefaultStr> {
     pub convos: i64,
     pub convos_started: i64,
@@ -211,67 +193,67 @@ pub mod metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ConvosStarted;
         type MessagesSent;
         type MessagesReceived;
         type Convos;
+        type ConvosStarted;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ConvosStarted = Unset;
         type MessagesSent = Unset;
         type MessagesReceived = Unset;
         type Convos = Unset;
-    }
-    ///State transition - sets the `convos_started` field to Set
-    pub struct SetConvosStarted<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetConvosStarted<St> {}
-    impl<St: State> State for SetConvosStarted<St> {
-        type ConvosStarted = Set<members::convos_started>;
-        type MessagesSent = St::MessagesSent;
-        type MessagesReceived = St::MessagesReceived;
-        type Convos = St::Convos;
+        type ConvosStarted = Unset;
     }
     ///State transition - sets the `messages_sent` field to Set
     pub struct SetMessagesSent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessagesSent<St> {}
     impl<St: State> State for SetMessagesSent<St> {
-        type ConvosStarted = St::ConvosStarted;
         type MessagesSent = Set<members::messages_sent>;
         type MessagesReceived = St::MessagesReceived;
         type Convos = St::Convos;
+        type ConvosStarted = St::ConvosStarted;
     }
     ///State transition - sets the `messages_received` field to Set
     pub struct SetMessagesReceived<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessagesReceived<St> {}
     impl<St: State> State for SetMessagesReceived<St> {
-        type ConvosStarted = St::ConvosStarted;
         type MessagesSent = St::MessagesSent;
         type MessagesReceived = Set<members::messages_received>;
         type Convos = St::Convos;
+        type ConvosStarted = St::ConvosStarted;
     }
     ///State transition - sets the `convos` field to Set
     pub struct SetConvos<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvos<St> {}
     impl<St: State> State for SetConvos<St> {
-        type ConvosStarted = St::ConvosStarted;
         type MessagesSent = St::MessagesSent;
         type MessagesReceived = St::MessagesReceived;
         type Convos = Set<members::convos>;
+        type ConvosStarted = St::ConvosStarted;
+    }
+    ///State transition - sets the `convos_started` field to Set
+    pub struct SetConvosStarted<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetConvosStarted<St> {}
+    impl<St: State> State for SetConvosStarted<St> {
+        type MessagesSent = St::MessagesSent;
+        type MessagesReceived = St::MessagesReceived;
+        type Convos = St::Convos;
+        type ConvosStarted = Set<members::convos_started>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `convos_started` field
-        pub struct convos_started(());
         ///Marker type for the `messages_sent` field
         pub struct messages_sent(());
         ///Marker type for the `messages_received` field
         pub struct messages_received(());
         ///Marker type for the `convos` field
         pub struct convos(());
+        ///Marker type for the `convos_started` field
+        pub struct convos_started(());
     }
 }
 
@@ -379,10 +361,10 @@ where
 impl<S: BosStr, St> MetadataBuilder<S, St>
 where
     St: metadata_state::State,
-    St::ConvosStarted: metadata_state::IsSet,
     St::MessagesSent: metadata_state::IsSet,
     St::MessagesReceived: metadata_state::IsSet,
     St::Convos: metadata_state::IsSet,
+    St::ConvosStarted: metadata_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Metadata<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use serde::{Serialize, Deserialize};
 use crate::app_openmkt::marketplace::listing;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LocationObj<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub county: Option<S>,
@@ -57,10 +51,7 @@ pub struct LocationObj<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "app.openmkt.marketplace.listing",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Listing<S: BosStr = DefaultStr> {
     pub category: S,
@@ -89,13 +80,7 @@ pub struct Listing<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ListingGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -105,13 +90,7 @@ pub struct ListingGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MetadataObj<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subcategory: Option<S>,
@@ -400,85 +379,85 @@ pub mod listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Price;
-        type Title;
-        type Location;
-        type CreatedAt;
         type Category;
+        type CreatedAt;
+        type Title;
+        type Price;
+        type Location;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Price = Unset;
-        type Title = Unset;
-        type Location = Unset;
-        type CreatedAt = Unset;
         type Category = Unset;
-    }
-    ///State transition - sets the `price` field to Set
-    pub struct SetPrice<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPrice<St> {}
-    impl<St: State> State for SetPrice<St> {
-        type Price = Set<members::price>;
-        type Title = St::Title;
-        type Location = St::Location;
-        type CreatedAt = St::CreatedAt;
-        type Category = St::Category;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Price = St::Price;
-        type Title = Set<members::title>;
-        type Location = St::Location;
-        type CreatedAt = St::CreatedAt;
-        type Category = St::Category;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLocation<St> {}
-    impl<St: State> State for SetLocation<St> {
-        type Price = St::Price;
-        type Title = St::Title;
-        type Location = Set<members::location>;
-        type CreatedAt = St::CreatedAt;
-        type Category = St::Category;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Price = St::Price;
-        type Title = St::Title;
-        type Location = St::Location;
-        type CreatedAt = Set<members::created_at>;
-        type Category = St::Category;
+        type CreatedAt = Unset;
+        type Title = Unset;
+        type Price = Unset;
+        type Location = Unset;
     }
     ///State transition - sets the `category` field to Set
     pub struct SetCategory<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCategory<St> {}
     impl<St: State> State for SetCategory<St> {
-        type Price = St::Price;
-        type Title = St::Title;
-        type Location = St::Location;
-        type CreatedAt = St::CreatedAt;
         type Category = Set<members::category>;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Price = St::Price;
+        type Location = St::Location;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Category = St::Category;
+        type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type Price = St::Price;
+        type Location = St::Location;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Category = St::Category;
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type Price = St::Price;
+        type Location = St::Location;
+    }
+    ///State transition - sets the `price` field to Set
+    pub struct SetPrice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPrice<St> {}
+    impl<St: State> State for SetPrice<St> {
+        type Category = St::Category;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Price = Set<members::price>;
+        type Location = St::Location;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocation<St> {}
+    impl<St: State> State for SetLocation<St> {
+        type Category = St::Category;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Price = St::Price;
+        type Location = Set<members::location>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `price` field
-        pub struct price(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `location` field
-        pub struct location(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `category` field
         pub struct category(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `price` field
+        pub struct price(());
+        ///Marker type for the `location` field
+        pub struct location(());
     }
 }
 
@@ -698,11 +677,11 @@ where
 impl<S: BosStr, St> ListingBuilder<S, St>
 where
     St: listing_state::State,
-    St::Price: listing_state::IsSet,
-    St::Title: listing_state::IsSet,
-    St::Location: listing_state::IsSet,
-    St::CreatedAt: listing_state::IsSet,
     St::Category: listing_state::IsSet,
+    St::CreatedAt: listing_state::IsSet,
+    St::Title: listing_state::IsSet,
+    St::Price: listing_state::IsSet,
+    St::Location: listing_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Listing<S> {

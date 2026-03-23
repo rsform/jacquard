@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use serde::{Serialize, Deserialize};
 use crate::app_fitsky::workout;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardioDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -68,13 +62,7 @@ pub struct CardioDetails<S: BosStr = DefaultStr> {
 /// Time in seconds spent in each heart rate zone
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardioZoneData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub zone1_rest: Option<i64>,
@@ -92,13 +80,7 @@ pub struct CardioZoneData<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Exercise<S: BosStr = DefaultStr> {
     pub name: S,
     pub sets: Vec<workout::ExerciseSet<S>>,
@@ -108,13 +90,7 @@ pub struct Exercise<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExerciseSet<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reps: Option<i64>,
@@ -127,13 +103,7 @@ pub struct ExerciseSet<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FlexibilityDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -242,13 +212,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HeartRateData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avg: Option<i64>,
@@ -264,13 +228,7 @@ pub struct HeartRateData<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HeartRateSample<S: BosStr = DefaultStr> {
     pub bpm: i64,
     pub timestamp: Datetime,
@@ -280,13 +238,7 @@ pub struct HeartRateSample<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HiitSportsDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -409,10 +361,7 @@ where
     rename_all = "camelCase",
     rename = "app.fitsky.workout",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Workout<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -448,13 +397,7 @@ pub struct Workout<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum WorkoutDetails<S: BosStr = DefaultStr> {
     #[serde(rename = "app.fitsky.workout#cardioDetails")]
     CardioDetails(Box<workout::CardioDetails<S>>),
@@ -662,13 +605,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct WorkoutGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -678,13 +615,7 @@ pub struct WorkoutGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Milestone<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
@@ -781,13 +712,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RoutePoint<S: BosStr = DefaultStr> {
     ///Latitude in microdegrees (degrees * 1,000,000)
     pub lat_e6: i64,
@@ -800,13 +725,7 @@ pub struct RoutePoint<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StrengthDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -827,13 +746,7 @@ pub struct StrengthDetails<S: BosStr = DefaultStr> {
 /// Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VisibilitySettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<VisibilitySettingsCalories<S>>,
@@ -2736,37 +2649,37 @@ pub mod heart_rate_sample_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bpm;
         type Timestamp;
+        type Bpm;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bpm = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `bpm` field to Set
-    pub struct SetBpm<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBpm<St> {}
-    impl<St: State> State for SetBpm<St> {
-        type Bpm = Set<members::bpm>;
-        type Timestamp = St::Timestamp;
+        type Bpm = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type Bpm = St::Bpm;
         type Timestamp = Set<members::timestamp>;
+        type Bpm = St::Bpm;
+    }
+    ///State transition - sets the `bpm` field to Set
+    pub struct SetBpm<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBpm<St> {}
+    impl<St: State> State for SetBpm<St> {
+        type Timestamp = St::Timestamp;
+        type Bpm = Set<members::bpm>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bpm` field
-        pub struct bpm(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `bpm` field
+        pub struct bpm(());
     }
 }
 
@@ -2836,8 +2749,8 @@ where
 impl<S: BosStr, St> HeartRateSampleBuilder<S, St>
 where
     St: heart_rate_sample_state::State,
-    St::Bpm: heart_rate_sample_state::IsSet,
     St::Timestamp: heart_rate_sample_state::IsSet,
+    St::Bpm: heart_rate_sample_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> HeartRateSample<S> {
@@ -2870,85 +2783,85 @@ pub mod workout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type StartedAt;
-        type Type;
-        type CreatedAt;
         type Duration;
+        type Type;
+        type StartedAt;
+        type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type StartedAt = Unset;
-        type Type = Unset;
-        type CreatedAt = Unset;
         type Duration = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type StartedAt = St::StartedAt;
-        type Type = St::Type;
-        type CreatedAt = St::CreatedAt;
-        type Duration = St::Duration;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
-    impl<St: State> State for SetStartedAt<St> {
-        type Title = St::Title;
-        type StartedAt = Set<members::started_at>;
-        type Type = St::Type;
-        type CreatedAt = St::CreatedAt;
-        type Duration = St::Duration;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Title = St::Title;
-        type StartedAt = St::StartedAt;
-        type Type = Set<members::r#type>;
-        type CreatedAt = St::CreatedAt;
-        type Duration = St::Duration;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
-        type StartedAt = St::StartedAt;
-        type Type = St::Type;
-        type CreatedAt = Set<members::created_at>;
-        type Duration = St::Duration;
+        type Type = Unset;
+        type StartedAt = Unset;
+        type Title = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDuration<St> {}
     impl<St: State> State for SetDuration<St> {
-        type Title = St::Title;
-        type StartedAt = St::StartedAt;
-        type Type = St::Type;
-        type CreatedAt = St::CreatedAt;
         type Duration = Set<members::duration>;
+        type Type = St::Type;
+        type StartedAt = St::StartedAt;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Duration = St::Duration;
+        type Type = Set<members::r#type>;
+        type StartedAt = St::StartedAt;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
+    impl<St: State> State for SetStartedAt<St> {
+        type Duration = St::Duration;
+        type Type = St::Type;
+        type StartedAt = Set<members::started_at>;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Duration = St::Duration;
+        type Type = St::Type;
+        type StartedAt = St::StartedAt;
+        type Title = Set<members::title>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Duration = St::Duration;
+        type Type = St::Type;
+        type StartedAt = St::StartedAt;
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `duration` field
         pub struct duration(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -3219,11 +3132,11 @@ impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
 impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
     St: workout_state::State,
-    St::Title: workout_state::IsSet,
-    St::StartedAt: workout_state::IsSet,
-    St::Type: workout_state::IsSet,
-    St::CreatedAt: workout_state::IsSet,
     St::Duration: workout_state::IsSet,
+    St::Type: workout_state::IsSet,
+    St::StartedAt: workout_state::IsSet,
+    St::Title: workout_state::IsSet,
+    St::CreatedAt: workout_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Workout<S> {
@@ -3275,37 +3188,37 @@ pub mod milestone_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type Type;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
-    impl<St: State> State for SetTimestamp<St> {
-        type Timestamp = Set<members::timestamp>;
-        type Type = St::Type;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Timestamp = St::Timestamp;
         type Type = Set<members::r#type>;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Type = St::Type;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -3401,8 +3314,8 @@ impl<S: BosStr, St: milestone_state::State> MilestoneBuilder<S, St> {
 impl<S: BosStr, St> MilestoneBuilder<S, St>
 where
     St: milestone_state::State,
-    St::Timestamp: milestone_state::IsSet,
     St::Type: milestone_state::IsSet,
+    St::Timestamp: milestone_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Milestone<S> {
@@ -3439,51 +3352,51 @@ pub mod route_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Timestamp;
         type LatE6;
         type LngE6;
-        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Timestamp = Unset;
         type LatE6 = Unset;
         type LngE6 = Unset;
-        type Timestamp = Unset;
-    }
-    ///State transition - sets the `lat_e6` field to Set
-    pub struct SetLatE6<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLatE6<St> {}
-    impl<St: State> State for SetLatE6<St> {
-        type LatE6 = Set<members::lat_e6>;
-        type LngE6 = St::LngE6;
-        type Timestamp = St::Timestamp;
-    }
-    ///State transition - sets the `lng_e6` field to Set
-    pub struct SetLngE6<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLngE6<St> {}
-    impl<St: State> State for SetLngE6<St> {
-        type LatE6 = St::LatE6;
-        type LngE6 = Set<members::lng_e6>;
-        type Timestamp = St::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
+        type Timestamp = Set<members::timestamp>;
         type LatE6 = St::LatE6;
         type LngE6 = St::LngE6;
-        type Timestamp = Set<members::timestamp>;
+    }
+    ///State transition - sets the `lat_e6` field to Set
+    pub struct SetLatE6<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLatE6<St> {}
+    impl<St: State> State for SetLatE6<St> {
+        type Timestamp = St::Timestamp;
+        type LatE6 = Set<members::lat_e6>;
+        type LngE6 = St::LngE6;
+    }
+    ///State transition - sets the `lng_e6` field to Set
+    pub struct SetLngE6<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLngE6<St> {}
+    impl<St: State> State for SetLngE6<St> {
+        type Timestamp = St::Timestamp;
+        type LatE6 = St::LatE6;
+        type LngE6 = Set<members::lng_e6>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
         ///Marker type for the `lat_e6` field
         pub struct lat_e6(());
         ///Marker type for the `lng_e6` field
         pub struct lng_e6(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
     }
 }
 
@@ -3572,9 +3485,9 @@ where
 impl<S: BosStr, St> RoutePointBuilder<S, St>
 where
     St: route_point_state::State,
+    St::Timestamp: route_point_state::IsSet,
     St::LatE6: route_point_state::IsSet,
     St::LngE6: route_point_state::IsSet,
-    St::Timestamp: route_point_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RoutePoint<S> {

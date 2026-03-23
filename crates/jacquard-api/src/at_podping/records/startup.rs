@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "at.podping.records.startup",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Startup<S: BosStr = DefaultStr> {
     ///Optional, e.g. 1,078
@@ -77,13 +74,7 @@ pub struct Startup<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct StartupGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -149,51 +140,51 @@ pub mod startup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
-        type ServerAccount;
         type Timestamp;
+        type ServerAccount;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
-        type ServerAccount = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Message = Set<members::message>;
-        type ServerAccount = St::ServerAccount;
-        type Timestamp = St::Timestamp;
-    }
-    ///State transition - sets the `server_account` field to Set
-    pub struct SetServerAccount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetServerAccount<St> {}
-    impl<St: State> State for SetServerAccount<St> {
-        type Message = St::Message;
-        type ServerAccount = Set<members::server_account>;
-        type Timestamp = St::Timestamp;
+        type ServerAccount = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type Message = St::Message;
-        type ServerAccount = St::ServerAccount;
         type Timestamp = Set<members::timestamp>;
+        type ServerAccount = St::ServerAccount;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `server_account` field to Set
+    pub struct SetServerAccount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServerAccount<St> {}
+    impl<St: State> State for SetServerAccount<St> {
+        type Timestamp = St::Timestamp;
+        type ServerAccount = Set<members::server_account>;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type Timestamp = St::Timestamp;
+        type ServerAccount = St::ServerAccount;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
-        ///Marker type for the `server_account` field
-        pub struct server_account(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `server_account` field
+        pub struct server_account(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -398,9 +389,9 @@ impl<S: BosStr, St: startup_state::State> StartupBuilder<S, St> {
 impl<S: BosStr, St> StartupBuilder<S, St>
 where
     St: startup_state::State,
-    St::Message: startup_state::IsSet,
-    St::ServerAccount: startup_state::IsSet,
     St::Timestamp: startup_state::IsSet,
+    St::ServerAccount: startup_state::IsSet,
+    St::Message: startup_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Startup<S> {

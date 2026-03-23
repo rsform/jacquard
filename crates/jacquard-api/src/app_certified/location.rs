@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,10 +37,7 @@ use crate::app_certified::location;
     rename_all = "camelCase",
     rename = "app.certified.location",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Location<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this record was originally created
@@ -66,13 +63,7 @@ pub struct Location<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum LocationLocation<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
@@ -194,13 +185,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct LocationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -211,13 +196,7 @@ pub struct LocationGetRecordOutput<S: BosStr = DefaultStr> {
 /// A location represented as a string, e.g. coordinates or a small GeoJSON string.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LocationString<S: BosStr = DefaultStr> {
     ///The location string value
     pub string: S,
@@ -399,85 +378,85 @@ pub mod location_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Location;
         type Srs;
         type CreatedAt;
-        type Location;
-        type LocationType;
         type LpVersion;
+        type LocationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Location = Unset;
         type Srs = Unset;
         type CreatedAt = Unset;
-        type Location = Unset;
-        type LocationType = Unset;
         type LpVersion = Unset;
-    }
-    ///State transition - sets the `srs` field to Set
-    pub struct SetSrs<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSrs<St> {}
-    impl<St: State> State for SetSrs<St> {
-        type Srs = Set<members::srs>;
-        type CreatedAt = St::CreatedAt;
-        type Location = St::Location;
-        type LocationType = St::LocationType;
-        type LpVersion = St::LpVersion;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Srs = St::Srs;
-        type CreatedAt = Set<members::created_at>;
-        type Location = St::Location;
-        type LocationType = St::LocationType;
-        type LpVersion = St::LpVersion;
+        type LocationType = Unset;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLocation<St> {}
     impl<St: State> State for SetLocation<St> {
-        type Srs = St::Srs;
-        type CreatedAt = St::CreatedAt;
         type Location = Set<members::location>;
-        type LocationType = St::LocationType;
-        type LpVersion = St::LpVersion;
-    }
-    ///State transition - sets the `location_type` field to Set
-    pub struct SetLocationType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLocationType<St> {}
-    impl<St: State> State for SetLocationType<St> {
         type Srs = St::Srs;
         type CreatedAt = St::CreatedAt;
-        type Location = St::Location;
-        type LocationType = Set<members::location_type>;
         type LpVersion = St::LpVersion;
+        type LocationType = St::LocationType;
+    }
+    ///State transition - sets the `srs` field to Set
+    pub struct SetSrs<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSrs<St> {}
+    impl<St: State> State for SetSrs<St> {
+        type Location = St::Location;
+        type Srs = Set<members::srs>;
+        type CreatedAt = St::CreatedAt;
+        type LpVersion = St::LpVersion;
+        type LocationType = St::LocationType;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Location = St::Location;
+        type Srs = St::Srs;
+        type CreatedAt = Set<members::created_at>;
+        type LpVersion = St::LpVersion;
+        type LocationType = St::LocationType;
     }
     ///State transition - sets the `lp_version` field to Set
     pub struct SetLpVersion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLpVersion<St> {}
     impl<St: State> State for SetLpVersion<St> {
+        type Location = St::Location;
         type Srs = St::Srs;
         type CreatedAt = St::CreatedAt;
-        type Location = St::Location;
-        type LocationType = St::LocationType;
         type LpVersion = Set<members::lp_version>;
+        type LocationType = St::LocationType;
+    }
+    ///State transition - sets the `location_type` field to Set
+    pub struct SetLocationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocationType<St> {}
+    impl<St: State> State for SetLocationType<St> {
+        type Location = St::Location;
+        type Srs = St::Srs;
+        type CreatedAt = St::CreatedAt;
+        type LpVersion = St::LpVersion;
+        type LocationType = Set<members::location_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `location` field
+        pub struct location(());
         ///Marker type for the `srs` field
         pub struct srs(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `location` field
-        pub struct location(());
-        ///Marker type for the `location_type` field
-        pub struct location_type(());
         ///Marker type for the `lp_version` field
         pub struct lp_version(());
+        ///Marker type for the `location_type` field
+        pub struct location_type(());
     }
 }
 
@@ -638,11 +617,11 @@ where
 impl<S: BosStr, St> LocationBuilder<S, St>
 where
     St: location_state::State,
+    St::Location: location_state::IsSet,
     St::Srs: location_state::IsSet,
     St::CreatedAt: location_state::IsSet,
-    St::Location: location_state::IsSet,
-    St::LocationType: location_state::IsSet,
     St::LpVersion: location_state::IsSet,
+    St::LocationType: location_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Location<S> {

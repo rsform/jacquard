@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "sh.weaver.notebook.colourScheme",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ColourScheme<S: BosStr = DefaultStr> {
     pub colours: ColourSchemeColours<S>,
@@ -51,13 +48,7 @@ pub struct ColourScheme<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ColourSchemeColours<S: BosStr = DefaultStr> {
     ///Primary background for page/frame
     pub base: S,
@@ -98,13 +89,7 @@ pub struct ColourSchemeColours<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ColourSchemeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -420,49 +405,49 @@ pub mod colour_scheme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Variant;
+        type Name;
         type Colours;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Variant = Unset;
+        type Name = Unset;
         type Colours = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Variant = St::Variant;
-        type Colours = St::Colours;
     }
     ///State transition - sets the `variant` field to Set
     pub struct SetVariant<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVariant<St> {}
     impl<St: State> State for SetVariant<St> {
-        type Name = St::Name;
         type Variant = Set<members::variant>;
+        type Name = St::Name;
+        type Colours = St::Colours;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Variant = St::Variant;
+        type Name = Set<members::name>;
         type Colours = St::Colours;
     }
     ///State transition - sets the `colours` field to Set
     pub struct SetColours<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetColours<St> {}
     impl<St: State> State for SetColours<St> {
-        type Name = St::Name;
         type Variant = St::Variant;
+        type Name = St::Name;
         type Colours = Set<members::colours>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `variant` field
         pub struct variant(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `colours` field
         pub struct colours(());
     }
@@ -553,8 +538,8 @@ where
 impl<S: BosStr, St> ColourSchemeBuilder<S, St>
 where
     St: colour_scheme_state::State,
-    St::Name: colour_scheme_state::IsSet,
     St::Variant: colour_scheme_state::IsSet,
+    St::Name: colour_scheme_state::IsSet,
     St::Colours: colour_scheme_state::IsSet,
 {
     /// Build the final struct.

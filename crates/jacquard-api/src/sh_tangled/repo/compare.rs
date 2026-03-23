@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Compare<S: BosStr = DefaultStr> {
     pub repo: S,
     pub rev1: S,
@@ -166,50 +160,50 @@ pub mod compare_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rev2;
-        type Repo;
         type Rev1;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rev2 = Unset;
-        type Repo = Unset;
         type Rev1 = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `rev2` field to Set
     pub struct SetRev2<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev2<St> {}
     impl<St: State> State for SetRev2<St> {
         type Rev2 = Set<members::rev2>;
+        type Rev1 = St::Rev1;
         type Repo = St::Repo;
-        type Rev1 = St::Rev1;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Rev2 = St::Rev2;
-        type Repo = Set<members::repo>;
-        type Rev1 = St::Rev1;
     }
     ///State transition - sets the `rev1` field to Set
     pub struct SetRev1<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev1<St> {}
     impl<St: State> State for SetRev1<St> {
         type Rev2 = St::Rev2;
-        type Repo = St::Repo;
         type Rev1 = Set<members::rev1>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Rev2 = St::Rev2;
+        type Rev1 = St::Rev1;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rev2` field
         pub struct rev2(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `rev1` field
         pub struct rev1(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -299,8 +293,8 @@ impl<S: BosStr, St> CompareBuilder<S, St>
 where
     St: compare_state::State,
     St::Rev2: compare_state::IsSet,
-    St::Repo: compare_state::IsSet,
     St::Rev1: compare_state::IsSet,
+    St::Repo: compare_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Compare<S> {

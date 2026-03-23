@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "app.juttu.articleLink",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ArticleLink<S: BosStr = DefaultStr> {
     ///The site-specific unique identifier for the article (e.g., slug).
@@ -57,13 +54,7 @@ pub struct ArticleLink<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ArticleLinkGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -141,50 +132,50 @@ pub mod article_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ArticleId;
-        type CommentsThread;
         type CreatedAt;
+        type CommentsThread;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ArticleId = Unset;
-        type CommentsThread = Unset;
         type CreatedAt = Unset;
+        type CommentsThread = Unset;
     }
     ///State transition - sets the `article_id` field to Set
     pub struct SetArticleId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArticleId<St> {}
     impl<St: State> State for SetArticleId<St> {
         type ArticleId = Set<members::article_id>;
+        type CreatedAt = St::CreatedAt;
         type CommentsThread = St::CommentsThread;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `comments_thread` field to Set
-    pub struct SetCommentsThread<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCommentsThread<St> {}
-    impl<St: State> State for SetCommentsThread<St> {
-        type ArticleId = St::ArticleId;
-        type CommentsThread = Set<members::comments_thread>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type ArticleId = St::ArticleId;
-        type CommentsThread = St::CommentsThread;
         type CreatedAt = Set<members::created_at>;
+        type CommentsThread = St::CommentsThread;
+    }
+    ///State transition - sets the `comments_thread` field to Set
+    pub struct SetCommentsThread<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCommentsThread<St> {}
+    impl<St: State> State for SetCommentsThread<St> {
+        type ArticleId = St::ArticleId;
+        type CreatedAt = St::CreatedAt;
+        type CommentsThread = Set<members::comments_thread>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `article_id` field
         pub struct article_id(());
-        ///Marker type for the `comments_thread` field
-        pub struct comments_thread(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `comments_thread` field
+        pub struct comments_thread(());
     }
 }
 
@@ -287,8 +278,8 @@ impl<S: BosStr, St> ArticleLinkBuilder<S, St>
 where
     St: article_link_state::State,
     St::ArticleId: article_link_state::IsSet,
-    St::CommentsThread: article_link_state::IsSet,
     St::CreatedAt: article_link_state::IsSet,
+    St::CommentsThread: article_link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ArticleLink<S> {

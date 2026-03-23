@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "tech.tokimeki.poll.vote",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Vote<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -53,13 +50,7 @@ pub struct Vote<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct VoteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -145,51 +136,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Poll;
-        type CreatedAt;
         type OptionIndex;
+        type CreatedAt;
+        type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Poll = Unset;
-        type CreatedAt = Unset;
         type OptionIndex = Unset;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPoll<St> {}
-    impl<St: State> State for SetPoll<St> {
-        type Poll = Set<members::poll>;
-        type CreatedAt = St::CreatedAt;
-        type OptionIndex = St::OptionIndex;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Poll = St::Poll;
-        type CreatedAt = Set<members::created_at>;
-        type OptionIndex = St::OptionIndex;
+        type CreatedAt = Unset;
+        type Poll = Unset;
     }
     ///State transition - sets the `option_index` field to Set
     pub struct SetOptionIndex<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOptionIndex<St> {}
     impl<St: State> State for SetOptionIndex<St> {
-        type Poll = St::Poll;
-        type CreatedAt = St::CreatedAt;
         type OptionIndex = Set<members::option_index>;
+        type CreatedAt = St::CreatedAt;
+        type Poll = St::Poll;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type OptionIndex = St::OptionIndex;
+        type CreatedAt = Set<members::created_at>;
+        type Poll = St::Poll;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPoll<St> {}
+    impl<St: State> State for SetPoll<St> {
+        type OptionIndex = St::OptionIndex;
+        type CreatedAt = St::CreatedAt;
+        type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `poll` field
-        pub struct poll(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `option_index` field
         pub struct option_index(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `poll` field
+        pub struct poll(());
     }
 }
 
@@ -278,9 +269,9 @@ where
 impl<S: BosStr, St> VoteBuilder<S, St>
 where
     St: vote_state::State,
-    St::Poll: vote_state::IsSet,
-    St::CreatedAt: vote_state::IsSet,
     St::OptionIndex: vote_state::IsSet,
+    St::CreatedAt: vote_state::IsSet,
+    St::Poll: vote_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Vote<S> {

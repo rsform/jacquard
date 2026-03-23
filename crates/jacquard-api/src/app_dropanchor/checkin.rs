@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::app_dropanchor::checkin;
 /// Street address (based on community.lexicon.location.address)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Address<S: BosStr = DefaultStr> {
     ///The ISO 3166 country code (preferably 2-letter)
     pub country: S,
@@ -64,13 +58,7 @@ pub struct Address<S: BosStr = DefaultStr> {
 /// Image attachment with thumbnail and full-size versions
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckinImage<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -86,13 +74,7 @@ pub struct CheckinImage<S: BosStr = DefaultStr> {
 /// Foursquare venue data (based on community.lexicon.location.fsq)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FsqPlace<S: BosStr = DefaultStr> {
     ///The unique identifier of a Foursquare POI
     pub fsq_place_id: S,
@@ -112,13 +94,7 @@ pub struct FsqPlace<S: BosStr = DefaultStr> {
 /// Geographic coordinates in WGS84 (based on community.lexicon.location.geo)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Geo<S: BosStr = DefaultStr> {
     ///Altitude in meters
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -141,10 +117,7 @@ pub struct Geo<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "app.dropanchor.checkin",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Checkin<S: BosStr = DefaultStr> {
     ///Address of the check-in location (based on community.lexicon.location.address)
@@ -177,13 +150,7 @@ pub struct Checkin<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CheckinGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -964,37 +931,37 @@ pub mod checkin_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fullsize;
         type Thumb;
+        type Fullsize;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fullsize = Unset;
         type Thumb = Unset;
-    }
-    ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFullsize<St> {}
-    impl<St: State> State for SetFullsize<St> {
-        type Fullsize = Set<members::fullsize>;
-        type Thumb = St::Thumb;
+        type Fullsize = Unset;
     }
     ///State transition - sets the `thumb` field to Set
     pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetThumb<St> {}
     impl<St: State> State for SetThumb<St> {
-        type Fullsize = St::Fullsize;
         type Thumb = Set<members::thumb>;
+        type Fullsize = St::Fullsize;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFullsize<St> {}
+    impl<St: State> State for SetFullsize<St> {
+        type Thumb = St::Thumb;
+        type Fullsize = Set<members::fullsize>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fullsize` field
-        pub struct fullsize(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
+        ///Marker type for the `fullsize` field
+        pub struct fullsize(());
     }
 }
 
@@ -1077,8 +1044,8 @@ where
 impl<S: BosStr, St> CheckinImageBuilder<S, St>
 where
     St: checkin_image_state::State,
-    St::Fullsize: checkin_image_state::IsSet,
     St::Thumb: checkin_image_state::IsSet,
+    St::Fullsize: checkin_image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CheckinImage<S> {
@@ -1113,67 +1080,67 @@ pub mod checkin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type Geo;
         type Address;
         type Text;
-        type Geo;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type Geo = Unset;
         type Address = Unset;
         type Text = Unset;
-        type Geo = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Address = St::Address;
-        type Text = St::Text;
-        type Geo = St::Geo;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAddress<St> {}
-    impl<St: State> State for SetAddress<St> {
-        type CreatedAt = St::CreatedAt;
-        type Address = Set<members::address>;
-        type Text = St::Text;
-        type Geo = St::Geo;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type CreatedAt = St::CreatedAt;
-        type Address = St::Address;
-        type Text = Set<members::text>;
-        type Geo = St::Geo;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `geo` field to Set
     pub struct SetGeo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGeo<St> {}
     impl<St: State> State for SetGeo<St> {
-        type CreatedAt = St::CreatedAt;
+        type Geo = Set<members::geo>;
         type Address = St::Address;
         type Text = St::Text;
-        type Geo = Set<members::geo>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddress<St> {}
+    impl<St: State> State for SetAddress<St> {
+        type Geo = St::Geo;
+        type Address = Set<members::address>;
+        type Text = St::Text;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Geo = St::Geo;
+        type Address = St::Address;
+        type Text = Set<members::text>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Geo = St::Geo;
+        type Address = St::Address;
+        type Text = St::Text;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `geo` field
+        pub struct geo(());
         ///Marker type for the `address` field
         pub struct address(());
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `geo` field
-        pub struct geo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1356,10 +1323,10 @@ where
 impl<S: BosStr, St> CheckinBuilder<S, St>
 where
     St: checkin_state::State,
-    St::CreatedAt: checkin_state::IsSet,
+    St::Geo: checkin_state::IsSet,
     St::Address: checkin_state::IsSet,
     St::Text: checkin_state::IsSet,
-    St::Geo: checkin_state::IsSet,
+    St::CreatedAt: checkin_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Checkin<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,10 +33,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "sh.tangled.pipeline.status",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Status<S: BosStr = DefaultStr> {
     ///time of creation of this status update
@@ -60,13 +57,7 @@ pub struct Status<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct StatusGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -132,65 +123,65 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Pipeline;
         type Workflow;
         type CreatedAt;
-        type Pipeline;
         type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Pipeline = Unset;
         type Workflow = Unset;
         type CreatedAt = Unset;
-        type Pipeline = Unset;
         type Status = Unset;
+    }
+    ///State transition - sets the `pipeline` field to Set
+    pub struct SetPipeline<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPipeline<St> {}
+    impl<St: State> State for SetPipeline<St> {
+        type Pipeline = Set<members::pipeline>;
+        type Workflow = St::Workflow;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
     }
     ///State transition - sets the `workflow` field to Set
     pub struct SetWorkflow<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWorkflow<St> {}
     impl<St: State> State for SetWorkflow<St> {
+        type Pipeline = St::Pipeline;
         type Workflow = Set<members::workflow>;
         type CreatedAt = St::CreatedAt;
-        type Pipeline = St::Pipeline;
         type Status = St::Status;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type Pipeline = St::Pipeline;
         type Workflow = St::Workflow;
         type CreatedAt = Set<members::created_at>;
-        type Pipeline = St::Pipeline;
-        type Status = St::Status;
-    }
-    ///State transition - sets the `pipeline` field to Set
-    pub struct SetPipeline<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPipeline<St> {}
-    impl<St: State> State for SetPipeline<St> {
-        type Workflow = St::Workflow;
-        type CreatedAt = St::CreatedAt;
-        type Pipeline = Set<members::pipeline>;
         type Status = St::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
+        type Pipeline = St::Pipeline;
         type Workflow = St::Workflow;
         type CreatedAt = St::CreatedAt;
-        type Pipeline = St::Pipeline;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `pipeline` field
+        pub struct pipeline(());
         ///Marker type for the `workflow` field
         pub struct workflow(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `pipeline` field
-        pub struct pipeline(());
         ///Marker type for the `status` field
         pub struct status(());
     }
@@ -333,9 +324,9 @@ where
 impl<S: BosStr, St> StatusBuilder<S, St>
 where
     St: status_state::State,
+    St::Pipeline: status_state::IsSet,
     St::Workflow: status_state::IsSet,
     St::CreatedAt: status_state::IsSet,
-    St::Pipeline: status_state::IsSet,
     St::Status: status_state::IsSet,
 {
     /// Build the final struct.

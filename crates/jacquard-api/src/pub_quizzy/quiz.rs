@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::pub_quizzy::quiz;
     rename_all = "camelCase",
     rename = "pub.quizzy.quiz",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Quiz<S: BosStr = DefaultStr> {
     ///A short description about the quiz, and what to expect from it
@@ -71,13 +68,7 @@ pub struct Quiz<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct QuizGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -88,13 +79,7 @@ pub struct QuizGetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a question with its point value
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QuestionRef<S: BosStr = DefaultStr> {
     ///A custom name for this question, as opposed to its number
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -111,13 +96,7 @@ pub struct QuestionRef<S: BosStr = DefaultStr> {
 /// A round within a quiz
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Round<S: BosStr = DefaultStr> {
     ///Ordered list of questions in this round
     pub questions: Vec<quiz::QuestionRef<S>>,
@@ -366,66 +345,66 @@ pub mod quiz_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Locales;
-        type Timestamp;
         type Title;
         type Rounds;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Locales = Unset;
-        type Timestamp = Unset;
         type Title = Unset;
         type Rounds = Unset;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `locales` field to Set
     pub struct SetLocales<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLocales<St> {}
     impl<St: State> State for SetLocales<St> {
         type Locales = Set<members::locales>;
+        type Title = St::Title;
+        type Rounds = St::Rounds;
         type Timestamp = St::Timestamp;
-        type Title = St::Title;
-        type Rounds = St::Rounds;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
-    impl<St: State> State for SetTimestamp<St> {
-        type Locales = St::Locales;
-        type Timestamp = Set<members::timestamp>;
-        type Title = St::Title;
-        type Rounds = St::Rounds;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
         type Locales = St::Locales;
-        type Timestamp = St::Timestamp;
         type Title = Set<members::title>;
         type Rounds = St::Rounds;
+        type Timestamp = St::Timestamp;
     }
     ///State transition - sets the `rounds` field to Set
     pub struct SetRounds<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRounds<St> {}
     impl<St: State> State for SetRounds<St> {
         type Locales = St::Locales;
-        type Timestamp = St::Timestamp;
         type Title = St::Title;
         type Rounds = Set<members::rounds>;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Locales = St::Locales;
+        type Title = St::Title;
+        type Rounds = St::Rounds;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `locales` field
         pub struct locales(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `rounds` field
         pub struct rounds(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -595,9 +574,9 @@ impl<S: BosStr, St> QuizBuilder<S, St>
 where
     St: quiz_state::State,
     St::Locales: quiz_state::IsSet,
-    St::Timestamp: quiz_state::IsSet,
     St::Title: quiz_state::IsSet,
     St::Rounds: quiz_state::IsSet,
+    St::Timestamp: quiz_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Quiz<S> {

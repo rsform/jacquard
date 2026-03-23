@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::pub_quizzy::quiz_score;
     rename_all = "camelCase",
     rename = "pub.quizzy.quizScore",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct QuizScore<S: BosStr = DefaultStr> {
     ///Reference to the quizBegin record
@@ -53,13 +50,7 @@ pub struct QuizScore<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct QuizScoreGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -70,13 +61,7 @@ pub struct QuizScoreGetRecordOutput<S: BosStr = DefaultStr> {
 /// A team's final result
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TeamResult<S: BosStr = DefaultStr> {
     ///Reference to the team's detailed score record
     pub team_score: StrongRef<S>,
@@ -421,37 +406,37 @@ pub mod team_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TeamScore;
         type TotalScore;
+        type TeamScore;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TeamScore = Unset;
         type TotalScore = Unset;
-    }
-    ///State transition - sets the `team_score` field to Set
-    pub struct SetTeamScore<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTeamScore<St> {}
-    impl<St: State> State for SetTeamScore<St> {
-        type TeamScore = Set<members::team_score>;
-        type TotalScore = St::TotalScore;
+        type TeamScore = Unset;
     }
     ///State transition - sets the `total_score` field to Set
     pub struct SetTotalScore<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotalScore<St> {}
     impl<St: State> State for SetTotalScore<St> {
-        type TeamScore = St::TeamScore;
         type TotalScore = Set<members::total_score>;
+        type TeamScore = St::TeamScore;
+    }
+    ///State transition - sets the `team_score` field to Set
+    pub struct SetTeamScore<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTeamScore<St> {}
+    impl<St: State> State for SetTeamScore<St> {
+        type TotalScore = St::TotalScore;
+        type TeamScore = Set<members::team_score>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `team_score` field
-        pub struct team_score(());
         ///Marker type for the `total_score` field
         pub struct total_score(());
+        ///Marker type for the `team_score` field
+        pub struct team_score(());
     }
 }
 
@@ -521,8 +506,8 @@ where
 impl<S: BosStr, St> TeamResultBuilder<S, St>
 where
     St: team_result_state::State,
-    St::TeamScore: team_result_state::IsSet,
     St::TotalScore: team_result_state::IsSet,
+    St::TeamScore: team_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TeamResult<S> {

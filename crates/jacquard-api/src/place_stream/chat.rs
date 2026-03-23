@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,13 +34,7 @@ use crate::place_stream::chat::profile::Profile;
 use crate::place_stream::chat;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,13 +55,7 @@ pub struct MessageView<S: BosStr = DefaultStr> {
 
 #[jacquard_derive::open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum MessageViewReplyTo<S: BosStr = DefaultStr> {
     #[serde(rename = "place.stream.chat.defs#messageView")]
     MessageView(Box<chat::MessageView<S>>),
@@ -98,83 +86,83 @@ pub mod message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Cid;
         type IndexedAt;
+        type Uri;
         type Author;
+        type Cid;
         type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Cid = Unset;
         type IndexedAt = Unset;
+        type Uri = Unset;
         type Author = Unset;
+        type Cid = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
-        type IndexedAt = St::IndexedAt;
-        type Author = St::Author;
-        type Record = St::Record;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
-        type Cid = Set<members::cid>;
-        type IndexedAt = St::IndexedAt;
-        type Author = St::Author;
-        type Record = St::Record;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
         type IndexedAt = Set<members::indexed_at>;
+        type Uri = St::Uri;
         type Author = St::Author;
+        type Cid = St::Cid;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type IndexedAt = St::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Author = St::Author;
+        type Cid = St::Cid;
         type Record = St::Record;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthor<St> {}
     impl<St: State> State for SetAuthor<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
         type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
         type Author = Set<members::author>;
+        type Cid = St::Cid;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Author = St::Author;
+        type Cid = Set<members::cid>;
         type Record = St::Record;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Uri = St::Uri;
-        type Cid = St::Cid;
         type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
         type Author = St::Author;
+        type Cid = St::Cid;
         type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
     }
@@ -351,10 +339,10 @@ where
 impl<S: BosStr, St> MessageViewBuilder<S, St>
 where
     St: message_view_state::State,
-    St::Uri: message_view_state::IsSet,
-    St::Cid: message_view_state::IsSet,
     St::IndexedAt: message_view_state::IsSet,
+    St::Uri: message_view_state::IsSet,
     St::Author: message_view_state::IsSet,
+    St::Cid: message_view_state::IsSet,
     St::Record: message_view_state::IsSet,
 {
     /// Build the final struct.

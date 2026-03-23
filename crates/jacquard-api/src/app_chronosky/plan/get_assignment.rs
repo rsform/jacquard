@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::app_chronosky::plan::get_assignment;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAssignmentOutput<S: BosStr = DefaultStr> {
     ///Active plan assignment (null if no active plan)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,13 +42,7 @@ pub struct GetAssignmentOutput<S: BosStr = DefaultStr> {
 /// Plan assignment details.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlanAssignment<S: BosStr = DefaultStr> {
     ///Plan activation timestamp
     pub activated_at: Datetime,
@@ -77,13 +65,7 @@ pub struct PlanAssignment<S: BosStr = DefaultStr> {
 /// Plan information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlanInfo<S: BosStr = DefaultStr> {
     ///Plan description
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -117,13 +99,7 @@ pub struct PlanInfo<S: BosStr = DefaultStr> {
 /// Ticket information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TicketInfo<S: BosStr = DefaultStr> {
     ///Ticket code
     pub code: S,
@@ -303,93 +279,95 @@ pub mod plan_assignment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ActivatedAt;
         type Status;
         type ExpiresAt;
         type Id;
         type PlanId;
         type Plan;
-        type ActivatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ActivatedAt = Unset;
         type Status = Unset;
         type ExpiresAt = Unset;
         type Id = Unset;
         type PlanId = Unset;
         type Plan = Unset;
-        type ActivatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
-        type ExpiresAt = St::ExpiresAt;
-        type Id = St::Id;
-        type PlanId = St::PlanId;
-        type Plan = St::Plan;
-        type ActivatedAt = St::ActivatedAt;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetExpiresAt<St> {}
-    impl<St: State> State for SetExpiresAt<St> {
-        type Status = St::Status;
-        type ExpiresAt = Set<members::expires_at>;
-        type Id = St::Id;
-        type PlanId = St::PlanId;
-        type Plan = St::Plan;
-        type ActivatedAt = St::ActivatedAt;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Status = St::Status;
-        type ExpiresAt = St::ExpiresAt;
-        type Id = Set<members::id>;
-        type PlanId = St::PlanId;
-        type Plan = St::Plan;
-        type ActivatedAt = St::ActivatedAt;
-    }
-    ///State transition - sets the `plan_id` field to Set
-    pub struct SetPlanId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlanId<St> {}
-    impl<St: State> State for SetPlanId<St> {
-        type Status = St::Status;
-        type ExpiresAt = St::ExpiresAt;
-        type Id = St::Id;
-        type PlanId = Set<members::plan_id>;
-        type Plan = St::Plan;
-        type ActivatedAt = St::ActivatedAt;
-    }
-    ///State transition - sets the `plan` field to Set
-    pub struct SetPlan<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlan<St> {}
-    impl<St: State> State for SetPlan<St> {
-        type Status = St::Status;
-        type ExpiresAt = St::ExpiresAt;
-        type Id = St::Id;
-        type PlanId = St::PlanId;
-        type Plan = Set<members::plan>;
-        type ActivatedAt = St::ActivatedAt;
     }
     ///State transition - sets the `activated_at` field to Set
     pub struct SetActivatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActivatedAt<St> {}
     impl<St: State> State for SetActivatedAt<St> {
+        type ActivatedAt = Set<members::activated_at>;
         type Status = St::Status;
         type ExpiresAt = St::ExpiresAt;
         type Id = St::Id;
         type PlanId = St::PlanId;
         type Plan = St::Plan;
-        type ActivatedAt = Set<members::activated_at>;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type ActivatedAt = St::ActivatedAt;
+        type Status = Set<members::status>;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = St::Id;
+        type PlanId = St::PlanId;
+        type Plan = St::Plan;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExpiresAt<St> {}
+    impl<St: State> State for SetExpiresAt<St> {
+        type ActivatedAt = St::ActivatedAt;
+        type Status = St::Status;
+        type ExpiresAt = Set<members::expires_at>;
+        type Id = St::Id;
+        type PlanId = St::PlanId;
+        type Plan = St::Plan;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type ActivatedAt = St::ActivatedAt;
+        type Status = St::Status;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = Set<members::id>;
+        type PlanId = St::PlanId;
+        type Plan = St::Plan;
+    }
+    ///State transition - sets the `plan_id` field to Set
+    pub struct SetPlanId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlanId<St> {}
+    impl<St: State> State for SetPlanId<St> {
+        type ActivatedAt = St::ActivatedAt;
+        type Status = St::Status;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = St::Id;
+        type PlanId = Set<members::plan_id>;
+        type Plan = St::Plan;
+    }
+    ///State transition - sets the `plan` field to Set
+    pub struct SetPlan<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlan<St> {}
+    impl<St: State> State for SetPlan<St> {
+        type ActivatedAt = St::ActivatedAt;
+        type Status = St::Status;
+        type ExpiresAt = St::ExpiresAt;
+        type Id = St::Id;
+        type PlanId = St::PlanId;
+        type Plan = Set<members::plan>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `activated_at` field
+        pub struct activated_at(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `expires_at` field
@@ -400,8 +378,6 @@ pub mod plan_assignment_state {
         pub struct plan_id(());
         ///Marker type for the `plan` field
         pub struct plan(());
-        ///Marker type for the `activated_at` field
-        pub struct activated_at(());
     }
 }
 
@@ -571,12 +547,12 @@ impl<S: BosStr, St: plan_assignment_state::State> PlanAssignmentBuilder<S, St> {
 impl<S: BosStr, St> PlanAssignmentBuilder<S, St>
 where
     St: plan_assignment_state::State,
+    St::ActivatedAt: plan_assignment_state::IsSet,
     St::Status: plan_assignment_state::IsSet,
     St::ExpiresAt: plan_assignment_state::IsSet,
     St::Id: plan_assignment_state::IsSet,
     St::PlanId: plan_assignment_state::IsSet,
     St::Plan: plan_assignment_state::IsSet,
-    St::ActivatedAt: plan_assignment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlanAssignment<S> {

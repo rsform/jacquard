@@ -27,7 +27,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -54,13 +54,7 @@ use crate::tools_ozone::moderation;
 /// Logs account status related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AccountEvent<S: BosStr = DefaultStr> {
     ///Indicates that the account has a repository which can be fetched from the host that emitted this event.
     pub active: bool,
@@ -169,13 +163,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AccountHosting<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -287,13 +275,7 @@ where
 /// Statistics about a particular account subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AccountStats<S: BosStr = DefaultStr> {
     ///Total number of appeals against a moderation action on the account
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -317,13 +299,7 @@ pub struct AccountStats<S: BosStr = DefaultStr> {
 /// Strike information for an account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AccountStrike<S: BosStr = DefaultStr> {
     ///Current number of active strikes (excluding expired strikes)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -344,13 +320,7 @@ pub struct AccountStrike<S: BosStr = DefaultStr> {
 /// Age assurance info coming directly from users. Only works on DID subjects.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AgeAssuranceEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access: Option<Access<S>>,
@@ -470,13 +440,7 @@ where
 /// Age assurance status override by moderators. Only works on DID subjects.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AgeAssuranceOverrideEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access: Option<Access<S>>,
@@ -583,13 +547,7 @@ where
 /// Purges all age assurance events for the subject. Only works on DID subjects. Moderator-only.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AgeAssurancePurgeEvent<S: BosStr = DefaultStr> {
     ///Comment describing the reason for the purge.
     pub comment: S,
@@ -599,13 +557,7 @@ pub struct AgeAssurancePurgeEvent<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub created_at: Datetime,
@@ -622,13 +574,7 @@ pub struct BlobView<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum BlobViewDetails<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#imageDetails")]
     ImageDetails(Box<moderation::ImageDetails<S>>),
@@ -639,13 +585,7 @@ pub enum BlobViewDetails<S: BosStr = DefaultStr> {
 /// Logs cancellation of a scheduled takedown action for an account.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancelScheduledTakedownEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -656,13 +596,7 @@ pub struct CancelScheduledTakedownEvent<S: BosStr = DefaultStr> {
 /// Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IdentityEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -679,13 +613,7 @@ pub struct IdentityEvent<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageDetails<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -695,13 +623,7 @@ pub struct ImageDetails<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventAcknowledge<S: BosStr = DefaultStr> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -715,13 +637,7 @@ pub struct ModEventAcknowledge<S: BosStr = DefaultStr> {
 /// Add a comment to a subject. An empty comment will clear any previously set sticky comment.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventComment<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -735,13 +651,7 @@ pub struct ModEventComment<S: BosStr = DefaultStr> {
 /// Divert a record's blobs to a 3rd party service for further scanning/tagging
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventDivert<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -752,13 +662,7 @@ pub struct ModEventDivert<S: BosStr = DefaultStr> {
 /// Keep a log of outgoing email to a user
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventEmail<S: BosStr = DefaultStr> {
     ///Additional comment about the outgoing comm.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -789,13 +693,7 @@ pub struct ModEventEmail<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventEscalate<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -806,13 +704,7 @@ pub struct ModEventEscalate<S: BosStr = DefaultStr> {
 /// Apply/Negate labels on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventLabel<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -828,13 +720,7 @@ pub struct ModEventLabel<S: BosStr = DefaultStr> {
 /// Mute incoming reports on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventMute<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -847,13 +733,7 @@ pub struct ModEventMute<S: BosStr = DefaultStr> {
 /// Mute incoming reports from an account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventMuteReporter<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -867,13 +747,7 @@ pub struct ModEventMuteReporter<S: BosStr = DefaultStr> {
 /// Set priority score of the subject. Higher score means higher priority.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventPriorityScore<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -885,13 +759,7 @@ pub struct ModEventPriorityScore<S: BosStr = DefaultStr> {
 /// Report a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventReport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -906,13 +774,7 @@ pub struct ModEventReport<S: BosStr = DefaultStr> {
 /// Resolve appeal on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventResolveAppeal<S: BosStr = DefaultStr> {
     ///Describe resolution.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -924,13 +786,7 @@ pub struct ModEventResolveAppeal<S: BosStr = DefaultStr> {
 /// Revert take down action on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventReverseTakedown<S: BosStr = DefaultStr> {
     ///Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -951,13 +807,7 @@ pub struct ModEventReverseTakedown<S: BosStr = DefaultStr> {
 /// Add/Remove a tag on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventTag<S: BosStr = DefaultStr> {
     ///Tags to be added to the subject. If already exists, won't be duplicated.
     pub add: Vec<S>,
@@ -973,13 +823,7 @@ pub struct ModEventTag<S: BosStr = DefaultStr> {
 /// Take down a subject permanently or temporarily
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventTakedown<S: BosStr = DefaultStr> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1011,13 +855,7 @@ pub struct ModEventTakedown<S: BosStr = DefaultStr> {
 /// Unmute action on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventUnmute<S: BosStr = DefaultStr> {
     ///Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1029,13 +867,7 @@ pub struct ModEventUnmute<S: BosStr = DefaultStr> {
 /// Unmute incoming reports from an account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventUnmuteReporter<S: BosStr = DefaultStr> {
     ///Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1046,13 +878,7 @@ pub struct ModEventUnmuteReporter<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub created_by: Did<S>,
@@ -1073,13 +899,7 @@ pub struct ModEventView<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ModEventViewEvent<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#modEventTakedown")]
     ModEventTakedown(Box<moderation::ModEventTakedown<S>>),
@@ -1136,13 +956,7 @@ pub enum ModEventViewEvent<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ModEventViewSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<S>>),
@@ -1154,13 +968,7 @@ pub enum ModEventViewSubject<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModEventViewDetail<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub created_by: Did<S>,
@@ -1177,13 +985,7 @@ pub struct ModEventViewDetail<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ModEventViewDetailEvent<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#modEventTakedown")]
     ModEventTakedown(Box<moderation::ModEventTakedown<S>>),
@@ -1240,13 +1042,7 @@ pub enum ModEventViewDetailEvent<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ModEventViewDetailSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#repoView")]
     RepoView(Box<moderation::RepoView<S>>),
@@ -1261,13 +1057,7 @@ pub enum ModEventViewDetailSubject<S: BosStr = DefaultStr> {
 /// Moderation tool information for tracing the source of the action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModTool<S: BosStr = DefaultStr> {
     ///Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1280,13 +1070,7 @@ pub struct ModTool<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Moderation<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_status: Option<moderation::SubjectStatusView<S>>,
@@ -1296,13 +1080,7 @@ pub struct Moderation<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModerationDetail<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_status: Option<moderation::SubjectStatusView<S>>,
@@ -1313,13 +1091,7 @@ pub struct ModerationDetail<S: BosStr = DefaultStr> {
 /// Logs lifecycle event on a record subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -1415,13 +1187,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordHosting<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -1514,13 +1280,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordView<S: BosStr = DefaultStr> {
     pub blob_cids: Vec<Cid<S>>,
     pub cid: Cid<S>,
@@ -1535,13 +1295,7 @@ pub struct RecordView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordViewDetail<S: BosStr = DefaultStr> {
     pub blobs: Vec<moderation::BlobView<S>>,
     pub cid: Cid<S>,
@@ -1558,13 +1312,7 @@ pub struct RecordViewDetail<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordViewNotFound<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -1574,13 +1322,7 @@ pub struct RecordViewNotFound<S: BosStr = DefaultStr> {
 /// Statistics about a set of record subject items
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordsStats<S: BosStr = DefaultStr> {
     ///Number of items that were appealed at least once
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1612,13 +1354,7 @@ pub struct RecordsStats<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RepoView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deactivated_at: Option<Datetime>,
@@ -1643,13 +1379,7 @@ pub struct RepoView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RepoViewDetail<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deactivated_at: Option<Datetime>,
@@ -1680,13 +1410,7 @@ pub struct RepoViewDetail<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RepoViewNotFound<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -1695,13 +1419,7 @@ pub struct RepoViewNotFound<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReporterStats<S: BosStr = DefaultStr> {
     ///The total number of reports made by the user on accounts.
     pub account_report_count: i64,
@@ -1767,13 +1485,7 @@ impl core::fmt::Display for ReviewOpen {
 /// Account credentials revocation by moderators. Only works on DID subjects.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RevokeAccountCredentialsEvent<S: BosStr = DefaultStr> {
     ///Comment describing the reason for the revocation.
     pub comment: S,
@@ -1784,13 +1496,7 @@ pub struct RevokeAccountCredentialsEvent<S: BosStr = DefaultStr> {
 /// Logs a scheduled takedown action for an account.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScheduleTakedownEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -1807,13 +1513,7 @@ pub struct ScheduleTakedownEvent<S: BosStr = DefaultStr> {
 /// View of a scheduled moderation action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScheduledActionView<S: BosStr = DefaultStr> {
     ///Type of action to be executed
     pub action: ScheduledActionViewAction<S>,
@@ -2132,13 +1832,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubjectStatusView<S: BosStr = DefaultStr> {
     ///Statistics related to the account subject
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2393,13 +2087,7 @@ where
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubjectStatusViewHosting<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#accountHosting")]
     AccountHosting(Box<moderation::AccountHosting<S>>),
@@ -2410,13 +2098,7 @@ pub enum SubjectStatusViewHosting<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubjectStatusViewSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<S>>),
@@ -2429,13 +2111,7 @@ pub enum SubjectStatusViewSubject<S: BosStr = DefaultStr> {
 /// Detailed view of a subject. For record subjects, the author's repo and profile will be returned.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubjectView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile: Option<Data<S>>,
@@ -2483,13 +2159,7 @@ impl core::fmt::Display for TimelineEventPlcTombstone {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VideoDetails<S: BosStr = DefaultStr> {
     pub height: i64,
     pub length: i64,
@@ -3329,37 +2999,37 @@ pub mod account_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type Active;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type Active = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
-    impl<St: State> State for SetTimestamp<St> {
-        type Timestamp = Set<members::timestamp>;
-        type Active = St::Active;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActive<St> {}
     impl<St: State> State for SetActive<St> {
-        type Timestamp = St::Timestamp;
         type Active = Set<members::active>;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Active = St::Active;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `active` field
         pub struct active(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -3455,8 +3125,8 @@ where
 impl<S: BosStr, St> AccountEventBuilder<S, St>
 where
     St: account_event_state::State,
-    St::Timestamp: account_event_state::IsSet,
     St::Active: account_event_state::IsSet,
+    St::Timestamp: account_event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AccountEvent<S> {
@@ -6176,51 +5846,51 @@ pub mod age_assurance_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Status;
         type AttemptId;
         type CreatedAt;
-        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Status = Unset;
         type AttemptId = Unset;
         type CreatedAt = Unset;
-        type Status = Unset;
-    }
-    ///State transition - sets the `attempt_id` field to Set
-    pub struct SetAttemptId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAttemptId<St> {}
-    impl<St: State> State for SetAttemptId<St> {
-        type AttemptId = Set<members::attempt_id>;
-        type CreatedAt = St::CreatedAt;
-        type Status = St::Status;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type AttemptId = St::AttemptId;
-        type CreatedAt = Set<members::created_at>;
-        type Status = St::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
+        type Status = Set<members::status>;
         type AttemptId = St::AttemptId;
         type CreatedAt = St::CreatedAt;
-        type Status = Set<members::status>;
+    }
+    ///State transition - sets the `attempt_id` field to Set
+    pub struct SetAttemptId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAttemptId<St> {}
+    impl<St: State> State for SetAttemptId<St> {
+        type Status = St::Status;
+        type AttemptId = Set<members::attempt_id>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Status = St::Status;
+        type AttemptId = St::AttemptId;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `attempt_id` field
         pub struct attempt_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
     }
 }
 
@@ -6411,9 +6081,9 @@ where
 impl<S: BosStr, St> AgeAssuranceEventBuilder<S, St>
 where
     St: age_assurance_event_state::State,
+    St::Status: age_assurance_event_state::IsSet,
     St::AttemptId: age_assurance_event_state::IsSet,
     St::CreatedAt: age_assurance_event_state::IsSet,
-    St::Status: age_assurance_event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AgeAssuranceEvent<S> {
@@ -6462,67 +6132,67 @@ pub mod blob_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type CreatedAt;
-        type Size;
         type MimeType;
+        type Size;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type CreatedAt = Unset;
-        type Size = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type CreatedAt = St::CreatedAt;
-        type Size = St::Size;
-        type MimeType = St::MimeType;
+        type Size = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Cid = St::Cid;
         type CreatedAt = Set<members::created_at>;
+        type MimeType = St::MimeType;
         type Size = St::Size;
-        type MimeType = St::MimeType;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSize<St> {}
-    impl<St: State> State for SetSize<St> {
         type Cid = St::Cid;
-        type CreatedAt = St::CreatedAt;
-        type Size = Set<members::size>;
-        type MimeType = St::MimeType;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMimeType<St> {}
     impl<St: State> State for SetMimeType<St> {
-        type Cid = St::Cid;
         type CreatedAt = St::CreatedAt;
-        type Size = St::Size;
         type MimeType = Set<members::mime_type>;
+        type Size = St::Size;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type CreatedAt = St::CreatedAt;
+        type MimeType = St::MimeType;
+        type Size = Set<members::size>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type CreatedAt = St::CreatedAt;
+        type MimeType = St::MimeType;
+        type Size = St::Size;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `size` field
+        pub struct size(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -6666,10 +6336,10 @@ where
 impl<S: BosStr, St> BlobViewBuilder<S, St>
 where
     St: blob_view_state::State,
-    St::Cid: blob_view_state::IsSet,
     St::CreatedAt: blob_view_state::IsSet,
-    St::Size: blob_view_state::IsSet,
     St::MimeType: blob_view_state::IsSet,
+    St::Size: blob_view_state::IsSet,
+    St::Cid: blob_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BlobView<S> {
@@ -7007,37 +6677,37 @@ pub mod mod_event_label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NegateLabelVals;
         type CreateLabelVals;
+        type NegateLabelVals;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NegateLabelVals = Unset;
         type CreateLabelVals = Unset;
-    }
-    ///State transition - sets the `negate_label_vals` field to Set
-    pub struct SetNegateLabelVals<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNegateLabelVals<St> {}
-    impl<St: State> State for SetNegateLabelVals<St> {
-        type NegateLabelVals = Set<members::negate_label_vals>;
-        type CreateLabelVals = St::CreateLabelVals;
+        type NegateLabelVals = Unset;
     }
     ///State transition - sets the `create_label_vals` field to Set
     pub struct SetCreateLabelVals<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreateLabelVals<St> {}
     impl<St: State> State for SetCreateLabelVals<St> {
-        type NegateLabelVals = St::NegateLabelVals;
         type CreateLabelVals = Set<members::create_label_vals>;
+        type NegateLabelVals = St::NegateLabelVals;
+    }
+    ///State transition - sets the `negate_label_vals` field to Set
+    pub struct SetNegateLabelVals<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNegateLabelVals<St> {}
+    impl<St: State> State for SetNegateLabelVals<St> {
+        type CreateLabelVals = St::CreateLabelVals;
+        type NegateLabelVals = Set<members::negate_label_vals>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `negate_label_vals` field
-        pub struct negate_label_vals(());
         ///Marker type for the `create_label_vals` field
         pub struct create_label_vals(());
+        ///Marker type for the `negate_label_vals` field
+        pub struct negate_label_vals(());
     }
 }
 
@@ -7133,8 +6803,8 @@ where
 impl<S: BosStr, St> ModEventLabelBuilder<S, St>
 where
     St: mod_event_label_state::State,
-    St::NegateLabelVals: mod_event_label_state::IsSet,
     St::CreateLabelVals: mod_event_label_state::IsSet,
+    St::NegateLabelVals: mod_event_label_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ModEventLabel<S> {
@@ -7540,37 +7210,37 @@ pub mod mod_event_tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Add;
         type Remove;
+        type Add;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Add = Unset;
         type Remove = Unset;
-    }
-    ///State transition - sets the `add` field to Set
-    pub struct SetAdd<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAdd<St> {}
-    impl<St: State> State for SetAdd<St> {
-        type Add = Set<members::add>;
-        type Remove = St::Remove;
+        type Add = Unset;
     }
     ///State transition - sets the `remove` field to Set
     pub struct SetRemove<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRemove<St> {}
     impl<St: State> State for SetRemove<St> {
-        type Add = St::Add;
         type Remove = Set<members::remove>;
+        type Add = St::Add;
+    }
+    ///State transition - sets the `add` field to Set
+    pub struct SetAdd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAdd<St> {}
+    impl<St: State> State for SetAdd<St> {
+        type Remove = St::Remove;
+        type Add = Set<members::add>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `add` field
-        pub struct add(());
         ///Marker type for the `remove` field
         pub struct remove(());
+        ///Marker type for the `add` field
+        pub struct add(());
     }
 }
 
@@ -7653,8 +7323,8 @@ where
 impl<S: BosStr, St> ModEventTagBuilder<S, St>
 where
     St: mod_event_tag_state::State,
-    St::Add: mod_event_tag_state::IsSet,
     St::Remove: mod_event_tag_state::IsSet,
+    St::Add: mod_event_tag_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ModEventTag<S> {
@@ -7689,105 +7359,105 @@ pub mod mod_event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type CreatedBy;
+        type Id;
+        type Subject;
         type SubjectBlobCids;
         type Event;
-        type Subject;
-        type CreatedAt;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type CreatedBy = Unset;
+        type Id = Unset;
+        type Subject = Unset;
         type SubjectBlobCids = Unset;
         type Event = Unset;
-        type Subject = Unset;
-        type CreatedAt = Unset;
-        type Id = Unset;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
-    impl<St: State> State for SetCreatedBy<St> {
-        type CreatedBy = Set<members::created_by>;
-        type SubjectBlobCids = St::SubjectBlobCids;
-        type Event = St::Event;
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `subject_blob_cids` field to Set
-    pub struct SetSubjectBlobCids<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubjectBlobCids<St> {}
-    impl<St: State> State for SetSubjectBlobCids<St> {
-        type CreatedBy = St::CreatedBy;
-        type SubjectBlobCids = Set<members::subject_blob_cids>;
-        type Event = St::Event;
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEvent<St> {}
-    impl<St: State> State for SetEvent<St> {
-        type CreatedBy = St::CreatedBy;
-        type SubjectBlobCids = St::SubjectBlobCids;
-        type Event = Set<members::event>;
-        type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type CreatedBy = St::CreatedBy;
-        type SubjectBlobCids = St::SubjectBlobCids;
-        type Event = St::Event;
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type Subject = St::Subject;
         type SubjectBlobCids = St::SubjectBlobCids;
         type Event = St::Event;
-        type Subject = St::Subject;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
+    impl<St: State> State for SetCreatedBy<St> {
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = Set<members::created_by>;
         type Id = St::Id;
+        type Subject = St::Subject;
+        type SubjectBlobCids = St::SubjectBlobCids;
+        type Event = St::Event;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
+        type CreatedAt = St::CreatedAt;
         type CreatedBy = St::CreatedBy;
+        type Id = Set<members::id>;
+        type Subject = St::Subject;
         type SubjectBlobCids = St::SubjectBlobCids;
         type Event = St::Event;
-        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type CreatedAt = St::CreatedAt;
-        type Id = Set<members::id>;
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type Subject = Set<members::subject>;
+        type SubjectBlobCids = St::SubjectBlobCids;
+        type Event = St::Event;
+    }
+    ///State transition - sets the `subject_blob_cids` field to Set
+    pub struct SetSubjectBlobCids<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubjectBlobCids<St> {}
+    impl<St: State> State for SetSubjectBlobCids<St> {
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type Subject = St::Subject;
+        type SubjectBlobCids = Set<members::subject_blob_cids>;
+        type Event = St::Event;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvent<St> {}
+    impl<St: State> State for SetEvent<St> {
+        type CreatedAt = St::CreatedAt;
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type Subject = St::Subject;
+        type SubjectBlobCids = St::SubjectBlobCids;
+        type Event = Set<members::event>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `subject_blob_cids` field
         pub struct subject_blob_cids(());
         ///Marker type for the `event` field
         pub struct event(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
@@ -7982,12 +7652,12 @@ impl<S: BosStr, St: mod_event_view_state::State> ModEventViewBuilder<S, St> {
 impl<S: BosStr, St> ModEventViewBuilder<S, St>
 where
     St: mod_event_view_state::State,
+    St::CreatedAt: mod_event_view_state::IsSet,
     St::CreatedBy: mod_event_view_state::IsSet,
+    St::Id: mod_event_view_state::IsSet,
+    St::Subject: mod_event_view_state::IsSet,
     St::SubjectBlobCids: mod_event_view_state::IsSet,
     St::Event: mod_event_view_state::IsSet,
-    St::Subject: mod_event_view_state::IsSet,
-    St::CreatedAt: mod_event_view_state::IsSet,
-    St::Id: mod_event_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ModEventView<S> {
@@ -8036,10 +7706,10 @@ pub mod mod_event_view_detail_state {
     pub trait State: sealed::Sealed {
         type CreatedBy;
         type CreatedAt;
+        type SubjectBlobs;
         type Event;
         type Id;
         type Subject;
-        type SubjectBlobs;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -8047,10 +7717,10 @@ pub mod mod_event_view_detail_state {
     impl State for Empty {
         type CreatedBy = Unset;
         type CreatedAt = Unset;
+        type SubjectBlobs = Unset;
         type Event = Unset;
         type Id = Unset;
         type Subject = Unset;
-        type SubjectBlobs = Unset;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
@@ -8058,10 +7728,10 @@ pub mod mod_event_view_detail_state {
     impl<St: State> State for SetCreatedBy<St> {
         type CreatedBy = Set<members::created_by>;
         type CreatedAt = St::CreatedAt;
+        type SubjectBlobs = St::SubjectBlobs;
         type Event = St::Event;
         type Id = St::Id;
         type Subject = St::Subject;
-        type SubjectBlobs = St::SubjectBlobs;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -8069,43 +7739,10 @@ pub mod mod_event_view_detail_state {
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedBy = St::CreatedBy;
         type CreatedAt = Set<members::created_at>;
+        type SubjectBlobs = St::SubjectBlobs;
         type Event = St::Event;
         type Id = St::Id;
         type Subject = St::Subject;
-        type SubjectBlobs = St::SubjectBlobs;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEvent<St> {}
-    impl<St: State> State for SetEvent<St> {
-        type CreatedBy = St::CreatedBy;
-        type CreatedAt = St::CreatedAt;
-        type Event = Set<members::event>;
-        type Id = St::Id;
-        type Subject = St::Subject;
-        type SubjectBlobs = St::SubjectBlobs;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type CreatedBy = St::CreatedBy;
-        type CreatedAt = St::CreatedAt;
-        type Event = St::Event;
-        type Id = Set<members::id>;
-        type Subject = St::Subject;
-        type SubjectBlobs = St::SubjectBlobs;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type CreatedBy = St::CreatedBy;
-        type CreatedAt = St::CreatedAt;
-        type Event = St::Event;
-        type Id = St::Id;
-        type Subject = Set<members::subject>;
-        type SubjectBlobs = St::SubjectBlobs;
     }
     ///State transition - sets the `subject_blobs` field to Set
     pub struct SetSubjectBlobs<St: State = Empty>(PhantomData<fn() -> St>);
@@ -8113,10 +7750,43 @@ pub mod mod_event_view_detail_state {
     impl<St: State> State for SetSubjectBlobs<St> {
         type CreatedBy = St::CreatedBy;
         type CreatedAt = St::CreatedAt;
+        type SubjectBlobs = Set<members::subject_blobs>;
         type Event = St::Event;
         type Id = St::Id;
         type Subject = St::Subject;
-        type SubjectBlobs = Set<members::subject_blobs>;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvent<St> {}
+    impl<St: State> State for SetEvent<St> {
+        type CreatedBy = St::CreatedBy;
+        type CreatedAt = St::CreatedAt;
+        type SubjectBlobs = St::SubjectBlobs;
+        type Event = Set<members::event>;
+        type Id = St::Id;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type CreatedBy = St::CreatedBy;
+        type CreatedAt = St::CreatedAt;
+        type SubjectBlobs = St::SubjectBlobs;
+        type Event = St::Event;
+        type Id = Set<members::id>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedBy = St::CreatedBy;
+        type CreatedAt = St::CreatedAt;
+        type SubjectBlobs = St::SubjectBlobs;
+        type Event = St::Event;
+        type Id = St::Id;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -8125,14 +7795,14 @@ pub mod mod_event_view_detail_state {
         pub struct created_by(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject_blobs` field
+        pub struct subject_blobs(());
         ///Marker type for the `event` field
         pub struct event(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `subject_blobs` field
-        pub struct subject_blobs(());
     }
 }
 
@@ -8304,10 +7974,10 @@ where
     St: mod_event_view_detail_state::State,
     St::CreatedBy: mod_event_view_detail_state::IsSet,
     St::CreatedAt: mod_event_view_detail_state::IsSet,
+    St::SubjectBlobs: mod_event_view_detail_state::IsSet,
     St::Event: mod_event_view_detail_state::IsSet,
     St::Id: mod_event_view_detail_state::IsSet,
     St::Subject: mod_event_view_detail_state::IsSet,
-    St::SubjectBlobs: mod_event_view_detail_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ModEventViewDetail<S> {
@@ -8350,37 +8020,37 @@ pub mod record_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type Op;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type Op = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
-    impl<St: State> State for SetTimestamp<St> {
-        type Timestamp = Set<members::timestamp>;
-        type Op = St::Op;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `op` field to Set
     pub struct SetOp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOp<St> {}
     impl<St: State> State for SetOp<St> {
-        type Timestamp = St::Timestamp;
         type Op = Set<members::op>;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Op = St::Op;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `op` field
         pub struct op(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -8476,8 +8146,8 @@ where
 impl<S: BosStr, St> RecordEventBuilder<S, St>
 where
     St: record_event_state::State,
-    St::Timestamp: record_event_state::IsSet,
     St::Op: record_event_state::IsSet,
+    St::Timestamp: record_event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RecordEvent<S> {
@@ -8515,126 +8185,126 @@ pub mod record_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Value;
-        type Moderation;
         type Repo;
-        type IndexedAt;
         type BlobCids;
-        type Cid;
+        type Moderation;
         type Uri;
+        type Cid;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Value = Unset;
-        type Moderation = Unset;
         type Repo = Unset;
-        type IndexedAt = Unset;
         type BlobCids = Unset;
-        type Cid = Unset;
+        type Moderation = Unset;
         type Uri = Unset;
+        type Cid = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
+        type Repo = St::Repo;
+        type BlobCids = St::BlobCids;
         type Moderation = St::Moderation;
-        type Repo = St::Repo;
-        type IndexedAt = St::IndexedAt;
-        type BlobCids = St::BlobCids;
-        type Cid = St::Cid;
         type Uri = St::Uri;
-    }
-    ///State transition - sets the `moderation` field to Set
-    pub struct SetModeration<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetModeration<St> {}
-    impl<St: State> State for SetModeration<St> {
-        type Value = St::Value;
-        type Moderation = Set<members::moderation>;
-        type Repo = St::Repo;
-        type IndexedAt = St::IndexedAt;
-        type BlobCids = St::BlobCids;
         type Cid = St::Cid;
-        type Uri = St::Uri;
+        type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
         type Value = St::Value;
-        type Moderation = St::Moderation;
         type Repo = Set<members::repo>;
-        type IndexedAt = St::IndexedAt;
         type BlobCids = St::BlobCids;
-        type Cid = St::Cid;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Value = St::Value;
         type Moderation = St::Moderation;
-        type Repo = St::Repo;
-        type IndexedAt = Set<members::indexed_at>;
-        type BlobCids = St::BlobCids;
-        type Cid = St::Cid;
         type Uri = St::Uri;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `blob_cids` field to Set
     pub struct SetBlobCids<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlobCids<St> {}
     impl<St: State> State for SetBlobCids<St> {
         type Value = St::Value;
-        type Moderation = St::Moderation;
         type Repo = St::Repo;
-        type IndexedAt = St::IndexedAt;
         type BlobCids = Set<members::blob_cids>;
-        type Cid = St::Cid;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Value = St::Value;
         type Moderation = St::Moderation;
-        type Repo = St::Repo;
-        type IndexedAt = St::IndexedAt;
-        type BlobCids = St::BlobCids;
-        type Cid = Set<members::cid>;
         type Uri = St::Uri;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `moderation` field to Set
+    pub struct SetModeration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetModeration<St> {}
+    impl<St: State> State for SetModeration<St> {
+        type Value = St::Value;
+        type Repo = St::Repo;
+        type BlobCids = St::BlobCids;
+        type Moderation = Set<members::moderation>;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
         type Value = St::Value;
-        type Moderation = St::Moderation;
         type Repo = St::Repo;
-        type IndexedAt = St::IndexedAt;
         type BlobCids = St::BlobCids;
-        type Cid = St::Cid;
+        type Moderation = St::Moderation;
         type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Value = St::Value;
+        type Repo = St::Repo;
+        type BlobCids = St::BlobCids;
+        type Moderation = St::Moderation;
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Value = St::Value;
+        type Repo = St::Repo;
+        type BlobCids = St::BlobCids;
+        type Moderation = St::Moderation;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `moderation` field
-        pub struct moderation(());
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `blob_cids` field
         pub struct blob_cids(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
+        ///Marker type for the `moderation` field
+        pub struct moderation(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -8808,12 +8478,12 @@ impl<S: BosStr, St> RecordViewBuilder<S, St>
 where
     St: record_view_state::State,
     St::Value: record_view_state::IsSet,
-    St::Moderation: record_view_state::IsSet,
     St::Repo: record_view_state::IsSet,
-    St::IndexedAt: record_view_state::IsSet,
     St::BlobCids: record_view_state::IsSet,
-    St::Cid: record_view_state::IsSet,
+    St::Moderation: record_view_state::IsSet,
     St::Uri: record_view_state::IsSet,
+    St::Cid: record_view_state::IsSet,
+    St::IndexedAt: record_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RecordView<S> {
@@ -8856,125 +8526,125 @@ pub mod record_view_detail_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Value;
         type Uri;
-        type IndexedAt;
         type Repo;
         type Moderation;
         type Blobs;
-        type Value;
+        type IndexedAt;
         type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Value = Unset;
         type Uri = Unset;
-        type IndexedAt = Unset;
         type Repo = Unset;
         type Moderation = Unset;
         type Blobs = Unset;
-        type Value = Unset;
+        type IndexedAt = Unset;
         type Cid = Unset;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Value = Set<members::value>;
+        type Uri = St::Uri;
+        type Repo = St::Repo;
+        type Moderation = St::Moderation;
+        type Blobs = St::Blobs;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
+        type Value = St::Value;
         type Uri = Set<members::uri>;
+        type Repo = St::Repo;
+        type Moderation = St::Moderation;
+        type Blobs = St::Blobs;
         type IndexedAt = St::IndexedAt;
-        type Repo = St::Repo;
-        type Moderation = St::Moderation;
-        type Blobs = St::Blobs;
-        type Value = St::Value;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type Repo = St::Repo;
-        type Moderation = St::Moderation;
-        type Blobs = St::Blobs;
-        type Value = St::Value;
         type Cid = St::Cid;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
+        type Value = St::Value;
         type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type Repo = Set<members::repo>;
         type Moderation = St::Moderation;
         type Blobs = St::Blobs;
-        type Value = St::Value;
+        type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
     }
     ///State transition - sets the `moderation` field to Set
     pub struct SetModeration<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetModeration<St> {}
     impl<St: State> State for SetModeration<St> {
+        type Value = St::Value;
         type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type Repo = St::Repo;
         type Moderation = Set<members::moderation>;
         type Blobs = St::Blobs;
-        type Value = St::Value;
+        type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
     }
     ///State transition - sets the `blobs` field to Set
     pub struct SetBlobs<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlobs<St> {}
     impl<St: State> State for SetBlobs<St> {
+        type Value = St::Value;
         type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type Repo = St::Repo;
         type Moderation = St::Moderation;
         type Blobs = Set<members::blobs>;
-        type Value = St::Value;
+        type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
     }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Value = St::Value;
         type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type Repo = St::Repo;
         type Moderation = St::Moderation;
         type Blobs = St::Blobs;
-        type Value = Set<members::value>;
+        type IndexedAt = Set<members::indexed_at>;
         type Cid = St::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
+        type Value = St::Value;
         type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type Repo = St::Repo;
         type Moderation = St::Moderation;
         type Blobs = St::Blobs;
-        type Value = St::Value;
+        type IndexedAt = St::IndexedAt;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
         ///Marker type for the `blobs` field
         pub struct blobs(());
-        ///Marker type for the `value` field
-        pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
@@ -9163,12 +8833,12 @@ where
 impl<S: BosStr, St> RecordViewDetailBuilder<S, St>
 where
     St: record_view_detail_state::State,
+    St::Value: record_view_detail_state::IsSet,
     St::Uri: record_view_detail_state::IsSet,
-    St::IndexedAt: record_view_detail_state::IsSet,
     St::Repo: record_view_detail_state::IsSet,
     St::Moderation: record_view_detail_state::IsSet,
     St::Blobs: record_view_detail_state::IsSet,
-    St::Value: record_view_detail_state::IsSet,
+    St::IndexedAt: record_view_detail_state::IsSet,
     St::Cid: record_view_detail_state::IsSet,
 {
     /// Build the final struct.
@@ -9315,84 +8985,84 @@ pub mod repo_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Moderation;
-        type RelatedRecords;
         type IndexedAt;
+        type RelatedRecords;
         type Handle;
+        type Moderation;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Moderation = Unset;
-        type RelatedRecords = Unset;
         type IndexedAt = Unset;
+        type RelatedRecords = Unset;
         type Handle = Unset;
+        type Moderation = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Moderation = St::Moderation;
+        type IndexedAt = St::IndexedAt;
         type RelatedRecords = St::RelatedRecords;
-        type IndexedAt = St::IndexedAt;
         type Handle = St::Handle;
-    }
-    ///State transition - sets the `moderation` field to Set
-    pub struct SetModeration<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetModeration<St> {}
-    impl<St: State> State for SetModeration<St> {
-        type Did = St::Did;
-        type Moderation = Set<members::moderation>;
-        type RelatedRecords = St::RelatedRecords;
-        type IndexedAt = St::IndexedAt;
-        type Handle = St::Handle;
-    }
-    ///State transition - sets the `related_records` field to Set
-    pub struct SetRelatedRecords<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRelatedRecords<St> {}
-    impl<St: State> State for SetRelatedRecords<St> {
-        type Did = St::Did;
         type Moderation = St::Moderation;
-        type RelatedRecords = Set<members::related_records>;
-        type IndexedAt = St::IndexedAt;
-        type Handle = St::Handle;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
         type Did = St::Did;
-        type Moderation = St::Moderation;
-        type RelatedRecords = St::RelatedRecords;
         type IndexedAt = Set<members::indexed_at>;
+        type RelatedRecords = St::RelatedRecords;
         type Handle = St::Handle;
+        type Moderation = St::Moderation;
+    }
+    ///State transition - sets the `related_records` field to Set
+    pub struct SetRelatedRecords<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRelatedRecords<St> {}
+    impl<St: State> State for SetRelatedRecords<St> {
+        type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type RelatedRecords = Set<members::related_records>;
+        type Handle = St::Handle;
+        type Moderation = St::Moderation;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHandle<St> {}
     impl<St: State> State for SetHandle<St> {
         type Did = St::Did;
-        type Moderation = St::Moderation;
-        type RelatedRecords = St::RelatedRecords;
         type IndexedAt = St::IndexedAt;
+        type RelatedRecords = St::RelatedRecords;
         type Handle = Set<members::handle>;
+        type Moderation = St::Moderation;
+    }
+    ///State transition - sets the `moderation` field to Set
+    pub struct SetModeration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetModeration<St> {}
+    impl<St: State> State for SetModeration<St> {
+        type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type RelatedRecords = St::RelatedRecords;
+        type Handle = St::Handle;
+        type Moderation = Set<members::moderation>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `moderation` field
-        pub struct moderation(());
-        ///Marker type for the `related_records` field
-        pub struct related_records(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `related_records` field
+        pub struct related_records(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `moderation` field
+        pub struct moderation(());
     }
 }
 
@@ -9616,10 +9286,10 @@ impl<S: BosStr, St> RepoViewBuilder<S, St>
 where
     St: repo_view_state::State,
     St::Did: repo_view_state::IsSet,
-    St::Moderation: repo_view_state::IsSet,
-    St::RelatedRecords: repo_view_state::IsSet,
     St::IndexedAt: repo_view_state::IsSet,
+    St::RelatedRecords: repo_view_state::IsSet,
     St::Handle: repo_view_state::IsSet,
+    St::Moderation: repo_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RepoView<S> {
@@ -9669,9 +9339,9 @@ pub mod repo_view_detail_state {
     pub trait State: sealed::Sealed {
         type Handle;
         type Moderation;
-        type RelatedRecords;
-        type IndexedAt;
         type Did;
+        type IndexedAt;
+        type RelatedRecords;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -9679,9 +9349,9 @@ pub mod repo_view_detail_state {
     impl State for Empty {
         type Handle = Unset;
         type Moderation = Unset;
-        type RelatedRecords = Unset;
-        type IndexedAt = Unset;
         type Did = Unset;
+        type IndexedAt = Unset;
+        type RelatedRecords = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
@@ -9689,9 +9359,9 @@ pub mod repo_view_detail_state {
     impl<St: State> State for SetHandle<St> {
         type Handle = Set<members::handle>;
         type Moderation = St::Moderation;
-        type RelatedRecords = St::RelatedRecords;
-        type IndexedAt = St::IndexedAt;
         type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type RelatedRecords = St::RelatedRecords;
     }
     ///State transition - sets the `moderation` field to Set
     pub struct SetModeration<St: State = Empty>(PhantomData<fn() -> St>);
@@ -9699,29 +9369,9 @@ pub mod repo_view_detail_state {
     impl<St: State> State for SetModeration<St> {
         type Handle = St::Handle;
         type Moderation = Set<members::moderation>;
-        type RelatedRecords = St::RelatedRecords;
+        type Did = St::Did;
         type IndexedAt = St::IndexedAt;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `related_records` field to Set
-    pub struct SetRelatedRecords<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRelatedRecords<St> {}
-    impl<St: State> State for SetRelatedRecords<St> {
-        type Handle = St::Handle;
-        type Moderation = St::Moderation;
-        type RelatedRecords = Set<members::related_records>;
-        type IndexedAt = St::IndexedAt;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Handle = St::Handle;
-        type Moderation = St::Moderation;
         type RelatedRecords = St::RelatedRecords;
-        type IndexedAt = Set<members::indexed_at>;
-        type Did = St::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
@@ -9729,9 +9379,29 @@ pub mod repo_view_detail_state {
     impl<St: State> State for SetDid<St> {
         type Handle = St::Handle;
         type Moderation = St::Moderation;
-        type RelatedRecords = St::RelatedRecords;
-        type IndexedAt = St::IndexedAt;
         type Did = Set<members::did>;
+        type IndexedAt = St::IndexedAt;
+        type RelatedRecords = St::RelatedRecords;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Handle = St::Handle;
+        type Moderation = St::Moderation;
+        type Did = St::Did;
+        type IndexedAt = Set<members::indexed_at>;
+        type RelatedRecords = St::RelatedRecords;
+    }
+    ///State transition - sets the `related_records` field to Set
+    pub struct SetRelatedRecords<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRelatedRecords<St> {}
+    impl<St: State> State for SetRelatedRecords<St> {
+        type Handle = St::Handle;
+        type Moderation = St::Moderation;
+        type Did = St::Did;
+        type IndexedAt = St::IndexedAt;
+        type RelatedRecords = Set<members::related_records>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -9740,12 +9410,12 @@ pub mod repo_view_detail_state {
         pub struct handle(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
-        ///Marker type for the `related_records` field
-        pub struct related_records(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `related_records` field
+        pub struct related_records(());
     }
 }
 
@@ -10027,9 +9697,9 @@ where
     St: repo_view_detail_state::State,
     St::Handle: repo_view_detail_state::IsSet,
     St::Moderation: repo_view_detail_state::IsSet,
-    St::RelatedRecords: repo_view_detail_state::IsSet,
-    St::IndexedAt: repo_view_detail_state::IsSet,
     St::Did: repo_view_detail_state::IsSet,
+    St::IndexedAt: repo_view_detail_state::IsSet,
+    St::RelatedRecords: repo_view_detail_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RepoViewDetail<S> {
@@ -10186,175 +9856,175 @@ pub mod reporter_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ReportedAccountCount;
         type Did;
-        type TakendownAccountCount;
-        type AccountReportCount;
-        type RecordReportCount;
         type LabeledRecordCount;
-        type LabeledAccountCount;
+        type RecordReportCount;
         type ReportedRecordCount;
+        type TakendownAccountCount;
+        type LabeledAccountCount;
+        type AccountReportCount;
+        type ReportedAccountCount;
         type TakendownRecordCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ReportedAccountCount = Unset;
         type Did = Unset;
-        type TakendownAccountCount = Unset;
-        type AccountReportCount = Unset;
-        type RecordReportCount = Unset;
         type LabeledRecordCount = Unset;
-        type LabeledAccountCount = Unset;
+        type RecordReportCount = Unset;
         type ReportedRecordCount = Unset;
+        type TakendownAccountCount = Unset;
+        type LabeledAccountCount = Unset;
+        type AccountReportCount = Unset;
+        type ReportedAccountCount = Unset;
         type TakendownRecordCount = Unset;
-    }
-    ///State transition - sets the `reported_account_count` field to Set
-    pub struct SetReportedAccountCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReportedAccountCount<St> {}
-    impl<St: State> State for SetReportedAccountCount<St> {
-        type ReportedAccountCount = Set<members::reported_account_count>;
-        type Did = St::Did;
-        type TakendownAccountCount = St::TakendownAccountCount;
-        type AccountReportCount = St::AccountReportCount;
-        type RecordReportCount = St::RecordReportCount;
-        type LabeledRecordCount = St::LabeledRecordCount;
-        type LabeledAccountCount = St::LabeledAccountCount;
-        type ReportedRecordCount = St::ReportedRecordCount;
-        type TakendownRecordCount = St::TakendownRecordCount;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type ReportedAccountCount = St::ReportedAccountCount;
         type Did = Set<members::did>;
-        type TakendownAccountCount = St::TakendownAccountCount;
-        type AccountReportCount = St::AccountReportCount;
+        type LabeledRecordCount = St::LabeledRecordCount;
         type RecordReportCount = St::RecordReportCount;
-        type LabeledRecordCount = St::LabeledRecordCount;
-        type LabeledAccountCount = St::LabeledAccountCount;
         type ReportedRecordCount = St::ReportedRecordCount;
-        type TakendownRecordCount = St::TakendownRecordCount;
-    }
-    ///State transition - sets the `takendown_account_count` field to Set
-    pub struct SetTakendownAccountCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTakendownAccountCount<St> {}
-    impl<St: State> State for SetTakendownAccountCount<St> {
-        type ReportedAccountCount = St::ReportedAccountCount;
-        type Did = St::Did;
-        type TakendownAccountCount = Set<members::takendown_account_count>;
-        type AccountReportCount = St::AccountReportCount;
-        type RecordReportCount = St::RecordReportCount;
-        type LabeledRecordCount = St::LabeledRecordCount;
-        type LabeledAccountCount = St::LabeledAccountCount;
-        type ReportedRecordCount = St::ReportedRecordCount;
-        type TakendownRecordCount = St::TakendownRecordCount;
-    }
-    ///State transition - sets the `account_report_count` field to Set
-    pub struct SetAccountReportCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAccountReportCount<St> {}
-    impl<St: State> State for SetAccountReportCount<St> {
-        type ReportedAccountCount = St::ReportedAccountCount;
-        type Did = St::Did;
         type TakendownAccountCount = St::TakendownAccountCount;
-        type AccountReportCount = Set<members::account_report_count>;
-        type RecordReportCount = St::RecordReportCount;
-        type LabeledRecordCount = St::LabeledRecordCount;
         type LabeledAccountCount = St::LabeledAccountCount;
-        type ReportedRecordCount = St::ReportedRecordCount;
-        type TakendownRecordCount = St::TakendownRecordCount;
-    }
-    ///State transition - sets the `record_report_count` field to Set
-    pub struct SetRecordReportCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecordReportCount<St> {}
-    impl<St: State> State for SetRecordReportCount<St> {
-        type ReportedAccountCount = St::ReportedAccountCount;
-        type Did = St::Did;
-        type TakendownAccountCount = St::TakendownAccountCount;
         type AccountReportCount = St::AccountReportCount;
-        type RecordReportCount = Set<members::record_report_count>;
-        type LabeledRecordCount = St::LabeledRecordCount;
-        type LabeledAccountCount = St::LabeledAccountCount;
-        type ReportedRecordCount = St::ReportedRecordCount;
+        type ReportedAccountCount = St::ReportedAccountCount;
         type TakendownRecordCount = St::TakendownRecordCount;
     }
     ///State transition - sets the `labeled_record_count` field to Set
     pub struct SetLabeledRecordCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLabeledRecordCount<St> {}
     impl<St: State> State for SetLabeledRecordCount<St> {
-        type ReportedAccountCount = St::ReportedAccountCount;
         type Did = St::Did;
-        type TakendownAccountCount = St::TakendownAccountCount;
-        type AccountReportCount = St::AccountReportCount;
-        type RecordReportCount = St::RecordReportCount;
         type LabeledRecordCount = Set<members::labeled_record_count>;
-        type LabeledAccountCount = St::LabeledAccountCount;
+        type RecordReportCount = St::RecordReportCount;
         type ReportedRecordCount = St::ReportedRecordCount;
+        type TakendownAccountCount = St::TakendownAccountCount;
+        type LabeledAccountCount = St::LabeledAccountCount;
+        type AccountReportCount = St::AccountReportCount;
+        type ReportedAccountCount = St::ReportedAccountCount;
         type TakendownRecordCount = St::TakendownRecordCount;
     }
-    ///State transition - sets the `labeled_account_count` field to Set
-    pub struct SetLabeledAccountCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLabeledAccountCount<St> {}
-    impl<St: State> State for SetLabeledAccountCount<St> {
-        type ReportedAccountCount = St::ReportedAccountCount;
+    ///State transition - sets the `record_report_count` field to Set
+    pub struct SetRecordReportCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecordReportCount<St> {}
+    impl<St: State> State for SetRecordReportCount<St> {
         type Did = St::Did;
-        type TakendownAccountCount = St::TakendownAccountCount;
-        type AccountReportCount = St::AccountReportCount;
-        type RecordReportCount = St::RecordReportCount;
         type LabeledRecordCount = St::LabeledRecordCount;
-        type LabeledAccountCount = Set<members::labeled_account_count>;
+        type RecordReportCount = Set<members::record_report_count>;
         type ReportedRecordCount = St::ReportedRecordCount;
+        type TakendownAccountCount = St::TakendownAccountCount;
+        type LabeledAccountCount = St::LabeledAccountCount;
+        type AccountReportCount = St::AccountReportCount;
+        type ReportedAccountCount = St::ReportedAccountCount;
         type TakendownRecordCount = St::TakendownRecordCount;
     }
     ///State transition - sets the `reported_record_count` field to Set
     pub struct SetReportedRecordCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReportedRecordCount<St> {}
     impl<St: State> State for SetReportedRecordCount<St> {
-        type ReportedAccountCount = St::ReportedAccountCount;
         type Did = St::Did;
-        type TakendownAccountCount = St::TakendownAccountCount;
-        type AccountReportCount = St::AccountReportCount;
-        type RecordReportCount = St::RecordReportCount;
         type LabeledRecordCount = St::LabeledRecordCount;
-        type LabeledAccountCount = St::LabeledAccountCount;
+        type RecordReportCount = St::RecordReportCount;
         type ReportedRecordCount = Set<members::reported_record_count>;
+        type TakendownAccountCount = St::TakendownAccountCount;
+        type LabeledAccountCount = St::LabeledAccountCount;
+        type AccountReportCount = St::AccountReportCount;
+        type ReportedAccountCount = St::ReportedAccountCount;
+        type TakendownRecordCount = St::TakendownRecordCount;
+    }
+    ///State transition - sets the `takendown_account_count` field to Set
+    pub struct SetTakendownAccountCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTakendownAccountCount<St> {}
+    impl<St: State> State for SetTakendownAccountCount<St> {
+        type Did = St::Did;
+        type LabeledRecordCount = St::LabeledRecordCount;
+        type RecordReportCount = St::RecordReportCount;
+        type ReportedRecordCount = St::ReportedRecordCount;
+        type TakendownAccountCount = Set<members::takendown_account_count>;
+        type LabeledAccountCount = St::LabeledAccountCount;
+        type AccountReportCount = St::AccountReportCount;
+        type ReportedAccountCount = St::ReportedAccountCount;
+        type TakendownRecordCount = St::TakendownRecordCount;
+    }
+    ///State transition - sets the `labeled_account_count` field to Set
+    pub struct SetLabeledAccountCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLabeledAccountCount<St> {}
+    impl<St: State> State for SetLabeledAccountCount<St> {
+        type Did = St::Did;
+        type LabeledRecordCount = St::LabeledRecordCount;
+        type RecordReportCount = St::RecordReportCount;
+        type ReportedRecordCount = St::ReportedRecordCount;
+        type TakendownAccountCount = St::TakendownAccountCount;
+        type LabeledAccountCount = Set<members::labeled_account_count>;
+        type AccountReportCount = St::AccountReportCount;
+        type ReportedAccountCount = St::ReportedAccountCount;
+        type TakendownRecordCount = St::TakendownRecordCount;
+    }
+    ///State transition - sets the `account_report_count` field to Set
+    pub struct SetAccountReportCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccountReportCount<St> {}
+    impl<St: State> State for SetAccountReportCount<St> {
+        type Did = St::Did;
+        type LabeledRecordCount = St::LabeledRecordCount;
+        type RecordReportCount = St::RecordReportCount;
+        type ReportedRecordCount = St::ReportedRecordCount;
+        type TakendownAccountCount = St::TakendownAccountCount;
+        type LabeledAccountCount = St::LabeledAccountCount;
+        type AccountReportCount = Set<members::account_report_count>;
+        type ReportedAccountCount = St::ReportedAccountCount;
+        type TakendownRecordCount = St::TakendownRecordCount;
+    }
+    ///State transition - sets the `reported_account_count` field to Set
+    pub struct SetReportedAccountCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReportedAccountCount<St> {}
+    impl<St: State> State for SetReportedAccountCount<St> {
+        type Did = St::Did;
+        type LabeledRecordCount = St::LabeledRecordCount;
+        type RecordReportCount = St::RecordReportCount;
+        type ReportedRecordCount = St::ReportedRecordCount;
+        type TakendownAccountCount = St::TakendownAccountCount;
+        type LabeledAccountCount = St::LabeledAccountCount;
+        type AccountReportCount = St::AccountReportCount;
+        type ReportedAccountCount = Set<members::reported_account_count>;
         type TakendownRecordCount = St::TakendownRecordCount;
     }
     ///State transition - sets the `takendown_record_count` field to Set
     pub struct SetTakendownRecordCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTakendownRecordCount<St> {}
     impl<St: State> State for SetTakendownRecordCount<St> {
-        type ReportedAccountCount = St::ReportedAccountCount;
         type Did = St::Did;
-        type TakendownAccountCount = St::TakendownAccountCount;
-        type AccountReportCount = St::AccountReportCount;
-        type RecordReportCount = St::RecordReportCount;
         type LabeledRecordCount = St::LabeledRecordCount;
-        type LabeledAccountCount = St::LabeledAccountCount;
+        type RecordReportCount = St::RecordReportCount;
         type ReportedRecordCount = St::ReportedRecordCount;
+        type TakendownAccountCount = St::TakendownAccountCount;
+        type LabeledAccountCount = St::LabeledAccountCount;
+        type AccountReportCount = St::AccountReportCount;
+        type ReportedAccountCount = St::ReportedAccountCount;
         type TakendownRecordCount = Set<members::takendown_record_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reported_account_count` field
-        pub struct reported_account_count(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `takendown_account_count` field
-        pub struct takendown_account_count(());
-        ///Marker type for the `account_report_count` field
-        pub struct account_report_count(());
-        ///Marker type for the `record_report_count` field
-        pub struct record_report_count(());
         ///Marker type for the `labeled_record_count` field
         pub struct labeled_record_count(());
-        ///Marker type for the `labeled_account_count` field
-        pub struct labeled_account_count(());
+        ///Marker type for the `record_report_count` field
+        pub struct record_report_count(());
         ///Marker type for the `reported_record_count` field
         pub struct reported_record_count(());
+        ///Marker type for the `takendown_account_count` field
+        pub struct takendown_account_count(());
+        ///Marker type for the `labeled_account_count` field
+        pub struct labeled_account_count(());
+        ///Marker type for the `account_report_count` field
+        pub struct account_report_count(());
+        ///Marker type for the `reported_account_count` field
+        pub struct reported_account_count(());
         ///Marker type for the `takendown_record_count` field
         pub struct takendown_record_count(());
     }
@@ -10569,14 +10239,14 @@ where
 impl<S: BosStr, St> ReporterStatsBuilder<S, St>
 where
     St: reporter_stats_state::State,
-    St::ReportedAccountCount: reporter_stats_state::IsSet,
     St::Did: reporter_stats_state::IsSet,
-    St::TakendownAccountCount: reporter_stats_state::IsSet,
-    St::AccountReportCount: reporter_stats_state::IsSet,
-    St::RecordReportCount: reporter_stats_state::IsSet,
     St::LabeledRecordCount: reporter_stats_state::IsSet,
-    St::LabeledAccountCount: reporter_stats_state::IsSet,
+    St::RecordReportCount: reporter_stats_state::IsSet,
     St::ReportedRecordCount: reporter_stats_state::IsSet,
+    St::TakendownAccountCount: reporter_stats_state::IsSet,
+    St::LabeledAccountCount: reporter_stats_state::IsSet,
+    St::AccountReportCount: reporter_stats_state::IsSet,
+    St::ReportedAccountCount: reporter_stats_state::IsSet,
     St::TakendownRecordCount: reporter_stats_state::IsSet,
 {
     /// Build the final struct.
@@ -10624,103 +10294,103 @@ pub mod scheduled_action_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
+        type CreatedBy;
+        type Id;
         type Action;
         type CreatedAt;
-        type Id;
-        type CreatedBy;
+        type Status;
         type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
+        type CreatedBy = Unset;
+        type Id = Unset;
         type Action = Unset;
         type CreatedAt = Unset;
-        type Id = Unset;
-        type CreatedBy = Unset;
+        type Status = Unset;
         type Did = Unset;
     }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
+    impl<St: State> State for SetCreatedBy<St> {
+        type CreatedBy = Set<members::created_by>;
+        type Id = St::Id;
         type Action = St::Action;
         type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-        type CreatedBy = St::CreatedBy;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAction<St> {}
-    impl<St: State> State for SetAction<St> {
         type Status = St::Status;
-        type Action = Set<members::action>;
-        type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-        type CreatedBy = St::CreatedBy;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Status = St::Status;
-        type Action = St::Action;
-        type CreatedAt = Set<members::created_at>;
-        type Id = St::Id;
-        type CreatedBy = St::CreatedBy;
         type Did = St::Did;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Status = St::Status;
+        type CreatedBy = St::CreatedBy;
+        type Id = Set<members::id>;
         type Action = St::Action;
         type CreatedAt = St::CreatedAt;
-        type Id = Set<members::id>;
-        type CreatedBy = St::CreatedBy;
+        type Status = St::Status;
         type Did = St::Did;
     }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
-    impl<St: State> State for SetCreatedBy<St> {
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAction<St> {}
+    impl<St: State> State for SetAction<St> {
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type Action = Set<members::action>;
+        type CreatedAt = St::CreatedAt;
         type Status = St::Status;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
+        type Action = St::Action;
+        type CreatedAt = Set<members::created_at>;
+        type Status = St::Status;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
         type Action = St::Action;
         type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-        type CreatedBy = Set<members::created_by>;
+        type Status = Set<members::status>;
         type Did = St::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Status = St::Status;
+        type CreatedBy = St::CreatedBy;
+        type Id = St::Id;
         type Action = St::Action;
         type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
-        type CreatedBy = St::CreatedBy;
+        type Status = St::Status;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `action` field
         pub struct action(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `did` field
         pub struct did(());
     }
@@ -11047,11 +10717,11 @@ impl<
 impl<S: BosStr, St> ScheduledActionViewBuilder<S, St>
 where
     St: scheduled_action_view_state::State,
-    St::Status: scheduled_action_view_state::IsSet,
+    St::CreatedBy: scheduled_action_view_state::IsSet,
+    St::Id: scheduled_action_view_state::IsSet,
     St::Action: scheduled_action_view_state::IsSet,
     St::CreatedAt: scheduled_action_view_state::IsSet,
-    St::Id: scheduled_action_view_state::IsSet,
-    St::CreatedBy: scheduled_action_view_state::IsSet,
+    St::Status: scheduled_action_view_state::IsSet,
     St::Did: scheduled_action_view_state::IsSet,
 {
     /// Build the final struct.
@@ -11111,83 +10781,83 @@ pub mod subject_status_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Id;
-        type CreatedAt;
         type Subject;
+        type Id;
+        type UpdatedAt;
+        type CreatedAt;
         type ReviewState;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type Id = Unset;
-        type CreatedAt = Unset;
         type Subject = Unset;
+        type Id = Unset;
+        type UpdatedAt = Unset;
+        type CreatedAt = Unset;
         type ReviewState = Unset;
     }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type UpdatedAt = Set<members::updated_at>;
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Subject = Set<members::subject>;
         type Id = St::Id;
+        type UpdatedAt = St::UpdatedAt;
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
         type ReviewState = St::ReviewState;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Id = Set<members::id>;
-        type CreatedAt = St::CreatedAt;
         type Subject = St::Subject;
+        type Id = Set<members::id>;
+        type UpdatedAt = St::UpdatedAt;
+        type CreatedAt = St::CreatedAt;
+        type ReviewState = St::ReviewState;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Subject = St::Subject;
+        type Id = St::Id;
+        type UpdatedAt = Set<members::updated_at>;
+        type CreatedAt = St::CreatedAt;
         type ReviewState = St::ReviewState;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Id = St::Id;
-        type CreatedAt = Set<members::created_at>;
         type Subject = St::Subject;
-        type ReviewState = St::ReviewState;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type UpdatedAt = St::UpdatedAt;
         type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
-        type Subject = Set<members::subject>;
+        type UpdatedAt = St::UpdatedAt;
+        type CreatedAt = Set<members::created_at>;
         type ReviewState = St::ReviewState;
     }
     ///State transition - sets the `review_state` field to Set
     pub struct SetReviewState<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReviewState<St> {}
     impl<St: State> State for SetReviewState<St> {
-        type UpdatedAt = St::UpdatedAt;
-        type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
         type Subject = St::Subject;
+        type Id = St::Id;
+        type UpdatedAt = St::UpdatedAt;
+        type CreatedAt = St::CreatedAt;
         type ReviewState = Set<members::review_state>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `review_state` field
         pub struct review_state(());
     }
@@ -11661,10 +11331,10 @@ where
 impl<S: BosStr, St> SubjectStatusViewBuilder<S, St>
 where
     St: subject_status_view_state::State,
-    St::UpdatedAt: subject_status_view_state::IsSet,
-    St::Id: subject_status_view_state::IsSet,
-    St::CreatedAt: subject_status_view_state::IsSet,
     St::Subject: subject_status_view_state::IsSet,
+    St::Id: subject_status_view_state::IsSet,
+    St::UpdatedAt: subject_status_view_state::IsSet,
+    St::CreatedAt: subject_status_view_state::IsSet,
     St::ReviewState: subject_status_view_state::IsSet,
 {
     /// Build the final struct.
@@ -11960,49 +11630,49 @@ pub mod video_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
         type Length;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
+        type Width = Unset;
         type Length = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWidth<St> {}
-    impl<St: State> State for SetWidth<St> {
-        type Width = Set<members::width>;
-        type Height = St::Height;
-        type Length = St::Length;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHeight<St> {}
     impl<St: State> State for SetHeight<St> {
-        type Width = St::Width;
         type Height = Set<members::height>;
+        type Width = St::Width;
+        type Length = St::Length;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Height = St::Height;
+        type Width = Set<members::width>;
         type Length = St::Length;
     }
     ///State transition - sets the `length` field to Set
     pub struct SetLength<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLength<St> {}
     impl<St: State> State for SetLength<St> {
-        type Width = St::Width;
         type Height = St::Height;
+        type Width = St::Width;
         type Length = Set<members::length>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
         ///Marker type for the `length` field
         pub struct length(());
     }
@@ -12093,8 +11763,8 @@ where
 impl<S: BosStr, St> VideoDetailsBuilder<S, St>
 where
     St: video_details_state::State,
-    St::Width: video_details_state::IsSet,
     St::Height: video_details_state::IsSet,
+    St::Width: video_details_state::IsSet,
     St::Length: video_details_state::IsSet,
 {
     /// Build the final struct.

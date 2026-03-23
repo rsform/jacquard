@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use serde::{Serialize, Deserialize};
 /// Holds the signature for another record showing it has verified it to the best of it's ability and it should be trusted if the signatures match.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationRef<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///The at://uri for the public did:key to verify the remote record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
@@ -77,85 +71,85 @@ pub mod verification_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
-        type Subject;
+        type CreatedAt;
         type KeyRef;
         type RecordRef;
-        type CreatedAt;
+        type Signature;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
-        type Subject = Unset;
+        type CreatedAt = Unset;
         type KeyRef = Unset;
         type RecordRef = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSignature<St> {}
-    impl<St: State> State for SetSignature<St> {
-        type Signature = Set<members::signature>;
-        type Subject = St::Subject;
-        type KeyRef = St::KeyRef;
-        type RecordRef = St::RecordRef;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Signature = St::Signature;
-        type Subject = Set<members::subject>;
-        type KeyRef = St::KeyRef;
-        type RecordRef = St::RecordRef;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `key_ref` field to Set
-    pub struct SetKeyRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKeyRef<St> {}
-    impl<St: State> State for SetKeyRef<St> {
-        type Signature = St::Signature;
-        type Subject = St::Subject;
-        type KeyRef = Set<members::key_ref>;
-        type RecordRef = St::RecordRef;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `record_ref` field to Set
-    pub struct SetRecordRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecordRef<St> {}
-    impl<St: State> State for SetRecordRef<St> {
-        type Signature = St::Signature;
-        type Subject = St::Subject;
-        type KeyRef = St::KeyRef;
-        type RecordRef = Set<members::record_ref>;
-        type CreatedAt = St::CreatedAt;
+        type Signature = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Signature = St::Signature;
-        type Subject = St::Subject;
+        type CreatedAt = Set<members::created_at>;
         type KeyRef = St::KeyRef;
         type RecordRef = St::RecordRef;
-        type CreatedAt = Set<members::created_at>;
+        type Signature = St::Signature;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `key_ref` field to Set
+    pub struct SetKeyRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKeyRef<St> {}
+    impl<St: State> State for SetKeyRef<St> {
+        type CreatedAt = St::CreatedAt;
+        type KeyRef = Set<members::key_ref>;
+        type RecordRef = St::RecordRef;
+        type Signature = St::Signature;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `record_ref` field to Set
+    pub struct SetRecordRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecordRef<St> {}
+    impl<St: State> State for SetRecordRef<St> {
+        type CreatedAt = St::CreatedAt;
+        type KeyRef = St::KeyRef;
+        type RecordRef = Set<members::record_ref>;
+        type Signature = St::Signature;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignature<St> {}
+    impl<St: State> State for SetSignature<St> {
+        type CreatedAt = St::CreatedAt;
+        type KeyRef = St::KeyRef;
+        type RecordRef = St::RecordRef;
+        type Signature = Set<members::signature>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type KeyRef = St::KeyRef;
+        type RecordRef = St::RecordRef;
+        type Signature = St::Signature;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `key_ref` field
         pub struct key_ref(());
         ///Marker type for the `record_ref` field
         pub struct record_ref(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -288,11 +282,11 @@ where
 impl<S: BosStr, St> VerificationRefBuilder<S, St>
 where
     St: verification_ref_state::State,
-    St::Signature: verification_ref_state::IsSet,
-    St::Subject: verification_ref_state::IsSet,
+    St::CreatedAt: verification_ref_state::IsSet,
     St::KeyRef: verification_ref_state::IsSet,
     St::RecordRef: verification_ref_state::IsSet,
-    St::CreatedAt: verification_ref_state::IsSet,
+    St::Signature: verification_ref_state::IsSet,
+    St::Subject: verification_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> VerificationRef<S> {

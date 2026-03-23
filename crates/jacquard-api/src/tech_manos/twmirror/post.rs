@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,7 +28,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::tech_manos::twmirror::post;
-pub type TwitterId<S: BosStr = DefaultStr> = S;
+pub type TwitterId<S = DefaultStr> = S;
 /// Sidecar record for mirrored Twitter posts. The rkey should match the bskyPost ref.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -36,10 +36,7 @@ pub type TwitterId<S: BosStr = DefaultStr> = S;
     rename_all = "camelCase",
     rename = "tech.manos.twmirror.post",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Post<S: BosStr = DefaultStr> {
     ///strongRef to mirrored post on Bluesky.
@@ -57,13 +54,7 @@ pub struct Post<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -129,65 +120,65 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TweetId;
         type CreatedAt;
         type TwUserId;
+        type TweetId;
         type BskyPost;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TweetId = Unset;
         type CreatedAt = Unset;
         type TwUserId = Unset;
+        type TweetId = Unset;
         type BskyPost = Unset;
-    }
-    ///State transition - sets the `tweet_id` field to Set
-    pub struct SetTweetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTweetId<St> {}
-    impl<St: State> State for SetTweetId<St> {
-        type TweetId = Set<members::tweet_id>;
-        type CreatedAt = St::CreatedAt;
-        type TwUserId = St::TwUserId;
-        type BskyPost = St::BskyPost;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type TweetId = St::TweetId;
         type CreatedAt = Set<members::created_at>;
         type TwUserId = St::TwUserId;
+        type TweetId = St::TweetId;
         type BskyPost = St::BskyPost;
     }
     ///State transition - sets the `tw_user_id` field to Set
     pub struct SetTwUserId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTwUserId<St> {}
     impl<St: State> State for SetTwUserId<St> {
-        type TweetId = St::TweetId;
         type CreatedAt = St::CreatedAt;
         type TwUserId = Set<members::tw_user_id>;
+        type TweetId = St::TweetId;
+        type BskyPost = St::BskyPost;
+    }
+    ///State transition - sets the `tweet_id` field to Set
+    pub struct SetTweetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTweetId<St> {}
+    impl<St: State> State for SetTweetId<St> {
+        type CreatedAt = St::CreatedAt;
+        type TwUserId = St::TwUserId;
+        type TweetId = Set<members::tweet_id>;
         type BskyPost = St::BskyPost;
     }
     ///State transition - sets the `bsky_post` field to Set
     pub struct SetBskyPost<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBskyPost<St> {}
     impl<St: State> State for SetBskyPost<St> {
-        type TweetId = St::TweetId;
         type CreatedAt = St::CreatedAt;
         type TwUserId = St::TwUserId;
+        type TweetId = St::TweetId;
         type BskyPost = Set<members::bsky_post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tweet_id` field
-        pub struct tweet_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `tw_user_id` field
         pub struct tw_user_id(());
+        ///Marker type for the `tweet_id` field
+        pub struct tweet_id(());
         ///Marker type for the `bsky_post` field
         pub struct bsky_post(());
     }
@@ -302,9 +293,9 @@ where
 impl<S: BosStr, St> PostBuilder<S, St>
 where
     St: post_state::State,
-    St::TweetId: post_state::IsSet,
     St::CreatedAt: post_state::IsSet,
     St::TwUserId: post_state::IsSet,
+    St::TweetId: post_state::IsSet,
     St::BskyPost: post_state::IsSet,
 {
     /// Build the final struct.

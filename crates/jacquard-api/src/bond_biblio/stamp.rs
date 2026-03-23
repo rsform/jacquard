@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "bond.biblio.stamp",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Stamp<S: BosStr = DefaultStr> {
     ///AT-URI of the reader's book record. Lexicon-agnostic: works with bond.biblio.book, buzz.bookhive.book, or any future book lexicon.
@@ -53,13 +50,7 @@ pub struct Stamp<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct StampGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -125,51 +116,51 @@ pub mod stamp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type List;
         type Book;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type List = Unset;
         type Book = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type List = St::List;
-        type Book = St::Book;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetList<St> {}
     impl<St: State> State for SetList<St> {
-        type CreatedAt = St::CreatedAt;
         type List = Set<members::list>;
         type Book = St::Book;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBook<St> {}
     impl<St: State> State for SetBook<St> {
-        type CreatedAt = St::CreatedAt;
         type List = St::List;
         type Book = Set<members::book>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type List = St::List;
+        type Book = St::Book;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `list` field
         pub struct list(());
         ///Marker type for the `book` field
         pub struct book(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -258,9 +249,9 @@ where
 impl<S: BosStr, St> StampBuilder<S, St>
 where
     St: stamp_state::State,
-    St::CreatedAt: stamp_state::IsSet,
     St::List: stamp_state::IsSet,
     St::Book: stamp_state::IsSet,
+    St::CreatedAt: stamp_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Stamp<S> {

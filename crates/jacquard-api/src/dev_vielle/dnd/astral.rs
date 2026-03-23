@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use crate::dev_vielle::dnd::astral;
     rename_all = "camelCase",
     rename = "dev.vielle.dnd.astral",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Astral<S: BosStr = DefaultStr> {
     /// Defaults to `0`.
@@ -51,13 +48,7 @@ pub struct Astral<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct AstralGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -283,37 +274,37 @@ pub mod astral_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Points;
         type Powers;
+        type Points;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Points = Unset;
         type Powers = Unset;
-    }
-    ///State transition - sets the `points` field to Set
-    pub struct SetPoints<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPoints<St> {}
-    impl<St: State> State for SetPoints<St> {
-        type Points = Set<members::points>;
-        type Powers = St::Powers;
+        type Points = Unset;
     }
     ///State transition - sets the `powers` field to Set
     pub struct SetPowers<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPowers<St> {}
     impl<St: State> State for SetPowers<St> {
-        type Points = St::Points;
         type Powers = Set<members::powers>;
+        type Points = St::Points;
+    }
+    ///State transition - sets the `points` field to Set
+    pub struct SetPoints<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPoints<St> {}
+    impl<St: State> State for SetPoints<St> {
+        type Powers = St::Powers;
+        type Points = Set<members::points>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `points` field
-        pub struct points(());
         ///Marker type for the `powers` field
         pub struct powers(());
+        ///Marker type for the `points` field
+        pub struct points(());
     }
 }
 
@@ -383,8 +374,8 @@ where
 impl<S: BosStr, St> AstralBuilder<S, St>
 where
     St: astral_state::State,
-    St::Points: astral_state::IsSet,
     St::Powers: astral_state::IsSet,
+    St::Points: astral_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Astral<S> {

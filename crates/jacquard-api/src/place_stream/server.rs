@@ -19,7 +19,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,13 +36,7 @@ use serde::{Serialize, Deserialize};
 use crate::place_stream::server;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RewriteRule<S: BosStr = DefaultStr> {
     ///Text to search for and replace.
     pub from: S,
@@ -55,13 +49,7 @@ pub struct RewriteRule<S: BosStr = DefaultStr> {
 /// A webhook configuration for receiving Streamplace events.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Webhook<S: BosStr = DefaultStr> {
     ///Whether this webhook is currently active.
     pub active: bool,
@@ -440,85 +428,85 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Url;
         type Events;
-        type Active;
         type CreatedAt;
+        type Active;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Url = Unset;
         type Events = Unset;
-        type Active = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Url = St::Url;
-        type Events = St::Events;
-        type Active = St::Active;
-        type CreatedAt = St::CreatedAt;
+        type Active = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type Id = St::Id;
         type Url = Set<members::url>;
         type Events = St::Events;
-        type Active = St::Active;
         type CreatedAt = St::CreatedAt;
+        type Active = St::Active;
+        type Id = St::Id;
     }
     ///State transition - sets the `events` field to Set
     pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEvents<St> {}
     impl<St: State> State for SetEvents<St> {
-        type Id = St::Id;
         type Url = St::Url;
         type Events = Set<members::events>;
+        type CreatedAt = St::CreatedAt;
         type Active = St::Active;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActive<St> {}
-    impl<St: State> State for SetActive<St> {
         type Id = St::Id;
-        type Url = St::Url;
-        type Events = St::Events;
-        type Active = Set<members::active>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Id = St::Id;
         type Url = St::Url;
         type Events = St::Events;
-        type Active = St::Active;
         type CreatedAt = Set<members::created_at>;
+        type Active = St::Active;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActive<St> {}
+    impl<St: State> State for SetActive<St> {
+        type Url = St::Url;
+        type Events = St::Events;
+        type CreatedAt = St::CreatedAt;
+        type Active = Set<members::active>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Url = St::Url;
+        type Events = St::Events;
+        type CreatedAt = St::CreatedAt;
+        type Active = St::Active;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `events` field
         pub struct events(());
-        ///Marker type for the `active` field
-        pub struct active(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `active` field
+        pub struct active(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -795,11 +783,11 @@ where
 impl<S: BosStr, St> WebhookBuilder<S, St>
 where
     St: webhook_state::State,
-    St::Id: webhook_state::IsSet,
     St::Url: webhook_state::IsSet,
     St::Events: webhook_state::IsSet,
-    St::Active: webhook_state::IsSet,
     St::CreatedAt: webhook_state::IsSet,
+    St::Active: webhook_state::IsSet,
+    St::Id: webhook_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Webhook<S> {

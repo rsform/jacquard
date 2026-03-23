@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "garden.goals.goal",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Goal<S: BosStr = DefaultStr> {
     ///Preset name or hex color for incomplete state
@@ -89,13 +86,7 @@ pub struct Goal<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct GoalGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -328,67 +319,67 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GoalId;
-        type Name;
         type CreatedAt;
         type Year;
+        type GoalId;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GoalId = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
         type Year = Unset;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGoalId<St> {}
-    impl<St: State> State for SetGoalId<St> {
-        type GoalId = Set<members::goal_id>;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-        type Year = St::Year;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type GoalId = St::GoalId;
-        type Name = Set<members::name>;
-        type CreatedAt = St::CreatedAt;
-        type Year = St::Year;
+        type GoalId = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type GoalId = St::GoalId;
-        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
         type Year = St::Year;
+        type GoalId = St::GoalId;
+        type Name = St::Name;
     }
     ///State transition - sets the `year` field to Set
     pub struct SetYear<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetYear<St> {}
     impl<St: State> State for SetYear<St> {
-        type GoalId = St::GoalId;
-        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
         type Year = Set<members::year>;
+        type GoalId = St::GoalId;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGoalId<St> {}
+    impl<St: State> State for SetGoalId<St> {
+        type CreatedAt = St::CreatedAt;
+        type Year = St::Year;
+        type GoalId = Set<members::goal_id>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Year = St::Year;
+        type GoalId = St::GoalId;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `goal_id` field
-        pub struct goal_id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `year` field
         pub struct year(());
+        ///Marker type for the `goal_id` field
+        pub struct goal_id(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -671,10 +662,10 @@ where
 impl<S: BosStr, St> GoalBuilder<S, St>
 where
     St: goal_state::State,
-    St::GoalId: goal_state::IsSet,
-    St::Name: goal_state::IsSet,
     St::CreatedAt: goal_state::IsSet,
     St::Year: goal_state::IsSet,
+    St::GoalId: goal_state::IsSet,
+    St::Name: goal_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Goal<S> {

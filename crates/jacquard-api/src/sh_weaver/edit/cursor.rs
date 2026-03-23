@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,13 +30,7 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::edit::cursor;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContainerId<S: BosStr = DefaultStr> {
     pub value: ContainerIdValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -46,13 +40,7 @@ pub struct ContainerId<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ContainerIdValue<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.edit.cursor#normalContainerId")]
     NormalContainerId(Box<cursor::NormalContainerId<S>>),
@@ -62,13 +50,7 @@ pub enum ContainerIdValue<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CursorSide<S: BosStr = DefaultStr> {
     ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
     pub value: i64,
@@ -78,13 +60,7 @@ pub struct CursorSide<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Id<S: BosStr = DefaultStr> {
     pub counter: i64,
     pub peer: i64,
@@ -99,10 +75,7 @@ pub struct Id<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "sh.weaver.edit.cursor",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Cursor<S: BosStr = DefaultStr> {
     pub container: cursor::ContainerId<S>,
@@ -116,13 +89,7 @@ pub struct Cursor<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CursorGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -132,13 +99,7 @@ pub struct CursorGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NormalContainerId<S: BosStr = DefaultStr> {
     pub container_type: S,
     pub counter: i64,
@@ -149,13 +110,7 @@ pub struct NormalContainerId<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RootContainerId<S: BosStr = DefaultStr> {
     pub container_type: S,
     pub name: S,
@@ -680,37 +635,37 @@ pub mod id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Counter;
         type Peer;
+        type Counter;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Counter = Unset;
         type Peer = Unset;
-    }
-    ///State transition - sets the `counter` field to Set
-    pub struct SetCounter<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCounter<St> {}
-    impl<St: State> State for SetCounter<St> {
-        type Counter = Set<members::counter>;
-        type Peer = St::Peer;
+        type Counter = Unset;
     }
     ///State transition - sets the `peer` field to Set
     pub struct SetPeer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPeer<St> {}
     impl<St: State> State for SetPeer<St> {
-        type Counter = St::Counter;
         type Peer = Set<members::peer>;
+        type Counter = St::Counter;
+    }
+    ///State transition - sets the `counter` field to Set
+    pub struct SetCounter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCounter<St> {}
+    impl<St: State> State for SetCounter<St> {
+        type Peer = St::Peer;
+        type Counter = Set<members::counter>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `counter` field
-        pub struct counter(());
         ///Marker type for the `peer` field
         pub struct peer(());
+        ///Marker type for the `counter` field
+        pub struct counter(());
     }
 }
 
@@ -777,8 +732,8 @@ where
 impl<S: BosStr, St> IdBuilder<S, St>
 where
     St: id_state::State,
-    St::Counter: id_state::IsSet,
     St::Peer: id_state::IsSet,
+    St::Counter: id_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Id<S> {
@@ -958,51 +913,51 @@ pub mod normal_container_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ContainerType;
-        type Counter;
         type Peer;
+        type Counter;
+        type ContainerType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ContainerType = Unset;
-        type Counter = Unset;
         type Peer = Unset;
-    }
-    ///State transition - sets the `container_type` field to Set
-    pub struct SetContainerType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContainerType<St> {}
-    impl<St: State> State for SetContainerType<St> {
-        type ContainerType = Set<members::container_type>;
-        type Counter = St::Counter;
-        type Peer = St::Peer;
-    }
-    ///State transition - sets the `counter` field to Set
-    pub struct SetCounter<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCounter<St> {}
-    impl<St: State> State for SetCounter<St> {
-        type ContainerType = St::ContainerType;
-        type Counter = Set<members::counter>;
-        type Peer = St::Peer;
+        type Counter = Unset;
+        type ContainerType = Unset;
     }
     ///State transition - sets the `peer` field to Set
     pub struct SetPeer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPeer<St> {}
     impl<St: State> State for SetPeer<St> {
-        type ContainerType = St::ContainerType;
-        type Counter = St::Counter;
         type Peer = Set<members::peer>;
+        type Counter = St::Counter;
+        type ContainerType = St::ContainerType;
+    }
+    ///State transition - sets the `counter` field to Set
+    pub struct SetCounter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCounter<St> {}
+    impl<St: State> State for SetCounter<St> {
+        type Peer = St::Peer;
+        type Counter = Set<members::counter>;
+        type ContainerType = St::ContainerType;
+    }
+    ///State transition - sets the `container_type` field to Set
+    pub struct SetContainerType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContainerType<St> {}
+    impl<St: State> State for SetContainerType<St> {
+        type Peer = St::Peer;
+        type Counter = St::Counter;
+        type ContainerType = Set<members::container_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `container_type` field
-        pub struct container_type(());
-        ///Marker type for the `counter` field
-        pub struct counter(());
         ///Marker type for the `peer` field
         pub struct peer(());
+        ///Marker type for the `counter` field
+        pub struct counter(());
+        ///Marker type for the `container_type` field
+        pub struct container_type(());
     }
 }
 
@@ -1091,9 +1046,9 @@ where
 impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
 where
     St: normal_container_id_state::State,
-    St::ContainerType: normal_container_id_state::IsSet,
-    St::Counter: normal_container_id_state::IsSet,
     St::Peer: normal_container_id_state::IsSet,
+    St::Counter: normal_container_id_state::IsSet,
+    St::ContainerType: normal_container_id_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> NormalContainerId<S> {

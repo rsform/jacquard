@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use crate::com_atproto::label::Label;
 use crate::com_atproto::label::subscribe_labels;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Info<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
@@ -118,13 +112,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Labels<S: BosStr = DefaultStr> {
     pub labels: Vec<Label<S>>,
     pub seq: i64,
@@ -143,20 +131,22 @@ pub struct SubscribeLabels {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeLabelsMessage<'a> {
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub enum SubscribeLabelsMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "#labels")]
     Labels(Box<subscribe_labels::Labels<S>>),
     #[serde(rename = "#info")]
     Info(Box<subscribe_labels::Info<S>>),
 }
 
-impl<'a> SubscribeLabelsMessage<'a> {
+impl<S: BosStr> SubscribeLabelsMessage<S> {
     /// Decode a framed DAG-CBOR message (header + body).
-    pub fn decode_framed<'de: 'a>(
+    pub fn decode_framed<'de>(
         bytes: &'de [u8],
-    ) -> Result<SubscribeLabelsMessage<'a>, jacquard_common::error::DecodeError> {
+    ) -> Result<SubscribeLabelsMessage<S>, jacquard_common::error::DecodeError>
+    where
+        S: serde::Deserialize<'de>,
+    {
         let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
             bytes,
         )?;
@@ -260,11 +250,15 @@ pub struct SubscribeLabelsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeLabelsStream {
     const NSID: &'static str = "com.atproto.label.subscribeLabels";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
-    type Message<'de> = SubscribeLabelsMessage<'de>;
+    type Message<S: BosStr> = SubscribeLabelsMessage<S>;
     type Error = SubscribeLabelsError;
-    fn decode_message<'de>(
+    fn decode_message<'de, S>(
         bytes: &'de [u8],
-    ) -> Result<Self::Message<'de>, jacquard_common::error::DecodeError> {
+    ) -> Result<Self::Message<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + serde::Deserialize<'de>,
+        Self::Message<S>: serde::Deserialize<'de>,
+    {
         SubscribeLabelsMessage::decode_framed(bytes)
     }
 }
@@ -279,7 +273,7 @@ pub struct SubscribeLabelsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeLabelsEndpoint {
     const PATH: &'static str = "/xrpc/com.atproto.label.subscribeLabels";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
-    type Params<'de> = SubscribeLabels;
+    type Params<S: BosStr> = SubscribeLabels;
     type Stream = SubscribeLabelsStream;
 }
 
@@ -381,37 +375,37 @@ pub mod labels_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Labels;
         type Seq;
+        type Labels;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Labels = Unset;
         type Seq = Unset;
-    }
-    ///State transition - sets the `labels` field to Set
-    pub struct SetLabels<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLabels<St> {}
-    impl<St: State> State for SetLabels<St> {
-        type Labels = Set<members::labels>;
-        type Seq = St::Seq;
+        type Labels = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSeq<St> {}
     impl<St: State> State for SetSeq<St> {
-        type Labels = St::Labels;
         type Seq = Set<members::seq>;
+        type Labels = St::Labels;
+    }
+    ///State transition - sets the `labels` field to Set
+    pub struct SetLabels<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLabels<St> {}
+    impl<St: State> State for SetLabels<St> {
+        type Seq = St::Seq;
+        type Labels = Set<members::labels>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `labels` field
-        pub struct labels(());
         ///Marker type for the `seq` field
         pub struct seq(());
+        ///Marker type for the `labels` field
+        pub struct labels(());
     }
 }
 
@@ -481,8 +475,8 @@ where
 impl<S: BosStr, St> LabelsBuilder<S, St>
 where
     St: labels_state::State,
-    St::Labels: labels_state::IsSet,
     St::Seq: labels_state::IsSet,
+    St::Labels: labels_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Labels<S> {

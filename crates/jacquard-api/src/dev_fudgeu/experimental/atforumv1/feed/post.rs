@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "dev.fudgeu.experimental.atforumv1.feed.post",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Post<S: BosStr = DefaultStr> {
     pub category: AtUri<S>,
@@ -58,13 +55,7 @@ pub struct Post<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -186,104 +177,104 @@ pub mod post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Category;
-        type Content;
         type Tags;
-        type Forum;
+        type Content;
         type Title;
+        type Forum;
+        type Category;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Category = Unset;
-        type Content = Unset;
         type Tags = Unset;
-        type Forum = Unset;
+        type Content = Unset;
         type Title = Unset;
+        type Forum = Unset;
+        type Category = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Category = St::Category;
+        type Tags = St::Tags;
         type Content = St::Content;
-        type Tags = St::Tags;
-        type Forum = St::Forum;
         type Title = St::Title;
-    }
-    ///State transition - sets the `category` field to Set
-    pub struct SetCategory<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCategory<St> {}
-    impl<St: State> State for SetCategory<St> {
-        type CreatedAt = St::CreatedAt;
-        type Category = Set<members::category>;
-        type Content = St::Content;
-        type Tags = St::Tags;
         type Forum = St::Forum;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type CreatedAt = St::CreatedAt;
         type Category = St::Category;
-        type Content = Set<members::content>;
-        type Tags = St::Tags;
-        type Forum = St::Forum;
-        type Title = St::Title;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTags<St> {}
     impl<St: State> State for SetTags<St> {
         type CreatedAt = St::CreatedAt;
-        type Category = St::Category;
-        type Content = St::Content;
         type Tags = Set<members::tags>;
-        type Forum = St::Forum;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `forum` field to Set
-    pub struct SetForum<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetForum<St> {}
-    impl<St: State> State for SetForum<St> {
-        type CreatedAt = St::CreatedAt;
-        type Category = St::Category;
         type Content = St::Content;
-        type Tags = St::Tags;
-        type Forum = Set<members::forum>;
         type Title = St::Title;
+        type Forum = St::Forum;
+        type Category = St::Category;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Content = Set<members::content>;
+        type Title = St::Title;
+        type Forum = St::Forum;
+        type Category = St::Category;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
         type CreatedAt = St::CreatedAt;
-        type Category = St::Category;
-        type Content = St::Content;
         type Tags = St::Tags;
-        type Forum = St::Forum;
+        type Content = St::Content;
         type Title = Set<members::title>;
+        type Forum = St::Forum;
+        type Category = St::Category;
+    }
+    ///State transition - sets the `forum` field to Set
+    pub struct SetForum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetForum<St> {}
+    impl<St: State> State for SetForum<St> {
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Content = St::Content;
+        type Title = St::Title;
+        type Forum = Set<members::forum>;
+        type Category = St::Category;
+    }
+    ///State transition - sets the `category` field to Set
+    pub struct SetCategory<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCategory<St> {}
+    impl<St: State> State for SetCategory<St> {
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Content = St::Content;
+        type Title = St::Title;
+        type Forum = St::Forum;
+        type Category = Set<members::category>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `category` field
-        pub struct category(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `tags` field
         pub struct tags(());
-        ///Marker type for the `forum` field
-        pub struct forum(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `forum` field
+        pub struct forum(());
+        ///Marker type for the `category` field
+        pub struct category(());
     }
 }
 
@@ -465,11 +456,11 @@ impl<S: BosStr, St> PostBuilder<S, St>
 where
     St: post_state::State,
     St::CreatedAt: post_state::IsSet,
-    St::Category: post_state::IsSet,
-    St::Content: post_state::IsSet,
     St::Tags: post_state::IsSet,
-    St::Forum: post_state::IsSet,
+    St::Content: post_state::IsSet,
     St::Title: post_state::IsSet,
+    St::Forum: post_state::IsSet,
+    St::Category: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {

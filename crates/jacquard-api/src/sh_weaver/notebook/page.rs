@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,10 +37,7 @@ use crate::sh_weaver::notebook::Title;
     rename_all = "camelCase",
     rename = "sh.weaver.notebook.page",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Page<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this was originally created.
@@ -60,13 +57,7 @@ pub struct Page<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PageGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -133,50 +124,50 @@ pub mod page_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Authors;
-        type Notebook;
         type EntryList;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Authors = Unset;
-        type Notebook = Unset;
         type EntryList = Unset;
+        type Notebook = Unset;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
         type Authors = Set<members::authors>;
+        type EntryList = St::EntryList;
         type Notebook = St::Notebook;
-        type EntryList = St::EntryList;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNotebook<St> {}
-    impl<St: State> State for SetNotebook<St> {
-        type Authors = St::Authors;
-        type Notebook = Set<members::notebook>;
-        type EntryList = St::EntryList;
     }
     ///State transition - sets the `entry_list` field to Set
     pub struct SetEntryList<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEntryList<St> {}
     impl<St: State> State for SetEntryList<St> {
         type Authors = St::Authors;
-        type Notebook = St::Notebook;
         type EntryList = Set<members::entry_list>;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Authors = St::Authors;
+        type EntryList = St::EntryList;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `authors` field
         pub struct authors(());
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
@@ -292,8 +283,8 @@ impl<S: BosStr, St> PageBuilder<S, St>
 where
     St: page_state::State,
     St::Authors: page_state::IsSet,
-    St::Notebook: page_state::IsSet,
     St::EntryList: page_state::IsSet,
+    St::Notebook: page_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Page<S> {

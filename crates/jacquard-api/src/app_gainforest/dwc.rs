@@ -12,7 +12,7 @@ pub mod occurrence;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -220,13 +220,7 @@ where
 /// A geographic point with uncertainty, following Darwin Core Location class
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Geolocation<S: BosStr = DefaultStr> {
     ///Horizontal distance from the coordinates describing the smallest circle containing the whole location. Zero is not valid.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -484,13 +478,7 @@ where
 /// A taxonomic identification with provenance metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TaxonIdentification<S: BosStr = DefaultStr> {
     ///Date the identification was made (ISO 8601)
     #[serde(skip_serializing_if = "Option::is_none")]

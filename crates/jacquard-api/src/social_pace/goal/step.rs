@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "social.pace.goal.step",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Step<S: BosStr = DefaultStr> {
     ///The first time this record was created
@@ -53,13 +50,7 @@ pub struct Step<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct StepGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -125,49 +116,49 @@ pub mod step_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Steps;
         type CreatedAt;
+        type Steps;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Steps = Unset;
         type CreatedAt = Unset;
+        type Steps = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSteps<St> {}
-    impl<St: State> State for SetSteps<St> {
-        type Steps = Set<members::steps>;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Steps = St::Steps;
         type CreatedAt = Set<members::created_at>;
+        type Steps = St::Steps;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSteps<St> {}
+    impl<St: State> State for SetSteps<St> {
+        type CreatedAt = St::CreatedAt;
+        type Steps = Set<members::steps>;
         type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
-        type Steps = St::Steps;
         type CreatedAt = St::CreatedAt;
+        type Steps = St::Steps;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `steps` field
-        pub struct steps(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `steps` field
+        pub struct steps(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
@@ -258,8 +249,8 @@ where
 impl<S: BosStr, St> StepBuilder<S, St>
 where
     St: step_state::State,
-    St::Steps: step_state::IsSet,
     St::CreatedAt: step_state::IsSet,
+    St::Steps: step_state::IsSet,
     St::UpdatedAt: step_state::IsSet,
 {
     /// Build the final struct.

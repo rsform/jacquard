@@ -7,7 +7,7 @@
 
 pub mod create_report;
 
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 /// Appeal a previously taken moderation action

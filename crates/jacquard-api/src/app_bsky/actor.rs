@@ -21,7 +21,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -49,13 +49,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::app_bsky::actor;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AdultContentPref<S: BosStr = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_adult_content_pref_enabled")]
@@ -67,13 +61,7 @@ pub struct AdultContentPref<S: BosStr = DefaultStr> {
 /// If set, an active progress guide. Once completed, can be set to undefined. Should have unspecced fields tracking progress.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BskyAppProgressGuide<S: BosStr = DefaultStr> {
     pub guide: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -83,13 +71,7 @@ pub struct BskyAppProgressGuide<S: BosStr = DefaultStr> {
 /// A grab bag of state that's specific to the bsky.app program. Third-party apps shouldn't use this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BskyAppStatePref<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active_progress_guide: Option<actor::BskyAppProgressGuide<S>>,
@@ -105,13 +87,7 @@ pub struct BskyAppStatePref<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContentLabelPref<S: BosStr = DefaultStr> {
     pub label: S,
     ///Which labeler does this preference apply to? If undefined, applies globally.
@@ -214,13 +190,7 @@ where
 /// Read-only preference containing value(s) inferred from the user's declared birthdate. Absence of this preference object in the response indicates that the user has not made a declaration.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeclaredAgePref<S: BosStr = DefaultStr> {
     ///Indicates if the user has declared that they are over 13 years of age.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -237,13 +207,7 @@ pub struct DeclaredAgePref<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedViewPref<S: BosStr = DefaultStr> {
     ///The URI of the feed, or an identifier which describes the feed.
     pub feed: S,
@@ -269,13 +233,7 @@ pub struct FeedViewPref<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HiddenPostsPref<S: BosStr = DefaultStr> {
     ///A list of URIs of posts the account owner has hidden.
     pub items: Vec<AtUri<S>>,
@@ -285,13 +243,7 @@ pub struct HiddenPostsPref<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InterestsPref<S: BosStr = DefaultStr> {
     ///A list of tags which describe the account owner's interests gathered during onboarding.
     pub tags: Vec<S>,
@@ -302,13 +254,7 @@ pub struct InterestsPref<S: BosStr = DefaultStr> {
 /// The subject's followers whom you also follow
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KnownFollowers<S: BosStr = DefaultStr> {
     pub count: i64,
     pub followers: Vec<actor::ProfileViewBasic<S>>,
@@ -318,13 +264,7 @@ pub struct KnownFollowers<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerPrefItem<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -333,13 +273,7 @@ pub struct LabelerPrefItem<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelersPref<S: BosStr = DefaultStr> {
     pub labelers: Vec<actor::LabelerPrefItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -349,13 +283,7 @@ pub struct LabelersPref<S: BosStr = DefaultStr> {
 /// Preferences for live events.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LiveEventPreferences<S: BosStr = DefaultStr> {
     ///A list of feed IDs that the user has hidden from live events.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -371,13 +299,7 @@ pub struct LiveEventPreferences<S: BosStr = DefaultStr> {
 /// A word that the account owner has muted.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MutedWord<S: BosStr = DefaultStr> {
     ///Groups of users to apply the muted word to. If undefined, applies to all users.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -552,13 +474,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MutedWordsPref<S: BosStr = DefaultStr> {
     ///A list of words the account owner has muted.
     pub items: Vec<actor::MutedWord<S>>,
@@ -569,13 +485,7 @@ pub struct MutedWordsPref<S: BosStr = DefaultStr> {
 /// A new user experiences (NUX) storage object
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Nux<S: BosStr = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_nux_completed")]
@@ -593,13 +503,7 @@ pub struct Nux<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PersonalDetailsPref<S: BosStr = DefaultStr> {
     ///The birth date of account owner.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -611,13 +515,7 @@ pub struct PersonalDetailsPref<S: BosStr = DefaultStr> {
 /// Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PostInteractionSettingsPref<S: BosStr = DefaultStr> {
     ///Matches postgate record. List of rules defining who can embed this users posts. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -634,13 +532,7 @@ pub struct PostInteractionSettingsPref<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum PostInteractionSettingsPrefThreadgateAllowRulesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     ThreadgateMentionRule(Box<MentionRule<S>>),
@@ -655,13 +547,7 @@ pub enum PostInteractionSettingsPrefThreadgateAllowRulesItem<S: BosStr = Default
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum PreferencesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.actor.defs#adultContentPref")]
     AdultContentPref(Box<actor::AdultContentPref<S>>),
@@ -697,16 +583,10 @@ pub enum PreferencesItem<S: BosStr = DefaultStr> {
     LiveEventPreferences(Box<actor::LiveEventPreferences<S>>),
 }
 
-pub type Preferences<S: BosStr = DefaultStr> = Vec<PreferencesItem<S>>;
+pub type Preferences<S = DefaultStr> = Vec<PreferencesItem<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileAssociated<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_subscription: Option<actor::ProfileAssociatedActivitySubscription<S>>,
@@ -728,13 +608,7 @@ pub struct ProfileAssociated<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileAssociatedActivitySubscription<S: BosStr = DefaultStr> {
     pub allow_subscriptions: ProfileAssociatedActivitySubscriptionAllowSubscriptions<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -843,13 +717,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileAssociatedChat<S: BosStr = DefaultStr> {
     pub allow_incoming: ProfileAssociatedChatAllowIncoming<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -949,13 +817,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileAssociatedGerm<S: BosStr = DefaultStr> {
     pub message_me_url: UriValue<S>,
     pub show_button_to: ProfileAssociatedGermShowButtonTo<S>,
@@ -1050,13 +912,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated: Option<actor::ProfileAssociated<S>>,
@@ -1091,13 +947,7 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated: Option<actor::ProfileAssociated<S>>,
@@ -1128,13 +978,7 @@ pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileViewDetailed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated: Option<actor::ProfileAssociated<S>>,
@@ -1183,13 +1027,7 @@ pub struct ProfileViewDetailed<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SavedFeed<S: BosStr = DefaultStr> {
     pub id: S,
     pub pinned: bool,
@@ -1283,13 +1121,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SavedFeedsPref<S: BosStr = DefaultStr> {
     pub pinned: Vec<AtUri<S>>,
     pub saved: Vec<AtUri<S>>,
@@ -1301,13 +1133,7 @@ pub struct SavedFeedsPref<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SavedFeedsPrefV2<S: BosStr = DefaultStr> {
     pub items: Vec<actor::SavedFeed<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -1316,13 +1142,7 @@ pub struct SavedFeedsPrefV2<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatusView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -1424,13 +1244,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThreadViewPref<S: BosStr = DefaultStr> {
     ///Sorting mode for threads.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1533,13 +1347,7 @@ where
 /// Preferences for how verified accounts appear in the app.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationPrefs<S: BosStr = DefaultStr> {
     ///Hide the blue check badges for verified accounts and trusted verifiers.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1552,13 +1360,7 @@ pub struct VerificationPrefs<S: BosStr = DefaultStr> {
 /// Represents the verification information about the user this object is attached to.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationState<S: BosStr = DefaultStr> {
     ///The user's status as a trusted verifier.
     pub trusted_verifier_status: VerificationStateTrustedVerifierStatus<S>,
@@ -1757,13 +1559,7 @@ where
 /// An individual verification for an associated subject.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationView<S: BosStr = DefaultStr> {
     ///Timestamp when the verification was created.
     pub created_at: Datetime,
@@ -1780,13 +1576,7 @@ pub struct VerificationView<S: BosStr = DefaultStr> {
 /// Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewerState<S: BosStr = DefaultStr> {
     ///This property is present only in selected cases, as an optimization.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -5422,37 +5212,37 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Handle = St::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHandle<St> {}
     impl<St: State> State for SetHandle<St> {
-        type Did = St::Did;
         type Handle = Set<members::handle>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Handle = St::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -5720,8 +5510,8 @@ impl<S: BosStr, St: profile_view_state::State> ProfileViewBuilder<S, St> {
 impl<S: BosStr, St> ProfileViewBuilder<S, St>
 where
     St: profile_view_state::State,
-    St::Did: profile_view_state::IsSet,
     St::Handle: profile_view_state::IsSet,
+    St::Did: profile_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProfileView<S> {
@@ -6100,37 +5890,37 @@ pub mod profile_view_detailed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
-        type Did = St::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Handle = St::Handle;
         type Did = Set<members::did>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -6569,8 +6359,8 @@ impl<
 impl<S: BosStr, St> ProfileViewDetailedBuilder<S, St>
 where
     St: profile_view_detailed_state::State,
-    St::Handle: profile_view_detailed_state::IsSet,
     St::Did: profile_view_detailed_state::IsSet,
+    St::Handle: profile_view_detailed_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProfileViewDetailed<S> {
@@ -6641,67 +6431,67 @@ pub mod saved_feed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Type;
         type Value;
+        type Id;
         type Pinned;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Type = Unset;
         type Value = Unset;
+        type Id = Unset;
         type Pinned = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Type = St::Type;
-        type Value = St::Value;
-        type Pinned = St::Pinned;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Id = St::Id;
-        type Type = Set<members::r#type>;
-        type Value = St::Value;
-        type Pinned = St::Pinned;
+        type Type = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Id = St::Id;
-        type Type = St::Type;
         type Value = Set<members::value>;
+        type Id = St::Id;
         type Pinned = St::Pinned;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Value = St::Value;
+        type Id = Set<members::id>;
+        type Pinned = St::Pinned;
+        type Type = St::Type;
     }
     ///State transition - sets the `pinned` field to Set
     pub struct SetPinned<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPinned<St> {}
     impl<St: State> State for SetPinned<St> {
-        type Id = St::Id;
-        type Type = St::Type;
         type Value = St::Value;
+        type Id = St::Id;
         type Pinned = Set<members::pinned>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Value = St::Value;
+        type Id = St::Id;
+        type Pinned = St::Pinned;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `pinned` field
         pub struct pinned(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -6809,10 +6599,10 @@ where
 impl<S: BosStr, St> SavedFeedBuilder<S, St>
 where
     St: saved_feed_state::State,
-    St::Id: saved_feed_state::IsSet,
-    St::Type: saved_feed_state::IsSet,
     St::Value: saved_feed_state::IsSet,
+    St::Id: saved_feed_state::IsSet,
     St::Pinned: saved_feed_state::IsSet,
+    St::Type: saved_feed_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SavedFeed<S> {
@@ -6849,37 +6639,37 @@ pub mod saved_feeds_pref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pinned;
         type Saved;
+        type Pinned;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pinned = Unset;
         type Saved = Unset;
-    }
-    ///State transition - sets the `pinned` field to Set
-    pub struct SetPinned<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPinned<St> {}
-    impl<St: State> State for SetPinned<St> {
-        type Pinned = Set<members::pinned>;
-        type Saved = St::Saved;
+        type Pinned = Unset;
     }
     ///State transition - sets the `saved` field to Set
     pub struct SetSaved<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSaved<St> {}
     impl<St: State> State for SetSaved<St> {
-        type Pinned = St::Pinned;
         type Saved = Set<members::saved>;
+        type Pinned = St::Pinned;
+    }
+    ///State transition - sets the `pinned` field to Set
+    pub struct SetPinned<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPinned<St> {}
+    impl<St: State> State for SetPinned<St> {
+        type Saved = St::Saved;
+        type Pinned = Set<members::pinned>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pinned` field
-        pub struct pinned(());
         ///Marker type for the `saved` field
         pub struct saved(());
+        ///Marker type for the `pinned` field
+        pub struct pinned(());
     }
 }
 
@@ -6962,8 +6752,8 @@ impl<S: BosStr, St: saved_feeds_pref_state::State> SavedFeedsPrefBuilder<S, St> 
 impl<S: BosStr, St> SavedFeedsPrefBuilder<S, St>
 where
     St: saved_feeds_pref_state::State,
-    St::Pinned: saved_feeds_pref_state::IsSet,
     St::Saved: saved_feeds_pref_state::IsSet,
+    St::Pinned: saved_feeds_pref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SavedFeedsPref<S> {
@@ -7521,67 +7311,67 @@ pub mod verification_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Issuer;
         type CreatedAt;
         type Uri;
         type IsValid;
+        type Issuer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Issuer = Unset;
         type CreatedAt = Unset;
         type Uri = Unset;
         type IsValid = Unset;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIssuer<St> {}
-    impl<St: State> State for SetIssuer<St> {
-        type Issuer = Set<members::issuer>;
-        type CreatedAt = St::CreatedAt;
-        type Uri = St::Uri;
-        type IsValid = St::IsValid;
+        type Issuer = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Issuer = St::Issuer;
         type CreatedAt = Set<members::created_at>;
         type Uri = St::Uri;
         type IsValid = St::IsValid;
+        type Issuer = St::Issuer;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Issuer = St::Issuer;
         type CreatedAt = St::CreatedAt;
         type Uri = Set<members::uri>;
         type IsValid = St::IsValid;
+        type Issuer = St::Issuer;
     }
     ///State transition - sets the `is_valid` field to Set
     pub struct SetIsValid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIsValid<St> {}
     impl<St: State> State for SetIsValid<St> {
-        type Issuer = St::Issuer;
         type CreatedAt = St::CreatedAt;
         type Uri = St::Uri;
         type IsValid = Set<members::is_valid>;
+        type Issuer = St::Issuer;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssuer<St> {}
+    impl<St: State> State for SetIssuer<St> {
+        type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
+        type IsValid = St::IsValid;
+        type Issuer = Set<members::issuer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `is_valid` field
         pub struct is_valid(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
     }
 }
 
@@ -7689,10 +7479,10 @@ where
 impl<S: BosStr, St> VerificationViewBuilder<S, St>
 where
     St: verification_view_state::State,
-    St::Issuer: verification_view_state::IsSet,
     St::CreatedAt: verification_view_state::IsSet,
     St::Uri: verification_view_state::IsSet,
     St::IsValid: verification_view_state::IsSet,
+    St::Issuer: verification_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> VerificationView<S> {

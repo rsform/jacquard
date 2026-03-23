@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "tech.tokimeki.poll.poll",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Poll<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -56,13 +53,7 @@ pub struct Poll<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct PollGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -150,49 +141,49 @@ pub mod poll_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type EndsAt;
+        type CreatedAt;
         type Options;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type EndsAt = Unset;
+        type CreatedAt = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type EndsAt = St::EndsAt;
-        type Options = St::Options;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEndsAt<St> {}
     impl<St: State> State for SetEndsAt<St> {
-        type CreatedAt = St::CreatedAt;
         type EndsAt = Set<members::ends_at>;
+        type CreatedAt = St::CreatedAt;
+        type Options = St::Options;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type EndsAt = St::EndsAt;
+        type CreatedAt = Set<members::created_at>;
         type Options = St::Options;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOptions<St> {}
     impl<St: State> State for SetOptions<St> {
-        type CreatedAt = St::CreatedAt;
         type EndsAt = St::EndsAt;
+        type CreatedAt = St::CreatedAt;
         type Options = Set<members::options>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `options` field
         pub struct options(());
     }
@@ -296,8 +287,8 @@ impl<S: BosStr, St: poll_state::State> PollBuilder<S, St> {
 impl<S: BosStr, St> PollBuilder<S, St>
 where
     St: poll_state::State,
-    St::CreatedAt: poll_state::IsSet,
     St::EndsAt: poll_state::IsSet,
+    St::CreatedAt: poll_state::IsSet,
     St::Options: poll_state::IsSet,
 {
     /// Build the final struct.

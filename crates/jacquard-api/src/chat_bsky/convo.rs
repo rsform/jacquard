@@ -29,7 +29,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -50,13 +50,7 @@ use crate::chat_bsky::actor::ProfileViewBasic;
 use crate::chat_bsky::convo;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConvoView<S: BosStr = DefaultStr> {
     pub id: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -76,13 +70,7 @@ pub struct ConvoView<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ConvoViewLastMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<convo::MessageView<S>>),
@@ -170,13 +158,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeletedMessageView<S: BosStr = DefaultStr> {
     pub id: S,
     pub rev: S,
@@ -188,13 +170,7 @@ pub struct DeletedMessageView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -204,13 +180,7 @@ pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogAddReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogAddReactionMessage<S>,
@@ -223,13 +193,7 @@ pub struct LogAddReaction<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum LogAddReactionMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<convo::MessageView<S>>),
@@ -239,13 +203,7 @@ pub enum LogAddReactionMessage<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogBeginConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -255,13 +213,7 @@ pub struct LogBeginConvo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogCreateMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogCreateMessageMessage<S>,
@@ -273,13 +225,7 @@ pub struct LogCreateMessage<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum LogCreateMessageMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<convo::MessageView<S>>),
@@ -289,13 +235,7 @@ pub enum LogCreateMessageMessage<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogDeleteMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogDeleteMessageMessage<S>,
@@ -307,13 +247,7 @@ pub struct LogDeleteMessage<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum LogDeleteMessageMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<convo::MessageView<S>>),
@@ -323,13 +257,7 @@ pub enum LogDeleteMessageMessage<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -339,13 +267,7 @@ pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogMuteConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -355,13 +277,7 @@ pub struct LogMuteConvo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogReadMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogReadMessageMessage<S>,
@@ -373,13 +289,7 @@ pub struct LogReadMessage<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum LogReadMessageMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<convo::MessageView<S>>),
@@ -389,13 +299,7 @@ pub enum LogReadMessageMessage<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogRemoveReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogRemoveReactionMessage<S>,
@@ -408,13 +312,7 @@ pub struct LogRemoveReaction<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum LogRemoveReactionMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<convo::MessageView<S>>),
@@ -424,13 +322,7 @@ pub enum LogRemoveReactionMessage<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -440,13 +332,7 @@ pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
     pub message: convo::MessageView<S>,
     pub reaction: convo::ReactionView<S>,
@@ -456,13 +342,7 @@ pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageInput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<Record<S>>,
@@ -476,13 +356,7 @@ pub struct MessageInput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageRef<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub did: Did<S>,
@@ -493,13 +367,7 @@ pub struct MessageRef<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<View<S>>,
@@ -520,13 +388,7 @@ pub struct MessageView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageViewSender<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -535,13 +397,7 @@ pub struct MessageViewSender<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReactionView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub sender: convo::ReactionViewSender<S>,
@@ -552,13 +408,7 @@ pub struct ReactionView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReactionViewSender<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -908,85 +758,85 @@ pub mod convo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type UnreadCount;
+        type Members;
         type Rev;
         type Id;
-        type UnreadCount;
         type Muted;
-        type Members;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type UnreadCount = Unset;
+        type Members = Unset;
         type Rev = Unset;
         type Id = Unset;
-        type UnreadCount = Unset;
         type Muted = Unset;
-        type Members = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Rev = Set<members::rev>;
-        type Id = St::Id;
-        type UnreadCount = St::UnreadCount;
-        type Muted = St::Muted;
-        type Members = St::Members;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Rev = St::Rev;
-        type Id = Set<members::id>;
-        type UnreadCount = St::UnreadCount;
-        type Muted = St::Muted;
-        type Members = St::Members;
     }
     ///State transition - sets the `unread_count` field to Set
     pub struct SetUnreadCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUnreadCount<St> {}
     impl<St: State> State for SetUnreadCount<St> {
-        type Rev = St::Rev;
-        type Id = St::Id;
         type UnreadCount = Set<members::unread_count>;
-        type Muted = St::Muted;
         type Members = St::Members;
-    }
-    ///State transition - sets the `muted` field to Set
-    pub struct SetMuted<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMuted<St> {}
-    impl<St: State> State for SetMuted<St> {
         type Rev = St::Rev;
         type Id = St::Id;
-        type UnreadCount = St::UnreadCount;
-        type Muted = Set<members::muted>;
-        type Members = St::Members;
+        type Muted = St::Muted;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMembers<St> {}
     impl<St: State> State for SetMembers<St> {
+        type UnreadCount = St::UnreadCount;
+        type Members = Set<members::members>;
         type Rev = St::Rev;
         type Id = St::Id;
-        type UnreadCount = St::UnreadCount;
         type Muted = St::Muted;
-        type Members = Set<members::members>;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type UnreadCount = St::UnreadCount;
+        type Members = St::Members;
+        type Rev = Set<members::rev>;
+        type Id = St::Id;
+        type Muted = St::Muted;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type UnreadCount = St::UnreadCount;
+        type Members = St::Members;
+        type Rev = St::Rev;
+        type Id = Set<members::id>;
+        type Muted = St::Muted;
+    }
+    ///State transition - sets the `muted` field to Set
+    pub struct SetMuted<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMuted<St> {}
+    impl<St: State> State for SetMuted<St> {
+        type UnreadCount = St::UnreadCount;
+        type Members = St::Members;
+        type Rev = St::Rev;
+        type Id = St::Id;
+        type Muted = Set<members::muted>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `unread_count` field
+        pub struct unread_count(());
+        ///Marker type for the `members` field
+        pub struct members(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `unread_count` field
-        pub struct unread_count(());
         ///Marker type for the `muted` field
         pub struct muted(());
-        ///Marker type for the `members` field
-        pub struct members(());
     }
 }
 
@@ -1170,11 +1020,11 @@ where
 impl<S: BosStr, St> ConvoViewBuilder<S, St>
 where
     St: convo_view_state::State,
+    St::UnreadCount: convo_view_state::IsSet,
+    St::Members: convo_view_state::IsSet,
     St::Rev: convo_view_state::IsSet,
     St::Id: convo_view_state::IsSet,
-    St::UnreadCount: convo_view_state::IsSet,
     St::Muted: convo_view_state::IsSet,
-    St::Members: convo_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ConvoView<S> {
@@ -1911,65 +1761,65 @@ pub mod deleted_message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SentAt;
         type Rev;
         type Id;
+        type SentAt;
         type Sender;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SentAt = Unset;
         type Rev = Unset;
         type Id = Unset;
+        type SentAt = Unset;
         type Sender = Unset;
-    }
-    ///State transition - sets the `sent_at` field to Set
-    pub struct SetSentAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSentAt<St> {}
-    impl<St: State> State for SetSentAt<St> {
-        type SentAt = Set<members::sent_at>;
-        type Rev = St::Rev;
-        type Id = St::Id;
-        type Sender = St::Sender;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev<St> {}
     impl<St: State> State for SetRev<St> {
-        type SentAt = St::SentAt;
         type Rev = Set<members::rev>;
         type Id = St::Id;
+        type SentAt = St::SentAt;
         type Sender = St::Sender;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type SentAt = St::SentAt;
         type Rev = St::Rev;
         type Id = Set<members::id>;
+        type SentAt = St::SentAt;
+        type Sender = St::Sender;
+    }
+    ///State transition - sets the `sent_at` field to Set
+    pub struct SetSentAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSentAt<St> {}
+    impl<St: State> State for SetSentAt<St> {
+        type Rev = St::Rev;
+        type Id = St::Id;
+        type SentAt = Set<members::sent_at>;
         type Sender = St::Sender;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSender<St> {}
     impl<St: State> State for SetSender<St> {
-        type SentAt = St::SentAt;
         type Rev = St::Rev;
         type Id = St::Id;
+        type SentAt = St::SentAt;
         type Sender = Set<members::sender>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sent_at` field
-        pub struct sent_at(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `sent_at` field
+        pub struct sent_at(());
         ///Marker type for the `sender` field
         pub struct sender(());
     }
@@ -2084,9 +1934,9 @@ where
 impl<S: BosStr, St> DeletedMessageViewBuilder<S, St>
 where
     St: deleted_message_view_state::State,
-    St::SentAt: deleted_message_view_state::IsSet,
     St::Rev: deleted_message_view_state::IsSet,
     St::Id: deleted_message_view_state::IsSet,
+    St::SentAt: deleted_message_view_state::IsSet,
     St::Sender: deleted_message_view_state::IsSet,
 {
     /// Build the final struct.
@@ -2124,67 +1974,67 @@ pub mod log_add_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ConvoId;
         type Message;
-        type Reaction;
         type Rev;
+        type ConvoId;
+        type Reaction;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ConvoId = Unset;
         type Message = Unset;
-        type Reaction = Unset;
         type Rev = Unset;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetConvoId<St> {}
-    impl<St: State> State for SetConvoId<St> {
-        type ConvoId = Set<members::convo_id>;
-        type Message = St::Message;
-        type Reaction = St::Reaction;
-        type Rev = St::Rev;
+        type ConvoId = Unset;
+        type Reaction = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
-        type ConvoId = St::ConvoId;
         type Message = Set<members::message>;
-        type Reaction = St::Reaction;
         type Rev = St::Rev;
-    }
-    ///State transition - sets the `reaction` field to Set
-    pub struct SetReaction<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReaction<St> {}
-    impl<St: State> State for SetReaction<St> {
         type ConvoId = St::ConvoId;
-        type Message = St::Message;
-        type Reaction = Set<members::reaction>;
-        type Rev = St::Rev;
+        type Reaction = St::Reaction;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev<St> {}
     impl<St: State> State for SetRev<St> {
-        type ConvoId = St::ConvoId;
         type Message = St::Message;
-        type Reaction = St::Reaction;
         type Rev = Set<members::rev>;
+        type ConvoId = St::ConvoId;
+        type Reaction = St::Reaction;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetConvoId<St> {}
+    impl<St: State> State for SetConvoId<St> {
+        type Message = St::Message;
+        type Rev = St::Rev;
+        type ConvoId = Set<members::convo_id>;
+        type Reaction = St::Reaction;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReaction<St> {}
+    impl<St: State> State for SetReaction<St> {
+        type Message = St::Message;
+        type Rev = St::Rev;
+        type ConvoId = St::ConvoId;
+        type Reaction = Set<members::reaction>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `message` field
         pub struct message(());
-        ///Marker type for the `reaction` field
-        pub struct reaction(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
     }
 }
 
@@ -2297,10 +2147,10 @@ where
 impl<S: BosStr, St> LogAddReactionBuilder<S, St>
 where
     St: log_add_reaction_state::State,
-    St::ConvoId: log_add_reaction_state::IsSet,
     St::Message: log_add_reaction_state::IsSet,
-    St::Reaction: log_add_reaction_state::IsSet,
     St::Rev: log_add_reaction_state::IsSet,
+    St::ConvoId: log_add_reaction_state::IsSet,
+    St::Reaction: log_add_reaction_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogAddReaction<S> {
@@ -2337,51 +2187,51 @@ pub mod log_create_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
-        type Message;
         type ConvoId;
+        type Message;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
-        type Message = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Rev = Set<members::rev>;
-        type Message = St::Message;
-        type ConvoId = St::ConvoId;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Rev = St::Rev;
-        type Message = Set<members::message>;
-        type ConvoId = St::ConvoId;
+        type Message = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvoId<St> {}
     impl<St: State> State for SetConvoId<St> {
-        type Rev = St::Rev;
-        type Message = St::Message;
         type ConvoId = Set<members::convo_id>;
+        type Message = St::Message;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type ConvoId = St::ConvoId;
+        type Message = Set<members::message>;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type ConvoId = St::ConvoId;
+        type Message = St::Message;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -2470,9 +2320,9 @@ where
 impl<S: BosStr, St> LogCreateMessageBuilder<S, St>
 where
     St: log_create_message_state::State,
-    St::Rev: log_create_message_state::IsSet,
-    St::Message: log_create_message_state::IsSet,
     St::ConvoId: log_create_message_state::IsSet,
+    St::Message: log_create_message_state::IsSet,
+    St::Rev: log_create_message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogCreateMessage<S> {
@@ -2507,51 +2357,51 @@ pub mod log_delete_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
         type ConvoId;
         type Message;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
         type ConvoId = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Rev = Set<members::rev>;
-        type ConvoId = St::ConvoId;
-        type Message = St::Message;
+        type Rev = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvoId<St> {}
     impl<St: State> State for SetConvoId<St> {
-        type Rev = St::Rev;
         type ConvoId = Set<members::convo_id>;
         type Message = St::Message;
+        type Rev = St::Rev;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
-        type Rev = St::Rev;
         type ConvoId = St::ConvoId;
         type Message = Set<members::message>;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type ConvoId = St::ConvoId;
+        type Message = St::Message;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -2640,9 +2490,9 @@ where
 impl<S: BosStr, St> LogDeleteMessageBuilder<S, St>
 where
     St: log_delete_message_state::State,
-    St::Rev: log_delete_message_state::IsSet,
     St::ConvoId: log_delete_message_state::IsSet,
     St::Message: log_delete_message_state::IsSet,
+    St::Rev: log_delete_message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogDeleteMessage<S> {
@@ -2678,50 +2528,50 @@ pub mod log_read_message_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ConvoId;
-        type Message;
         type Rev;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ConvoId = Unset;
-        type Message = Unset;
         type Rev = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvoId<St> {}
     impl<St: State> State for SetConvoId<St> {
         type ConvoId = Set<members::convo_id>;
+        type Rev = St::Rev;
         type Message = St::Message;
-        type Rev = St::Rev;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type ConvoId = St::ConvoId;
-        type Message = Set<members::message>;
-        type Rev = St::Rev;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev<St> {}
     impl<St: State> State for SetRev<St> {
         type ConvoId = St::ConvoId;
-        type Message = St::Message;
         type Rev = Set<members::rev>;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type ConvoId = St::ConvoId;
+        type Rev = St::Rev;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -2811,8 +2661,8 @@ impl<S: BosStr, St> LogReadMessageBuilder<S, St>
 where
     St: log_read_message_state::State,
     St::ConvoId: log_read_message_state::IsSet,
-    St::Message: log_read_message_state::IsSet,
     St::Rev: log_read_message_state::IsSet,
+    St::Message: log_read_message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogReadMessage<S> {
@@ -2847,67 +2697,67 @@ pub mod log_remove_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reaction;
-        type Rev;
         type Message;
         type ConvoId;
+        type Rev;
+        type Reaction;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reaction = Unset;
-        type Rev = Unset;
         type Message = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `reaction` field to Set
-    pub struct SetReaction<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReaction<St> {}
-    impl<St: State> State for SetReaction<St> {
-        type Reaction = Set<members::reaction>;
-        type Rev = St::Rev;
-        type Message = St::Message;
-        type ConvoId = St::ConvoId;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Reaction = St::Reaction;
-        type Rev = Set<members::rev>;
-        type Message = St::Message;
-        type ConvoId = St::ConvoId;
+        type Rev = Unset;
+        type Reaction = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessage<St> {}
     impl<St: State> State for SetMessage<St> {
-        type Reaction = St::Reaction;
-        type Rev = St::Rev;
         type Message = Set<members::message>;
         type ConvoId = St::ConvoId;
+        type Rev = St::Rev;
+        type Reaction = St::Reaction;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetConvoId<St> {}
     impl<St: State> State for SetConvoId<St> {
-        type Reaction = St::Reaction;
-        type Rev = St::Rev;
         type Message = St::Message;
         type ConvoId = Set<members::convo_id>;
+        type Rev = St::Rev;
+        type Reaction = St::Reaction;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Message = St::Message;
+        type ConvoId = St::ConvoId;
+        type Rev = Set<members::rev>;
+        type Reaction = St::Reaction;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReaction<St> {}
+    impl<St: State> State for SetReaction<St> {
+        type Message = St::Message;
+        type ConvoId = St::ConvoId;
+        type Rev = St::Rev;
+        type Reaction = Set<members::reaction>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reaction` field
-        pub struct reaction(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `message` field
         pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
     }
 }
 
@@ -3020,10 +2870,10 @@ where
 impl<S: BosStr, St> LogRemoveReactionBuilder<S, St>
 where
     St: log_remove_reaction_state::State,
-    St::Reaction: log_remove_reaction_state::IsSet,
-    St::Rev: log_remove_reaction_state::IsSet,
     St::Message: log_remove_reaction_state::IsSet,
     St::ConvoId: log_remove_reaction_state::IsSet,
+    St::Rev: log_remove_reaction_state::IsSet,
+    St::Reaction: log_remove_reaction_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LogRemoveReaction<S> {
@@ -3060,37 +2910,37 @@ pub mod message_and_reaction_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type Reaction;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type Reaction = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMessage<St> {}
-    impl<St: State> State for SetMessage<St> {
-        type Message = Set<members::message>;
-        type Reaction = St::Reaction;
+        type Message = Unset;
     }
     ///State transition - sets the `reaction` field to Set
     pub struct SetReaction<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReaction<St> {}
     impl<St: State> State for SetReaction<St> {
-        type Message = St::Message;
         type Reaction = Set<members::reaction>;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type Reaction = St::Reaction;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `reaction` field
         pub struct reaction(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -3174,8 +3024,8 @@ where
 impl<S: BosStr, St> MessageAndReactionViewBuilder<S, St>
 where
     St: message_and_reaction_view_state::State,
-    St::Message: message_and_reaction_view_state::IsSet,
     St::Reaction: message_and_reaction_view_state::IsSet,
+    St::Message: message_and_reaction_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MessageAndReactionView<S> {
@@ -3208,51 +3058,51 @@ pub mod message_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ConvoId;
         type Did;
         type MessageId;
+        type ConvoId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ConvoId = Unset;
         type Did = Unset;
         type MessageId = Unset;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetConvoId<St> {}
-    impl<St: State> State for SetConvoId<St> {
-        type ConvoId = Set<members::convo_id>;
-        type Did = St::Did;
-        type MessageId = St::MessageId;
+        type ConvoId = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type ConvoId = St::ConvoId;
         type Did = Set<members::did>;
         type MessageId = St::MessageId;
+        type ConvoId = St::ConvoId;
     }
     ///State transition - sets the `message_id` field to Set
     pub struct SetMessageId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessageId<St> {}
     impl<St: State> State for SetMessageId<St> {
-        type ConvoId = St::ConvoId;
         type Did = St::Did;
         type MessageId = Set<members::message_id>;
+        type ConvoId = St::ConvoId;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetConvoId<St> {}
+    impl<St: State> State for SetConvoId<St> {
+        type Did = St::Did;
+        type MessageId = St::MessageId;
+        type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `message_id` field
         pub struct message_id(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
     }
 }
 
@@ -3341,9 +3191,9 @@ where
 impl<S: BosStr, St> MessageRefBuilder<S, St>
 where
     St: message_ref_state::State,
-    St::ConvoId: message_ref_state::IsSet,
     St::Did: message_ref_state::IsSet,
     St::MessageId: message_ref_state::IsSet,
+    St::ConvoId: message_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MessageRef<S> {
@@ -3379,84 +3229,84 @@ pub mod message_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type Rev;
         type Sender;
         type SentAt;
         type Id;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type Rev = Unset;
         type Sender = Unset;
         type SentAt = Unset;
         type Id = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
         type Text = Set<members::text>;
+        type Sender = St::Sender;
+        type SentAt = St::SentAt;
+        type Id = St::Id;
         type Rev = St::Rev;
-        type Sender = St::Sender;
-        type SentAt = St::SentAt;
-        type Id = St::Id;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev<St> {}
-    impl<St: State> State for SetRev<St> {
-        type Text = St::Text;
-        type Rev = Set<members::rev>;
-        type Sender = St::Sender;
-        type SentAt = St::SentAt;
-        type Id = St::Id;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSender<St> {}
     impl<St: State> State for SetSender<St> {
         type Text = St::Text;
-        type Rev = St::Rev;
         type Sender = Set<members::sender>;
         type SentAt = St::SentAt;
         type Id = St::Id;
+        type Rev = St::Rev;
     }
     ///State transition - sets the `sent_at` field to Set
     pub struct SetSentAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSentAt<St> {}
     impl<St: State> State for SetSentAt<St> {
         type Text = St::Text;
-        type Rev = St::Rev;
         type Sender = St::Sender;
         type SentAt = Set<members::sent_at>;
         type Id = St::Id;
+        type Rev = St::Rev;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
         type Text = St::Text;
-        type Rev = St::Rev;
         type Sender = St::Sender;
         type SentAt = St::SentAt;
         type Id = Set<members::id>;
+        type Rev = St::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
+        type Text = St::Text;
+        type Sender = St::Sender;
+        type SentAt = St::SentAt;
+        type Id = St::Id;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `sender` field
         pub struct sender(());
         ///Marker type for the `sent_at` field
         pub struct sent_at(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -3638,10 +3488,10 @@ impl<S: BosStr, St> MessageViewBuilder<S, St>
 where
     St: message_view_state::State,
     St::Text: message_view_state::IsSet,
-    St::Rev: message_view_state::IsSet,
     St::Sender: message_view_state::IsSet,
     St::SentAt: message_view_state::IsSet,
     St::Id: message_view_state::IsSet,
+    St::Rev: message_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MessageView<S> {
@@ -3786,51 +3636,51 @@ pub mod reaction_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Value;
         type Sender;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Value = Unset;
         type Sender = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Value = St::Value;
-        type Sender = St::Sender;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type CreatedAt = St::CreatedAt;
         type Value = Set<members::value>;
         type Sender = St::Sender;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSender<St> {}
     impl<St: State> State for SetSender<St> {
-        type CreatedAt = St::CreatedAt;
         type Value = St::Value;
         type Sender = Set<members::sender>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Value = St::Value;
+        type Sender = St::Sender;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `sender` field
         pub struct sender(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -3919,9 +3769,9 @@ where
 impl<S: BosStr, St> ReactionViewBuilder<S, St>
 where
     St: reaction_view_state::State,
-    St::CreatedAt: reaction_view_state::IsSet,
     St::Value: reaction_view_state::IsSet,
     St::Sender: reaction_view_state::IsSet,
+    St::CreatedAt: reaction_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ReactionView<S> {

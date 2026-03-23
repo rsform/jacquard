@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::app_bsky::actor::ProfileViewBasic;
 /// An invite granting a DID access with profile information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InviteView<S: BosStr = DefaultStr> {
     ///When this invitation was created
     pub created_at: Datetime,
@@ -62,13 +56,7 @@ pub struct InviteView<S: BosStr = DefaultStr> {
 /// A request to join the waitlist with profile information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RequestView<S: BosStr = DefaultStr> {
     ///When the user joined the waitlist
     pub created_at: Datetime,
@@ -121,51 +109,51 @@ pub mod invite_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slice;
-        type Did;
         type CreatedAt;
+        type Did;
+        type Slice;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slice = Unset;
-        type Did = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlice<St> {}
-    impl<St: State> State for SetSlice<St> {
-        type Slice = Set<members::slice>;
-        type Did = St::Did;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Slice = St::Slice;
-        type Did = Set<members::did>;
-        type CreatedAt = St::CreatedAt;
+        type Did = Unset;
+        type Slice = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Slice = St::Slice;
-        type Did = St::Did;
         type CreatedAt = Set<members::created_at>;
+        type Did = St::Did;
+        type Slice = St::Slice;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type CreatedAt = St::CreatedAt;
+        type Did = Set<members::did>;
+        type Slice = St::Slice;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlice<St> {}
+    impl<St: State> State for SetSlice<St> {
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
+        type Slice = Set<members::slice>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice` field
-        pub struct slice(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
     }
 }
 
@@ -300,9 +288,9 @@ impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
 impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
     St: invite_view_state::State,
-    St::Slice: invite_view_state::IsSet,
-    St::Did: invite_view_state::IsSet,
     St::CreatedAt: invite_view_state::IsSet,
+    St::Did: invite_view_state::IsSet,
+    St::Slice: invite_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> InviteView<S> {
@@ -497,37 +485,37 @@ pub mod request_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Slice;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Slice = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Slice = St::Slice;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSlice<St> {}
     impl<St: State> State for SetSlice<St> {
-        type CreatedAt = St::CreatedAt;
         type Slice = Set<members::slice>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Slice = St::Slice;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `slice` field
         pub struct slice(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -610,8 +598,8 @@ where
 impl<S: BosStr, St> RequestViewBuilder<S, St>
 where
     St: request_view_state::State,
-    St::CreatedAt: request_view_state::IsSet,
     St::Slice: request_view_state::IsSet,
+    St::CreatedAt: request_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RequestView<S> {

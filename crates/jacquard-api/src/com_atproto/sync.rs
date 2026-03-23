@@ -25,7 +25,7 @@ pub mod request_crawl;
 #[cfg(feature = "streaming")]
 pub mod subscribe_repos;
 
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HostStatus<S: BosStr = DefaultStr> {

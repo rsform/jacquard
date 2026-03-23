@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "za.co.ciaran.cumulus.resolution",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Resolution<S: BosStr = DefaultStr> {
     pub answer: S,
@@ -52,13 +49,7 @@ pub struct Resolution<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ResolutionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -146,51 +137,51 @@ pub mod resolution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Market;
         type Answer;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Market = Unset;
         type Answer = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `market` field to Set
-    pub struct SetMarket<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMarket<St> {}
-    impl<St: State> State for SetMarket<St> {
-        type Market = Set<members::market>;
-        type Answer = St::Answer;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `answer` field to Set
-    pub struct SetAnswer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAnswer<St> {}
-    impl<St: State> State for SetAnswer<St> {
-        type Market = St::Market;
-        type Answer = Set<members::answer>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Market = St::Market;
         type Answer = St::Answer;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `market` field to Set
+    pub struct SetMarket<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMarket<St> {}
+    impl<St: State> State for SetMarket<St> {
+        type CreatedAt = St::CreatedAt;
+        type Market = Set<members::market>;
+        type Answer = St::Answer;
+    }
+    ///State transition - sets the `answer` field to Set
+    pub struct SetAnswer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAnswer<St> {}
+    impl<St: State> State for SetAnswer<St> {
+        type CreatedAt = St::CreatedAt;
+        type Market = St::Market;
+        type Answer = Set<members::answer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `market` field
         pub struct market(());
         ///Marker type for the `answer` field
         pub struct answer(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -279,9 +270,9 @@ where
 impl<S: BosStr, St> ResolutionBuilder<S, St>
 where
     St: resolution_state::State,
+    St::CreatedAt: resolution_state::IsSet,
     St::Market: resolution_state::IsSet,
     St::Answer: resolution_state::IsSet,
-    St::CreatedAt: resolution_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Resolution<S> {

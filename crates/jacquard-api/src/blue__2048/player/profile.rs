@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::blue__2048::SyncStatus;
     rename_all = "camelCase",
     rename = "blue.2048.player.profile",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -54,13 +51,7 @@ pub struct Profile<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -131,50 +122,50 @@ pub mod profile_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type SyncStatus;
-        type SoloPlay;
         type CreatedAt;
+        type SoloPlay;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type SyncStatus = Unset;
-        type SoloPlay = Unset;
         type CreatedAt = Unset;
+        type SoloPlay = Unset;
     }
     ///State transition - sets the `sync_status` field to Set
     pub struct SetSyncStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSyncStatus<St> {}
     impl<St: State> State for SetSyncStatus<St> {
         type SyncStatus = Set<members::sync_status>;
+        type CreatedAt = St::CreatedAt;
         type SoloPlay = St::SoloPlay;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `solo_play` field to Set
-    pub struct SetSoloPlay<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSoloPlay<St> {}
-    impl<St: State> State for SetSoloPlay<St> {
-        type SyncStatus = St::SyncStatus;
-        type SoloPlay = Set<members::solo_play>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type SyncStatus = St::SyncStatus;
-        type SoloPlay = St::SoloPlay;
         type CreatedAt = Set<members::created_at>;
+        type SoloPlay = St::SoloPlay;
+    }
+    ///State transition - sets the `solo_play` field to Set
+    pub struct SetSoloPlay<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSoloPlay<St> {}
+    impl<St: State> State for SetSoloPlay<St> {
+        type SyncStatus = St::SyncStatus;
+        type CreatedAt = St::CreatedAt;
+        type SoloPlay = Set<members::solo_play>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `sync_status` field
         pub struct sync_status(());
-        ///Marker type for the `solo_play` field
-        pub struct solo_play(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `solo_play` field
+        pub struct solo_play(());
     }
 }
 
@@ -264,8 +255,8 @@ impl<S: BosStr, St> ProfileBuilder<S, St>
 where
     St: profile_state::State,
     St::SyncStatus: profile_state::IsSet,
-    St::SoloPlay: profile_state::IsSet,
     St::CreatedAt: profile_state::IsSet,
+    St::SoloPlay: profile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Profile<S> {

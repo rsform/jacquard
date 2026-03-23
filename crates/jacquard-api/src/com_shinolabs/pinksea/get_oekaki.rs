@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -20,13 +20,7 @@ use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 use crate::com_shinolabs::pinksea::app_view_defs::OekakiTombstone;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOekaki<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     pub rkey: S,
@@ -34,13 +28,7 @@ pub struct GetOekaki<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOekakiOutput<S: BosStr = DefaultStr> {
     pub children: Vec<HydratedOekaki<S>>,
     pub parent: GetOekakiOutputParent<S>,
@@ -51,13 +39,7 @@ pub struct GetOekakiOutput<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum GetOekakiOutputParent<S: BosStr = DefaultStr> {
     #[serde(rename = "com.shinolabs.pinksea.appViewDefs#hydratedOekaki")]
     AppViewDefsHydratedOekaki(Box<HydratedOekaki<S>>),

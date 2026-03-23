@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::place_stream::chat::profile;
 /// Customizations for the color of a user's name in chat
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Color<S: BosStr = DefaultStr> {
     pub blue: i64,
     pub green: i64,
@@ -53,10 +47,7 @@ pub struct Color<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "place.stream.chat.profile",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,13 +59,7 @@ pub struct Profile<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -216,50 +201,50 @@ pub mod color_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Red;
-        type Green;
         type Blue;
+        type Green;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Red = Unset;
-        type Green = Unset;
         type Blue = Unset;
+        type Green = Unset;
     }
     ///State transition - sets the `red` field to Set
     pub struct SetRed<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRed<St> {}
     impl<St: State> State for SetRed<St> {
         type Red = Set<members::red>;
+        type Blue = St::Blue;
         type Green = St::Green;
-        type Blue = St::Blue;
-    }
-    ///State transition - sets the `green` field to Set
-    pub struct SetGreen<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGreen<St> {}
-    impl<St: State> State for SetGreen<St> {
-        type Red = St::Red;
-        type Green = Set<members::green>;
-        type Blue = St::Blue;
     }
     ///State transition - sets the `blue` field to Set
     pub struct SetBlue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlue<St> {}
     impl<St: State> State for SetBlue<St> {
         type Red = St::Red;
-        type Green = St::Green;
         type Blue = Set<members::blue>;
+        type Green = St::Green;
+    }
+    ///State transition - sets the `green` field to Set
+    pub struct SetGreen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGreen<St> {}
+    impl<St: State> State for SetGreen<St> {
+        type Red = St::Red;
+        type Blue = St::Blue;
+        type Green = Set<members::green>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `red` field
         pub struct red(());
-        ///Marker type for the `green` field
-        pub struct green(());
         ///Marker type for the `blue` field
         pub struct blue(());
+        ///Marker type for the `green` field
+        pub struct green(());
     }
 }
 
@@ -349,8 +334,8 @@ impl<S: BosStr, St> ColorBuilder<S, St>
 where
     St: color_state::State,
     St::Red: color_state::IsSet,
-    St::Green: color_state::IsSet,
     St::Blue: color_state::IsSet,
+    St::Green: color_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Color<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveOptions<S: BosStr = DefaultStr> {
     pub keys: Vec<Nsid<S>>,
     pub scope: RemoveOptionsScope<S>,
@@ -112,13 +106,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveOptionsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -162,37 +150,37 @@ pub mod remove_options_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scope;
         type Keys;
+        type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scope = Unset;
         type Keys = Unset;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScope<St> {}
-    impl<St: State> State for SetScope<St> {
-        type Scope = Set<members::scope>;
-        type Keys = St::Keys;
+        type Scope = Unset;
     }
     ///State transition - sets the `keys` field to Set
     pub struct SetKeys<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKeys<St> {}
     impl<St: State> State for SetKeys<St> {
-        type Scope = St::Scope;
         type Keys = Set<members::keys>;
+        type Scope = St::Scope;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScope<St> {}
+    impl<St: State> State for SetScope<St> {
+        type Keys = St::Keys;
+        type Scope = Set<members::scope>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scope` field
-        pub struct scope(());
         ///Marker type for the `keys` field
         pub struct keys(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
     }
 }
 
@@ -262,8 +250,8 @@ where
 impl<S: BosStr, St> RemoveOptionsBuilder<S, St>
 where
     St: remove_options_state::State,
-    St::Scope: remove_options_state::IsSet,
     St::Keys: remove_options_state::IsSet,
+    St::Scope: remove_options_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RemoveOptions<S> {

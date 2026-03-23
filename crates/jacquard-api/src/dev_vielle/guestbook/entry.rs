@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,10 +33,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "dev.vielle.guestbook.entry",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Entry<S: BosStr = DefaultStr> {
     pub book: AtUri<S>,
@@ -48,13 +45,7 @@ pub struct Entry<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -120,37 +111,37 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Contents;
         type Book;
+        type Contents;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Contents = Unset;
         type Book = Unset;
-    }
-    ///State transition - sets the `contents` field to Set
-    pub struct SetContents<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContents<St> {}
-    impl<St: State> State for SetContents<St> {
-        type Contents = Set<members::contents>;
-        type Book = St::Book;
+        type Contents = Unset;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBook<St> {}
     impl<St: State> State for SetBook<St> {
-        type Contents = St::Contents;
         type Book = Set<members::book>;
+        type Contents = St::Contents;
+    }
+    ///State transition - sets the `contents` field to Set
+    pub struct SetContents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContents<St> {}
+    impl<St: State> State for SetContents<St> {
+        type Book = St::Book;
+        type Contents = Set<members::contents>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contents` field
-        pub struct contents(());
         ///Marker type for the `book` field
         pub struct book(());
+        ///Marker type for the `contents` field
+        pub struct contents(());
     }
 }
 
@@ -220,8 +211,8 @@ where
 impl<S: BosStr, St> EntryBuilder<S, St>
 where
     St: entry_state::State,
-    St::Contents: entry_state::IsSet,
     St::Book: entry_state::IsSet,
+    St::Contents: entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Entry<S> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,10 +35,7 @@ use crate::scot_comhairle::testing_polis_statement_v1;
     rename_all = "camelCase",
     rename = "scot.comhairle.testingPolisStatementV1",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct TestingPolisStatementV1<S: BosStr = DefaultStr> {
     ///Timestamp when the statement was created
@@ -54,13 +51,7 @@ pub struct TestingPolisStatementV1<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct TestingPolisStatementV1GetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -71,13 +62,7 @@ pub struct TestingPolisStatementV1GetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a poll record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PollRef<S: BosStr = DefaultStr> {
     ///Content identifier of the poll record
     pub cid: Cid<S>,
@@ -172,51 +157,51 @@ pub mod testing_polis_statement_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Text;
         type Poll;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Text = Unset;
         type Poll = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Text = St::Text;
-        type Poll = St::Poll;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
-        type CreatedAt = St::CreatedAt;
         type Text = Set<members::text>;
         type Poll = St::Poll;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPoll<St> {}
     impl<St: State> State for SetPoll<St> {
-        type CreatedAt = St::CreatedAt;
         type Text = St::Text;
         type Poll = Set<members::poll>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Text = St::Text;
+        type Poll = St::Poll;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `poll` field
         pub struct poll(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -326,9 +311,9 @@ where
 impl<S: BosStr, St> TestingPolisStatementV1Builder<S, St>
 where
     St: testing_polis_statement_v1_state::State,
-    St::CreatedAt: testing_polis_statement_v1_state::IsSet,
     St::Text: testing_polis_statement_v1_state::IsSet,
     St::Poll: testing_polis_statement_v1_state::IsSet,
+    St::CreatedAt: testing_polis_statement_v1_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TestingPolisStatementV1<S> {

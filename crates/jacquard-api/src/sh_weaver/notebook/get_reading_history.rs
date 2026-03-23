@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,13 +29,7 @@ use crate::sh_weaver::notebook::ReadingProgress;
 use crate::sh_weaver::notebook::get_reading_history;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetReadingHistory<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -51,13 +45,7 @@ pub struct GetReadingHistory<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetReadingHistoryOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -68,13 +56,7 @@ pub struct GetReadingHistoryOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReadingHistoryItem<S: BosStr = DefaultStr> {
     ///The entry the user was last reading.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -239,37 +221,37 @@ pub mod reading_history_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Progress;
         type Notebook;
+        type Progress;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Progress = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `progress` field to Set
-    pub struct SetProgress<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetProgress<St> {}
-    impl<St: State> State for SetProgress<St> {
-        type Progress = Set<members::progress>;
-        type Notebook = St::Notebook;
+        type Progress = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNotebook<St> {}
     impl<St: State> State for SetNotebook<St> {
-        type Progress = St::Progress;
         type Notebook = Set<members::notebook>;
+        type Progress = St::Progress;
+    }
+    ///State transition - sets the `progress` field to Set
+    pub struct SetProgress<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetProgress<St> {}
+    impl<St: State> State for SetProgress<St> {
+        type Notebook = St::Notebook;
+        type Progress = Set<members::progress>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `progress` field
-        pub struct progress(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `progress` field
+        pub struct progress(());
     }
 }
 
@@ -352,8 +334,8 @@ where
 impl<S: BosStr, St> ReadingHistoryItemBuilder<S, St>
 where
     St: reading_history_item_state::State,
-    St::Progress: reading_history_item_state::IsSet,
     St::Notebook: reading_history_item_state::IsSet,
+    St::Progress: reading_history_item_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ReadingHistoryItem<S> {

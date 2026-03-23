@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "org.simocracy.event",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Event<S: BosStr = DefaultStr> {
     ///DID of the user who triggered the event
@@ -69,13 +66,7 @@ pub struct Event<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct EventGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -199,8 +190,8 @@ pub mod event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type SimNames;
-        type Type;
         type CreatedAt;
+        type Type;
         type ActorDid;
     }
     /// Empty state - all required fields are unset
@@ -208,8 +199,8 @@ pub mod event_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type SimNames = Unset;
-        type Type = Unset;
         type CreatedAt = Unset;
+        type Type = Unset;
         type ActorDid = Unset;
     }
     ///State transition - sets the `sim_names` field to Set
@@ -217,17 +208,8 @@ pub mod event_state {
     impl<St: State> sealed::Sealed for SetSimNames<St> {}
     impl<St: State> State for SetSimNames<St> {
         type SimNames = Set<members::sim_names>;
+        type CreatedAt = St::CreatedAt;
         type Type = St::Type;
-        type CreatedAt = St::CreatedAt;
-        type ActorDid = St::ActorDid;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type SimNames = St::SimNames;
-        type Type = Set<members::r#type>;
-        type CreatedAt = St::CreatedAt;
         type ActorDid = St::ActorDid;
     }
     ///State transition - sets the `created_at` field to Set
@@ -235,8 +217,17 @@ pub mod event_state {
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type SimNames = St::SimNames;
-        type Type = St::Type;
         type CreatedAt = Set<members::created_at>;
+        type Type = St::Type;
+        type ActorDid = St::ActorDid;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type SimNames = St::SimNames;
+        type CreatedAt = St::CreatedAt;
+        type Type = Set<members::r#type>;
         type ActorDid = St::ActorDid;
     }
     ///State transition - sets the `actor_did` field to Set
@@ -244,8 +235,8 @@ pub mod event_state {
     impl<St: State> sealed::Sealed for SetActorDid<St> {}
     impl<St: State> State for SetActorDid<St> {
         type SimNames = St::SimNames;
-        type Type = St::Type;
         type CreatedAt = St::CreatedAt;
+        type Type = St::Type;
         type ActorDid = Set<members::actor_did>;
     }
     /// Marker types for field names
@@ -253,10 +244,10 @@ pub mod event_state {
     pub mod members {
         ///Marker type for the `sim_names` field
         pub struct sim_names(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `actor_did` field
         pub struct actor_did(());
     }
@@ -442,8 +433,8 @@ impl<S: BosStr, St> EventBuilder<S, St>
 where
     St: event_state::State,
     St::SimNames: event_state::IsSet,
-    St::Type: event_state::IsSet,
     St::CreatedAt: event_state::IsSet,
+    St::Type: event_state::IsSet,
     St::ActorDid: event_state::IsSet,
 {
     /// Build the final struct.

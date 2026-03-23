@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,10 +37,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename_all = "camelCase",
     rename = "org.hypercerts.context.measurement",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Measurement<S: BosStr = DefaultStr> {
     ///Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.
@@ -88,13 +85,7 @@ pub struct Measurement<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct MeasurementGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -265,65 +256,65 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Metric;
         type Unit;
         type Value;
-        type Metric;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Metric = Unset;
         type Unit = Unset;
         type Value = Unset;
-        type Metric = Unset;
         type CreatedAt = Unset;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMetric<St> {}
+    impl<St: State> State for SetMetric<St> {
+        type Metric = Set<members::metric>;
+        type Unit = St::Unit;
+        type Value = St::Value;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `unit` field to Set
     pub struct SetUnit<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUnit<St> {}
     impl<St: State> State for SetUnit<St> {
+        type Metric = St::Metric;
         type Unit = Set<members::unit>;
         type Value = St::Value;
-        type Metric = St::Metric;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
+        type Metric = St::Metric;
         type Unit = St::Unit;
         type Value = Set<members::value>;
-        type Metric = St::Metric;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMetric<St> {}
-    impl<St: State> State for SetMetric<St> {
-        type Unit = St::Unit;
-        type Value = St::Value;
-        type Metric = Set<members::metric>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type Metric = St::Metric;
         type Unit = St::Unit;
         type Value = St::Value;
-        type Metric = St::Metric;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `metric` field
+        pub struct metric(());
         ///Marker type for the `unit` field
         pub struct unit(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -593,9 +584,9 @@ where
 impl<S: BosStr, St> MeasurementBuilder<S, St>
 where
     St: measurement_state::State,
+    St::Metric: measurement_state::IsSet,
     St::Unit: measurement_state::IsSet,
     St::Value: measurement_state::IsSet,
-    St::Metric: measurement_state::IsSet,
     St::CreatedAt: measurement_state::IsSet,
 {
     /// Build the final struct.

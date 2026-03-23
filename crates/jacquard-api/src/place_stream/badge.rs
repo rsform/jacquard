@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,13 +30,7 @@ use serde::{Serialize, Deserialize};
 /// View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BadgeView<S: BosStr = DefaultStr> {
     pub badge_type: BadgeViewBadgeType<S>,
     ///DID of the badge issuer.
@@ -184,50 +178,50 @@ pub mod badge_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type BadgeType;
-        type Recipient;
         type Issuer;
+        type Recipient;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type BadgeType = Unset;
-        type Recipient = Unset;
         type Issuer = Unset;
+        type Recipient = Unset;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBadgeType<St> {}
     impl<St: State> State for SetBadgeType<St> {
         type BadgeType = Set<members::badge_type>;
+        type Issuer = St::Issuer;
         type Recipient = St::Recipient;
-        type Issuer = St::Issuer;
-    }
-    ///State transition - sets the `recipient` field to Set
-    pub struct SetRecipient<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecipient<St> {}
-    impl<St: State> State for SetRecipient<St> {
-        type BadgeType = St::BadgeType;
-        type Recipient = Set<members::recipient>;
-        type Issuer = St::Issuer;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIssuer<St> {}
     impl<St: State> State for SetIssuer<St> {
         type BadgeType = St::BadgeType;
-        type Recipient = St::Recipient;
         type Issuer = Set<members::issuer>;
+        type Recipient = St::Recipient;
+    }
+    ///State transition - sets the `recipient` field to Set
+    pub struct SetRecipient<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecipient<St> {}
+    impl<St: State> State for SetRecipient<St> {
+        type BadgeType = St::BadgeType;
+        type Issuer = St::Issuer;
+        type Recipient = Set<members::recipient>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `badge_type` field
         pub struct badge_type(());
-        ///Marker type for the `recipient` field
-        pub struct recipient(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
+        ///Marker type for the `recipient` field
+        pub struct recipient(());
     }
 }
 
@@ -330,8 +324,8 @@ impl<S: BosStr, St> BadgeViewBuilder<S, St>
 where
     St: badge_view_state::State,
     St::BadgeType: badge_view_state::IsSet,
-    St::Recipient: badge_view_state::IsSet,
     St::Issuer: badge_view_state::IsSet,
+    St::Recipient: badge_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BadgeView<S> {

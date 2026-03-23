@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::app_fitsky::workout_plan;
     rename_all = "camelCase",
     rename = "app.fitsky.workoutPlan",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct WorkoutPlan<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
@@ -142,13 +139,7 @@ where
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct WorkoutPlanGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -158,13 +149,7 @@ pub struct WorkoutPlanGetRecordOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlanExercise<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -352,67 +337,67 @@ pub mod workout_plan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
+        type Type;
         type Exercises;
         type CreatedAt;
-        type Type;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
+        type Type = Unset;
         type Exercises = Unset;
         type CreatedAt = Unset;
-        type Type = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `exercises` field to Set
-    pub struct SetExercises<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetExercises<St> {}
-    impl<St: State> State for SetExercises<St> {
-        type Exercises = Set<members::exercises>;
-        type CreatedAt = St::CreatedAt;
-        type Type = St::Type;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Exercises = St::Exercises;
-        type CreatedAt = Set<members::created_at>;
-        type Type = St::Type;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Exercises = St::Exercises;
-        type CreatedAt = St::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
+        type Name = Set<members::name>;
+        type Type = St::Type;
         type Exercises = St::Exercises;
         type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Name = St::Name;
+        type Type = Set<members::r#type>;
+        type Exercises = St::Exercises;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `exercises` field to Set
+    pub struct SetExercises<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExercises<St> {}
+    impl<St: State> State for SetExercises<St> {
+        type Name = St::Name;
         type Type = St::Type;
-        type Name = Set<members::name>;
+        type Exercises = Set<members::exercises>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type Type = St::Type;
+        type Exercises = St::Exercises;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `exercises` field
         pub struct exercises(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -539,10 +524,10 @@ where
 impl<S: BosStr, St> WorkoutPlanBuilder<S, St>
 where
     St: workout_plan_state::State,
+    St::Name: workout_plan_state::IsSet,
+    St::Type: workout_plan_state::IsSet,
     St::Exercises: workout_plan_state::IsSet,
     St::CreatedAt: workout_plan_state::IsSet,
-    St::Type: workout_plan_state::IsSet,
-    St::Name: workout_plan_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WorkoutPlan<S> {
@@ -704,50 +689,50 @@ pub mod plan_exercise_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type TargetSets;
         type TargetReps;
+        type TargetSets;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type TargetSets = Unset;
         type TargetReps = Unset;
+        type TargetSets = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type TargetReps = St::TargetReps;
         type TargetSets = St::TargetSets;
-        type TargetReps = St::TargetReps;
-    }
-    ///State transition - sets the `target_sets` field to Set
-    pub struct SetTargetSets<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTargetSets<St> {}
-    impl<St: State> State for SetTargetSets<St> {
-        type Name = St::Name;
-        type TargetSets = Set<members::target_sets>;
-        type TargetReps = St::TargetReps;
     }
     ///State transition - sets the `target_reps` field to Set
     pub struct SetTargetReps<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTargetReps<St> {}
     impl<St: State> State for SetTargetReps<St> {
         type Name = St::Name;
-        type TargetSets = St::TargetSets;
         type TargetReps = Set<members::target_reps>;
+        type TargetSets = St::TargetSets;
+    }
+    ///State transition - sets the `target_sets` field to Set
+    pub struct SetTargetSets<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTargetSets<St> {}
+    impl<St: State> State for SetTargetSets<St> {
+        type Name = St::Name;
+        type TargetReps = St::TargetReps;
+        type TargetSets = Set<members::target_sets>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `target_sets` field
-        pub struct target_sets(());
         ///Marker type for the `target_reps` field
         pub struct target_reps(());
+        ///Marker type for the `target_sets` field
+        pub struct target_sets(());
     }
 }
 
@@ -850,8 +835,8 @@ impl<S: BosStr, St> PlanExerciseBuilder<S, St>
 where
     St: plan_exercise_state::State,
     St::Name: plan_exercise_state::IsSet,
-    St::TargetSets: plan_exercise_state::IsSet,
     St::TargetReps: plan_exercise_state::IsSet,
+    St::TargetSets: plan_exercise_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PlanExercise<S> {

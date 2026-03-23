@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::sync::list_repos;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRepos<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -45,13 +39,7 @@ pub struct ListRepos<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListReposOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -62,13 +50,7 @@ pub struct ListReposOutput<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Repo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
@@ -315,50 +297,50 @@ pub mod repo_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rev;
-        type Head;
         type Did;
+        type Head;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rev = Unset;
-        type Head = Unset;
         type Did = Unset;
+        type Head = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev<St> {}
     impl<St: State> State for SetRev<St> {
         type Rev = Set<members::rev>;
+        type Did = St::Did;
         type Head = St::Head;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `head` field to Set
-    pub struct SetHead<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHead<St> {}
-    impl<St: State> State for SetHead<St> {
-        type Rev = St::Rev;
-        type Head = Set<members::head>;
-        type Did = St::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Rev = St::Rev;
-        type Head = St::Head;
         type Did = Set<members::did>;
+        type Head = St::Head;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHead<St> {}
+    impl<St: State> State for SetHead<St> {
+        type Rev = St::Rev;
+        type Did = St::Did;
+        type Head = Set<members::head>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rev` field
         pub struct rev(());
-        ///Marker type for the `head` field
-        pub struct head(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `head` field
+        pub struct head(());
     }
 }
 
@@ -480,8 +462,8 @@ impl<S: BosStr, St> RepoBuilder<S, St>
 where
     St: repo_state::State,
     St::Rev: repo_state::IsSet,
-    St::Head: repo_state::IsSet,
     St::Did: repo_state::IsSet,
+    St::Head: repo_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Repo<S> {

@@ -18,7 +18,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,13 +34,7 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Set<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -51,13 +45,7 @@ pub struct Set<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SetView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -295,8 +283,8 @@ pub mod set_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type SetSize;
+        type Name;
         type CreatedAt;
         type UpdatedAt;
     }
@@ -304,26 +292,26 @@ pub mod set_view_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type SetSize = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type SetSize = St::SetSize;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `set_size` field to Set
     pub struct SetSetSize<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSetSize<St> {}
     impl<St: State> State for SetSetSize<St> {
-        type Name = St::Name;
         type SetSize = Set<members::set_size>;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type SetSize = St::SetSize;
+        type Name = Set<members::name>;
         type CreatedAt = St::CreatedAt;
         type UpdatedAt = St::UpdatedAt;
     }
@@ -331,8 +319,8 @@ pub mod set_view_state {
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
         type SetSize = St::SetSize;
+        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
         type UpdatedAt = St::UpdatedAt;
     }
@@ -340,18 +328,18 @@ pub mod set_view_state {
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
-        type Name = St::Name;
         type SetSize = St::SetSize;
+        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `set_size` field
         pub struct set_size(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `updated_at` field
@@ -476,8 +464,8 @@ where
 impl<S: BosStr, St> SetViewBuilder<S, St>
 where
     St: set_view_state::State,
-    St::Name: set_view_state::IsSet,
     St::SetSize: set_view_state::IsSet,
+    St::Name: set_view_state::IsSet,
     St::CreatedAt: set_view_state::IsSet,
     St::UpdatedAt: set_view_state::IsSet,
 {

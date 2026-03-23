@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::social_psky::richtext::facet::Facet;
     rename_all = "camelCase",
     rename = "social.psky.chat.message",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Message<S: BosStr = DefaultStr> {
     ///Text content.
@@ -57,13 +54,7 @@ pub struct Message<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct MessageGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -153,37 +144,37 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type Content;
+        type Room;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoom<St> {}
-    impl<St: State> State for SetRoom<St> {
-        type Room = Set<members::room>;
-        type Content = St::Content;
+        type Room = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type Room = St::Room;
         type Content = Set<members::content>;
+        type Room = St::Room;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
+        type Content = St::Content;
+        type Room = Set<members::room>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `room` field
+        pub struct room(());
     }
 }
 
@@ -279,8 +270,8 @@ where
 impl<S: BosStr, St> MessageBuilder<S, St>
 where
     St: message_state::State,
-    St::Room: message_state::IsSet,
     St::Content: message_state::IsSet,
+    St::Room: message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Message<S> {

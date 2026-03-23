@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +27,7 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::cancel_scheduled_actions;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancellationResults<S: BosStr = DefaultStr> {
     ///DIDs for which cancellation failed with error details
     pub failed: Vec<cancel_scheduled_actions::FailedCancellation<S>>,
@@ -45,13 +39,7 @@ pub struct CancellationResults<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FailedCancellation<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub error: S,
@@ -63,13 +51,7 @@ pub struct FailedCancellation<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancelScheduledActions<S: BosStr = DefaultStr> {
     ///Optional comment describing the reason for cancellation
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -82,13 +64,7 @@ pub struct CancelScheduledActions<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancelScheduledActionsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -164,37 +140,37 @@ pub mod cancellation_results_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Failed;
         type Succeeded;
+        type Failed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Failed = Unset;
         type Succeeded = Unset;
-    }
-    ///State transition - sets the `failed` field to Set
-    pub struct SetFailed<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFailed<St> {}
-    impl<St: State> State for SetFailed<St> {
-        type Failed = Set<members::failed>;
-        type Succeeded = St::Succeeded;
+        type Failed = Unset;
     }
     ///State transition - sets the `succeeded` field to Set
     pub struct SetSucceeded<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSucceeded<St> {}
     impl<St: State> State for SetSucceeded<St> {
-        type Failed = St::Failed;
         type Succeeded = Set<members::succeeded>;
+        type Failed = St::Failed;
+    }
+    ///State transition - sets the `failed` field to Set
+    pub struct SetFailed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFailed<St> {}
+    impl<St: State> State for SetFailed<St> {
+        type Succeeded = St::Succeeded;
+        type Failed = Set<members::failed>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `failed` field
-        pub struct failed(());
         ///Marker type for the `succeeded` field
         pub struct succeeded(());
+        ///Marker type for the `failed` field
+        pub struct failed(());
     }
 }
 
@@ -267,8 +243,8 @@ where
 impl<S: BosStr, St> CancellationResultsBuilder<S, St>
 where
     St: cancellation_results_state::State,
-    St::Failed: cancellation_results_state::IsSet,
     St::Succeeded: cancellation_results_state::IsSet,
+    St::Failed: cancellation_results_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CancellationResults<S> {
@@ -441,37 +417,37 @@ pub mod failed_cancellation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Error;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Error = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Error = St::Error;
+        type Did = Unset;
     }
     ///State transition - sets the `error` field to Set
     pub struct SetError<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetError<St> {}
     impl<St: State> State for SetError<St> {
-        type Did = St::Did;
         type Error = Set<members::error>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Error = St::Error;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `error` field
         pub struct error(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -554,8 +530,8 @@ impl<S: BosStr, St: failed_cancellation_state::State> FailedCancellationBuilder<
 impl<S: BosStr, St> FailedCancellationBuilder<S, St>
 where
     St: failed_cancellation_state::State,
-    St::Did: failed_cancellation_state::IsSet,
     St::Error: failed_cancellation_state::IsSet,
+    St::Did: failed_cancellation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> FailedCancellation<S> {

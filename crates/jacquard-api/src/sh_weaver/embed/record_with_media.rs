@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,13 +33,7 @@ use crate::sh_weaver::embed::records;
 use crate::sh_weaver::embed::video;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordWithMedia<S: BosStr = DefaultStr> {
     pub media: RecordWithMediaMedia<S>,
     pub records: Records<S>,
@@ -50,13 +44,7 @@ pub struct RecordWithMedia<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum RecordWithMediaMedia<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.embed.images")]
     Images(Box<Images<S>>),
@@ -68,13 +56,7 @@ pub enum RecordWithMediaMedia<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     pub media: ViewMedia<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -86,13 +68,7 @@ pub struct View<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ViewMedia<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.embed.images#view")]
     ImagesView(Box<images::View<S>>),
@@ -142,37 +118,37 @@ pub mod record_with_media_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Media;
         type Records;
+        type Media;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Media = Unset;
         type Records = Unset;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMedia<St> {}
-    impl<St: State> State for SetMedia<St> {
-        type Media = Set<members::media>;
-        type Records = St::Records;
+        type Media = Unset;
     }
     ///State transition - sets the `records` field to Set
     pub struct SetRecords<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecords<St> {}
     impl<St: State> State for SetRecords<St> {
-        type Media = St::Media;
         type Records = Set<members::records>;
+        type Media = St::Media;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMedia<St> {}
+    impl<St: State> State for SetMedia<St> {
+        type Records = St::Records;
+        type Media = Set<members::media>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media` field
-        pub struct media(());
         ///Marker type for the `records` field
         pub struct records(());
+        ///Marker type for the `media` field
+        pub struct media(());
     }
 }
 
@@ -242,8 +218,8 @@ where
 impl<S: BosStr, St> RecordWithMediaBuilder<S, St>
 where
     St: record_with_media_state::State,
-    St::Media: record_with_media_state::IsSet,
     St::Records: record_with_media_state::IsSet,
+    St::Media: record_with_media_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RecordWithMedia<S> {

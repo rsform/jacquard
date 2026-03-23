@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -28,13 +28,7 @@ use serde::{Serialize, Deserialize};
 use crate::club_stellz::evm::address_control;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AddressControl<S: BosStr = DefaultStr> {
     ///Ethereum address as bytes (20 bytes)
     #[serde(with = "jacquard_common::serde_bytes_helper")]
@@ -52,13 +46,7 @@ pub struct AddressControl<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SiweMessage<S: BosStr = DefaultStr> {
     ///Ethereum address in 0x-prefixed, checksummed hex format
     pub address: S,
@@ -175,51 +163,51 @@ pub mod address_control_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
         type Siwe;
         type Address;
+        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
         type Siwe = Unset;
         type Address = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSignature<St> {}
-    impl<St: State> State for SetSignature<St> {
-        type Signature = Set<members::signature>;
-        type Siwe = St::Siwe;
-        type Address = St::Address;
+        type Signature = Unset;
     }
     ///State transition - sets the `siwe` field to Set
     pub struct SetSiwe<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSiwe<St> {}
     impl<St: State> State for SetSiwe<St> {
-        type Signature = St::Signature;
         type Siwe = Set<members::siwe>;
         type Address = St::Address;
+        type Signature = St::Signature;
     }
     ///State transition - sets the `address` field to Set
     pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAddress<St> {}
     impl<St: State> State for SetAddress<St> {
-        type Signature = St::Signature;
         type Siwe = St::Siwe;
         type Address = Set<members::address>;
+        type Signature = St::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignature<St> {}
+    impl<St: State> State for SetSignature<St> {
+        type Siwe = St::Siwe;
+        type Address = St::Address;
+        type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
         ///Marker type for the `siwe` field
         pub struct siwe(());
         ///Marker type for the `address` field
         pub struct address(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
     }
 }
 
@@ -326,9 +314,9 @@ where
 impl<S: BosStr, St> AddressControlBuilder<S, St>
 where
     St: address_control_state::State,
-    St::Signature: address_control_state::IsSet,
     St::Siwe: address_control_state::IsSet,
     St::Address: address_control_state::IsSet,
+    St::Signature: address_control_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AddressControl<S> {
@@ -534,149 +522,149 @@ pub mod siwe_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Address;
         type Uri;
-        type IssuedAt;
-        type Version;
-        type Statement;
+        type Address;
         type ChainId;
+        type Statement;
+        type Version;
         type Nonce;
+        type IssuedAt;
         type Domain;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Address = Unset;
         type Uri = Unset;
-        type IssuedAt = Unset;
-        type Version = Unset;
-        type Statement = Unset;
+        type Address = Unset;
         type ChainId = Unset;
+        type Statement = Unset;
+        type Version = Unset;
         type Nonce = Unset;
+        type IssuedAt = Unset;
         type Domain = Unset;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAddress<St> {}
-    impl<St: State> State for SetAddress<St> {
-        type Address = Set<members::address>;
-        type Uri = St::Uri;
-        type IssuedAt = St::IssuedAt;
-        type Version = St::Version;
-        type Statement = St::Statement;
-        type ChainId = St::ChainId;
-        type Nonce = St::Nonce;
-        type Domain = St::Domain;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Address = St::Address;
         type Uri = Set<members::uri>;
-        type IssuedAt = St::IssuedAt;
-        type Version = St::Version;
-        type Statement = St::Statement;
+        type Address = St::Address;
         type ChainId = St::ChainId;
+        type Statement = St::Statement;
+        type Version = St::Version;
         type Nonce = St::Nonce;
+        type IssuedAt = St::IssuedAt;
         type Domain = St::Domain;
     }
-    ///State transition - sets the `issued_at` field to Set
-    pub struct SetIssuedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIssuedAt<St> {}
-    impl<St: State> State for SetIssuedAt<St> {
-        type Address = St::Address;
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddress<St> {}
+    impl<St: State> State for SetAddress<St> {
         type Uri = St::Uri;
-        type IssuedAt = Set<members::issued_at>;
-        type Version = St::Version;
+        type Address = Set<members::address>;
+        type ChainId = St::ChainId;
         type Statement = St::Statement;
-        type ChainId = St::ChainId;
-        type Nonce = St::Nonce;
-        type Domain = St::Domain;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVersion<St> {}
-    impl<St: State> State for SetVersion<St> {
-        type Address = St::Address;
-        type Uri = St::Uri;
-        type IssuedAt = St::IssuedAt;
-        type Version = Set<members::version>;
-        type Statement = St::Statement;
-        type ChainId = St::ChainId;
-        type Nonce = St::Nonce;
-        type Domain = St::Domain;
-    }
-    ///State transition - sets the `statement` field to Set
-    pub struct SetStatement<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatement<St> {}
-    impl<St: State> State for SetStatement<St> {
-        type Address = St::Address;
-        type Uri = St::Uri;
-        type IssuedAt = St::IssuedAt;
         type Version = St::Version;
-        type Statement = Set<members::statement>;
-        type ChainId = St::ChainId;
         type Nonce = St::Nonce;
+        type IssuedAt = St::IssuedAt;
         type Domain = St::Domain;
     }
     ///State transition - sets the `chain_id` field to Set
     pub struct SetChainId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetChainId<St> {}
     impl<St: State> State for SetChainId<St> {
-        type Address = St::Address;
         type Uri = St::Uri;
-        type IssuedAt = St::IssuedAt;
-        type Version = St::Version;
-        type Statement = St::Statement;
+        type Address = St::Address;
         type ChainId = Set<members::chain_id>;
+        type Statement = St::Statement;
+        type Version = St::Version;
         type Nonce = St::Nonce;
+        type IssuedAt = St::IssuedAt;
+        type Domain = St::Domain;
+    }
+    ///State transition - sets the `statement` field to Set
+    pub struct SetStatement<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatement<St> {}
+    impl<St: State> State for SetStatement<St> {
+        type Uri = St::Uri;
+        type Address = St::Address;
+        type ChainId = St::ChainId;
+        type Statement = Set<members::statement>;
+        type Version = St::Version;
+        type Nonce = St::Nonce;
+        type IssuedAt = St::IssuedAt;
+        type Domain = St::Domain;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVersion<St> {}
+    impl<St: State> State for SetVersion<St> {
+        type Uri = St::Uri;
+        type Address = St::Address;
+        type ChainId = St::ChainId;
+        type Statement = St::Statement;
+        type Version = Set<members::version>;
+        type Nonce = St::Nonce;
+        type IssuedAt = St::IssuedAt;
         type Domain = St::Domain;
     }
     ///State transition - sets the `nonce` field to Set
     pub struct SetNonce<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNonce<St> {}
     impl<St: State> State for SetNonce<St> {
-        type Address = St::Address;
         type Uri = St::Uri;
-        type IssuedAt = St::IssuedAt;
-        type Version = St::Version;
-        type Statement = St::Statement;
+        type Address = St::Address;
         type ChainId = St::ChainId;
+        type Statement = St::Statement;
+        type Version = St::Version;
         type Nonce = Set<members::nonce>;
+        type IssuedAt = St::IssuedAt;
+        type Domain = St::Domain;
+    }
+    ///State transition - sets the `issued_at` field to Set
+    pub struct SetIssuedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssuedAt<St> {}
+    impl<St: State> State for SetIssuedAt<St> {
+        type Uri = St::Uri;
+        type Address = St::Address;
+        type ChainId = St::ChainId;
+        type Statement = St::Statement;
+        type Version = St::Version;
+        type Nonce = St::Nonce;
+        type IssuedAt = Set<members::issued_at>;
         type Domain = St::Domain;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDomain<St> {}
     impl<St: State> State for SetDomain<St> {
-        type Address = St::Address;
         type Uri = St::Uri;
-        type IssuedAt = St::IssuedAt;
-        type Version = St::Version;
-        type Statement = St::Statement;
+        type Address = St::Address;
         type ChainId = St::ChainId;
+        type Statement = St::Statement;
+        type Version = St::Version;
         type Nonce = St::Nonce;
+        type IssuedAt = St::IssuedAt;
         type Domain = Set<members::domain>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `address` field
-        pub struct address(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `issued_at` field
-        pub struct issued_at(());
-        ///Marker type for the `version` field
-        pub struct version(());
-        ///Marker type for the `statement` field
-        pub struct statement(());
+        ///Marker type for the `address` field
+        pub struct address(());
         ///Marker type for the `chain_id` field
         pub struct chain_id(());
+        ///Marker type for the `statement` field
+        pub struct statement(());
+        ///Marker type for the `version` field
+        pub struct version(());
         ///Marker type for the `nonce` field
         pub struct nonce(());
+        ///Marker type for the `issued_at` field
+        pub struct issued_at(());
         ///Marker type for the `domain` field
         pub struct domain(());
     }
@@ -871,13 +859,13 @@ where
 impl<S: BosStr, St> SiweMessageBuilder<S, St>
 where
     St: siwe_message_state::State,
-    St::Address: siwe_message_state::IsSet,
     St::Uri: siwe_message_state::IsSet,
-    St::IssuedAt: siwe_message_state::IsSet,
-    St::Version: siwe_message_state::IsSet,
-    St::Statement: siwe_message_state::IsSet,
+    St::Address: siwe_message_state::IsSet,
     St::ChainId: siwe_message_state::IsSet,
+    St::Statement: siwe_message_state::IsSet,
+    St::Version: siwe_message_state::IsSet,
     St::Nonce: siwe_message_state::IsSet,
+    St::IssuedAt: siwe_message_state::IsSet,
     St::Domain: siwe_message_state::IsSet,
 {
     /// Build the final struct.

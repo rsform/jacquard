@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::com_deckbelcher::richtext;
 /// An unordered (bullet) list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BulletListBlock<S: BosStr = DefaultStr> {
     ///The list items.
     pub items: Vec<richtext::ListItem<S>>,
@@ -48,13 +42,7 @@ pub struct BulletListBlock<S: BosStr = DefaultStr> {
 /// A code block with optional language hint.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CodeBlock<S: BosStr = DefaultStr> {
     ///Optional language identifier for syntax highlighting.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,13 +57,7 @@ pub struct CodeBlock<S: BosStr = DefaultStr> {
 Used for primers and other long-form content.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Document<S: BosStr = DefaultStr> {
     ///Array of blocks (paragraphs, headings, etc).
     pub content: Vec<DocumentContentItem<S>>,
@@ -86,13 +68,7 @@ pub struct Document<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum DocumentContentItem<S: BosStr = DefaultStr> {
     #[serde(rename = "com.deckbelcher.richtext#paragraphBlock")]
     ParagraphBlock(Box<richtext::ParagraphBlock<S>>),
@@ -111,13 +87,7 @@ pub enum DocumentContentItem<S: BosStr = DefaultStr> {
 /// A heading block with level, text, and optional facets.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HeadingBlock<S: BosStr = DefaultStr> {
     ///Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -134,13 +104,7 @@ pub struct HeadingBlock<S: BosStr = DefaultStr> {
 /// A horizontal rule (thematic break).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HorizontalRuleBlock<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -149,13 +113,7 @@ pub struct HorizontalRuleBlock<S: BosStr = DefaultStr> {
 /// A single list item with text, optional facets, and optional sublist.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListItem<S: BosStr = DefaultStr> {
     ///Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -173,13 +131,7 @@ pub struct ListItem<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ListItemSublist<S: BosStr = DefaultStr> {
     #[serde(rename = "com.deckbelcher.richtext#bulletListBlock")]
     BulletListBlock(Box<richtext::BulletListBlock<S>>),
@@ -191,13 +143,7 @@ pub enum ListItemSublist<S: BosStr = DefaultStr> {
 Used for descriptions and other short formatted text.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Richtext<S: BosStr = DefaultStr> {
     ///Annotations of text (mentions, URLs, hashtags, formatting, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -212,13 +158,7 @@ pub struct Richtext<S: BosStr = DefaultStr> {
 /// An ordered (numbered) list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OrderedListBlock<S: BosStr = DefaultStr> {
     ///The list items.
     pub items: Vec<richtext::ListItem<S>>,
@@ -232,13 +172,7 @@ pub struct OrderedListBlock<S: BosStr = DefaultStr> {
 /// A paragraph block with text and optional facets.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ParagraphBlock<S: BosStr = DefaultStr> {
     ///Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]

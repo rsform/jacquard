@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::net_anisota::settings;
 /// Animation timing and speed settings for various UI animations
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AnimationTiming<S: BosStr = DefaultStr> {
     ///Card advance exit to right and entrance back in from right (stored as string)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -75,13 +69,7 @@ pub struct AnimationTiming<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BatchNotificationTypes<S: BosStr = DefaultStr> {
     ///Batch follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -108,13 +96,7 @@ pub struct BatchNotificationTypes<S: BosStr = DefaultStr> {
 /// App behavior and functionality settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BehaviorSettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub animation_timing: Option<settings::AnimationTiming<S>>,
@@ -261,13 +243,7 @@ pub struct BehaviorSettings<S: BosStr = DefaultStr> {
 /// Control button visibility settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ControlSettings<S: BosStr = DefaultStr> {
     ///Show account list button
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -360,13 +336,7 @@ pub struct ControlSettings<S: BosStr = DefaultStr> {
 /// Corner element positioning settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CornerElements<S: BosStr = DefaultStr> {
     ///Element to show in bottom left corner
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -386,13 +356,7 @@ pub struct CornerElements<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FilterNotificationTypes<S: BosStr = DefaultStr> {
     ///Show follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -418,13 +382,7 @@ pub struct FilterNotificationTypes<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FilterRelationshipTypes<S: BosStr = DefaultStr> {
     ///Show notifications from followers
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -444,13 +402,7 @@ pub struct FilterRelationshipTypes<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HideReposts<S: BosStr = DefaultStr> {
     ///Hide reposts in feed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -464,13 +416,7 @@ pub struct HideReposts<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HighlightNotificationTypes<S: BosStr = DefaultStr> {
     ///Highlight follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -497,13 +443,7 @@ pub struct HighlightNotificationTypes<S: BosStr = DefaultStr> {
 /// Keyboard shortcut configuration
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcuts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub composer: Option<settings::KeyboardShortcutsComposer<S>>,
@@ -522,13 +462,7 @@ pub struct KeyboardShortcuts<S: BosStr = DefaultStr> {
 /// Post composer keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsComposer<S: BosStr = DefaultStr> {
     ///Publish post (e.g., ctrl+enter)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -540,13 +474,7 @@ pub struct KeyboardShortcutsComposer<S: BosStr = DefaultStr> {
 /// Global navigation keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsGlobal<S: BosStr = DefaultStr> {
     ///Navigate to collection
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -567,13 +495,7 @@ pub struct KeyboardShortcutsGlobal<S: BosStr = DefaultStr> {
 /// Modal keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsModals<S: BosStr = DefaultStr> {
     ///Show keyboard shortcuts help
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -597,13 +519,7 @@ pub struct KeyboardShortcutsModals<S: BosStr = DefaultStr> {
 /// Navigation keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsNavigation<S: BosStr = DefaultStr> {
     ///Scroll down or next item
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -627,13 +543,7 @@ pub struct KeyboardShortcutsNavigation<S: BosStr = DefaultStr> {
 /// Post interaction keyboard shortcuts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct KeyboardShortcutsPostInteractions<S: BosStr = DefaultStr> {
     ///Like current post
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -658,10 +568,7 @@ pub struct KeyboardShortcutsPostInteractions<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "net.anisota.settings",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Settings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -689,13 +596,7 @@ pub struct Settings<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -706,13 +607,7 @@ pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
 /// Content moderation and filtering settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ModerationSettings<S: BosStr = DefaultStr> {
     ///How to handle posts from muted accounts
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -726,13 +621,7 @@ pub struct ModerationSettings<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatsVisibleSections<S: BosStr = DefaultStr> {
     ///Show activity section in stats overview
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -750,13 +639,7 @@ pub struct StatsVisibleSections<S: BosStr = DefaultStr> {
 /// UI visibility and behavior settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UiSettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub corner_elements: Option<settings::CornerElements<S>>,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,13 +29,7 @@ use crate::systems_timker::hawlt::note::Note;
 use crate::systems_timker::hawlt::list_notes;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotes<S: BosStr = DefaultStr> {
     ///(max length: 100)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,13 +42,7 @@ pub struct ListNotes<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -66,13 +54,7 @@ pub struct ListNotesOutput<S: BosStr = DefaultStr> {
 /// A note record with its AT URI, CID, and server-side index timestamp.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NoteView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub indexed_at: Datetime,
@@ -248,67 +230,67 @@ pub mod note_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type IndexedAt;
-        type Value;
         type Uri;
+        type Value;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type IndexedAt = Unset;
-        type Value = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type IndexedAt = St::IndexedAt;
-        type Value = St::Value;
-        type Uri = St::Uri;
+        type Value = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type Cid = St::Cid;
         type IndexedAt = Set<members::indexed_at>;
+        type Uri = St::Uri;
         type Value = St::Value;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
         type Cid = St::Cid;
-        type IndexedAt = St::IndexedAt;
-        type Value = Set<members::value>;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
         type IndexedAt = St::IndexedAt;
-        type Value = St::Value;
         type Uri = Set<members::uri>;
+        type Value = St::Value;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Value = Set<members::value>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Value = St::Value;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -416,10 +398,10 @@ where
 impl<S: BosStr, St> NoteViewBuilder<S, St>
 where
     St: note_view_state::State,
-    St::Cid: note_view_state::IsSet,
     St::IndexedAt: note_view_state::IsSet,
-    St::Value: note_view_state::IsSet,
     St::Uri: note_view_state::IsSet,
+    St::Value: note_view_state::IsSet,
+    St::Cid: note_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> NoteView<S> {

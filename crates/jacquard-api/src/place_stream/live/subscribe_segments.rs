@@ -7,20 +7,14 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::live::subscribe_segments;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscribeSegments<S: BosStr = DefaultStr> {
     pub streamer: S,
 }
@@ -28,18 +22,20 @@ pub struct SubscribeSegments<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeSegmentsMessage<'a> {
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub enum SubscribeSegmentsMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "#segment")]
     Segment(Box<subscribe_segments::Segment>),
 }
 
-impl<'a> SubscribeSegmentsMessage<'a> {
+impl<S: BosStr> SubscribeSegmentsMessage<S> {
     /// Decode a framed DAG-CBOR message (header + body).
-    pub fn decode_framed<'de: 'a>(
+    pub fn decode_framed<'de>(
         bytes: &'de [u8],
-    ) -> Result<SubscribeSegmentsMessage<'a>, jacquard_common::error::DecodeError> {
+    ) -> Result<SubscribeSegmentsMessage<S>, jacquard_common::error::DecodeError>
+    where
+        S: serde::Deserialize<'de>,
+    {
         let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
             bytes,
         )?;
@@ -66,11 +62,11 @@ pub struct SubscribeSegmentsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeSegmentsStream {
     const NSID: &'static str = "place.stream.live.subscribeSegments";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Message<'de> = SubscribeSegmentsMessage<'de>;
+    type Message<S: BosStr> = SubscribeSegmentsMessage<S>;
     type Error = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcSubscription for SubscribeSegments<'a> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcSubscription for SubscribeSegments<S> {
     const NSID: &'static str = "place.stream.live.subscribeSegments";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeSegmentsStream;
@@ -80,7 +76,7 @@ pub struct SubscribeSegmentsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeSegmentsEndpoint {
     const PATH: &'static str = "/xrpc/place.stream.live.subscribeSegments";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Params<'de> = SubscribeSegments<'de>;
+    type Params<S: BosStr> = SubscribeSegments<S>;
     type Stream = SubscribeSegmentsStream;
 }
 

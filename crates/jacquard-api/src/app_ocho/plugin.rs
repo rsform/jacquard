@@ -16,7 +16,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,13 +34,7 @@ use serde::{Serialize, Deserialize};
 use crate::app_ocho::plugin;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AdaptiveIcon<S: BosStr = DefaultStr> {
     ///The background color of the adaptive icon.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,13 +50,7 @@ pub struct AdaptiveIcon<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Android<S: BosStr = DefaultStr> {
     ///Configuration for the adaptive icon on Android.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,13 +65,7 @@ pub struct Android<S: BosStr = DefaultStr> {
 /// Android status bar configuration.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AndroidStatusBar<S: BosStr = DefaultStr> {
     ///The background color of the Android status bar.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -94,13 +76,7 @@ pub struct AndroidStatusBar<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Asset<S: BosStr = DefaultStr> {
     ///The blob of the asset
     pub blob: BlobRef<S>,
@@ -117,13 +93,7 @@ pub struct Asset<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Db<S: BosStr = DefaultStr> {
     ///The ID of the database.
     pub id: S,
@@ -133,13 +103,7 @@ pub struct Db<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Developer<S: BosStr = DefaultStr> {
     ///The tool used for development, e.g., 'expo-cli'.
     pub tool: S,
@@ -149,13 +113,7 @@ pub struct Developer<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpoClient<S: BosStr = DefaultStr> {
     ///Android-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -215,13 +173,7 @@ pub struct ExpoClient<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpoGo<S: BosStr = DefaultStr> {
     ///Developer-specific configuration for the Expo Go app.
     pub developer: plugin::Developer<S>,
@@ -231,13 +183,7 @@ pub struct ExpoGo<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Ios<S: BosStr = DefaultStr> {
     ///Whether the app supports iPad.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -248,13 +194,7 @@ pub struct Ios<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LaunchAsset<S: BosStr = DefaultStr> {
     ///The MIME type of the asset, e.g., 'image/png'.
     pub content_type: S,
@@ -268,13 +208,7 @@ pub struct LaunchAsset<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Manifest<S: BosStr = DefaultStr> {
     ///The date and time when this plugin manifest was created.
     pub created_at: Datetime,
@@ -293,13 +227,7 @@ pub struct Manifest<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ManifestExtra<S: BosStr = DefaultStr> {
     pub expo_client: plugin::ExpoClient<S>,
     pub expo_go: plugin::ExpoGo<S>,
@@ -310,13 +238,7 @@ pub struct ManifestExtra<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum PluginItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.ocho.plugin.defs#stringId")]
     StringId(Box<plugin::StringId<S>>),
@@ -324,19 +246,13 @@ pub enum PluginItem<S: BosStr = DefaultStr> {
     PluginConfig(Box<plugin::PluginConfig<S>>),
 }
 
-pub type Plugin<S: BosStr = DefaultStr> = Vec<PluginItem<S>>;
-pub type PluginConfig<S: BosStr = DefaultStr> = Data<S>;
+pub type Plugin<S = DefaultStr> = Vec<PluginItem<S>>;
+pub type PluginConfig<S = DefaultStr> = Data<S>;
 /// A string identifier for a plugin, used to reference it in the app.
-pub type StringId<S: BosStr = DefaultStr> = S;
+pub type StringId<S = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Web<S: BosStr = DefaultStr> {
     ///The bundler used for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1184,50 +1100,50 @@ pub mod asset_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Hash;
-        type Type;
         type Blob;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Hash = Unset;
-        type Type = Unset;
         type Blob = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `hash` field to Set
     pub struct SetHash<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHash<St> {}
     impl<St: State> State for SetHash<St> {
         type Hash = Set<members::hash>;
+        type Blob = St::Blob;
         type Type = St::Type;
-        type Blob = St::Blob;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Hash = St::Hash;
-        type Type = Set<members::r#type>;
-        type Blob = St::Blob;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlob<St> {}
     impl<St: State> State for SetBlob<St> {
         type Hash = St::Hash;
-        type Type = St::Type;
         type Blob = Set<members::blob>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Hash = St::Hash;
+        type Blob = St::Blob;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `hash` field
         pub struct hash(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -1330,8 +1246,8 @@ impl<S: BosStr, St> AssetBuilder<S, St>
 where
     St: asset_state::State,
     St::Hash: asset_state::IsSet,
-    St::Type: asset_state::IsSet,
     St::Blob: asset_state::IsSet,
+    St::Type: asset_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Asset<S> {
@@ -1462,49 +1378,49 @@ pub mod launch_asset_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Url;
+        type Key;
         type ContentType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Url = Unset;
+        type Key = Unset;
         type ContentType = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKey<St> {}
-    impl<St: State> State for SetKey<St> {
-        type Key = Set<members::key>;
-        type Url = St::Url;
-        type ContentType = St::ContentType;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type Key = St::Key;
         type Url = Set<members::url>;
+        type Key = St::Key;
+        type ContentType = St::ContentType;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Url = St::Url;
+        type Key = Set<members::key>;
         type ContentType = St::ContentType;
     }
     ///State transition - sets the `content_type` field to Set
     pub struct SetContentType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContentType<St> {}
     impl<St: State> State for SetContentType<St> {
-        type Key = St::Key;
         type Url = St::Url;
+        type Key = St::Key;
         type ContentType = Set<members::content_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `key` field
+        pub struct key(());
         ///Marker type for the `content_type` field
         pub struct content_type(());
     }
@@ -1595,8 +1511,8 @@ where
 impl<S: BosStr, St> LaunchAssetBuilder<S, St>
 where
     St: launch_asset_state::State,
-    St::Key: launch_asset_state::IsSet,
     St::Url: launch_asset_state::IsSet,
+    St::Key: launch_asset_state::IsSet,
     St::ContentType: launch_asset_state::IsSet,
 {
     /// Build the final struct.
@@ -1632,105 +1548,105 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type RuntimeVersion;
-        type Metadata;
+        type LaunchAsset;
         type Extra;
         type CreatedAt;
-        type LaunchAsset;
+        type Metadata;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type RuntimeVersion = Unset;
-        type Metadata = Unset;
+        type LaunchAsset = Unset;
         type Extra = Unset;
         type CreatedAt = Unset;
-        type LaunchAsset = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type RuntimeVersion = St::RuntimeVersion;
-        type Metadata = St::Metadata;
-        type Extra = St::Extra;
-        type CreatedAt = St::CreatedAt;
-        type LaunchAsset = St::LaunchAsset;
+        type Metadata = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `runtime_version` field to Set
     pub struct SetRuntimeVersion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRuntimeVersion<St> {}
     impl<St: State> State for SetRuntimeVersion<St> {
-        type Id = St::Id;
         type RuntimeVersion = Set<members::runtime_version>;
-        type Metadata = St::Metadata;
+        type LaunchAsset = St::LaunchAsset;
         type Extra = St::Extra;
         type CreatedAt = St::CreatedAt;
-        type LaunchAsset = St::LaunchAsset;
-    }
-    ///State transition - sets the `metadata` field to Set
-    pub struct SetMetadata<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMetadata<St> {}
-    impl<St: State> State for SetMetadata<St> {
-        type Id = St::Id;
-        type RuntimeVersion = St::RuntimeVersion;
-        type Metadata = Set<members::metadata>;
-        type Extra = St::Extra;
-        type CreatedAt = St::CreatedAt;
-        type LaunchAsset = St::LaunchAsset;
-    }
-    ///State transition - sets the `extra` field to Set
-    pub struct SetExtra<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetExtra<St> {}
-    impl<St: State> State for SetExtra<St> {
-        type Id = St::Id;
-        type RuntimeVersion = St::RuntimeVersion;
         type Metadata = St::Metadata;
-        type Extra = Set<members::extra>;
-        type CreatedAt = St::CreatedAt;
-        type LaunchAsset = St::LaunchAsset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
         type Id = St::Id;
-        type RuntimeVersion = St::RuntimeVersion;
-        type Metadata = St::Metadata;
-        type Extra = St::Extra;
-        type CreatedAt = Set<members::created_at>;
-        type LaunchAsset = St::LaunchAsset;
     }
     ///State transition - sets the `launch_asset` field to Set
     pub struct SetLaunchAsset<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLaunchAsset<St> {}
     impl<St: State> State for SetLaunchAsset<St> {
-        type Id = St::Id;
         type RuntimeVersion = St::RuntimeVersion;
-        type Metadata = St::Metadata;
+        type LaunchAsset = Set<members::launch_asset>;
         type Extra = St::Extra;
         type CreatedAt = St::CreatedAt;
-        type LaunchAsset = Set<members::launch_asset>;
+        type Metadata = St::Metadata;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `extra` field to Set
+    pub struct SetExtra<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExtra<St> {}
+    impl<St: State> State for SetExtra<St> {
+        type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = St::LaunchAsset;
+        type Extra = Set<members::extra>;
+        type CreatedAt = St::CreatedAt;
+        type Metadata = St::Metadata;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = St::LaunchAsset;
+        type Extra = St::Extra;
+        type CreatedAt = Set<members::created_at>;
+        type Metadata = St::Metadata;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `metadata` field to Set
+    pub struct SetMetadata<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMetadata<St> {}
+    impl<St: State> State for SetMetadata<St> {
+        type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = St::LaunchAsset;
+        type Extra = St::Extra;
+        type CreatedAt = St::CreatedAt;
+        type Metadata = Set<members::metadata>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type RuntimeVersion = St::RuntimeVersion;
+        type LaunchAsset = St::LaunchAsset;
+        type Extra = St::Extra;
+        type CreatedAt = St::CreatedAt;
+        type Metadata = St::Metadata;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `runtime_version` field
         pub struct runtime_version(());
-        ///Marker type for the `metadata` field
-        pub struct metadata(());
+        ///Marker type for the `launch_asset` field
+        pub struct launch_asset(());
         ///Marker type for the `extra` field
         pub struct extra(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `launch_asset` field
-        pub struct launch_asset(());
+        ///Marker type for the `metadata` field
+        pub struct metadata(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -1883,12 +1799,12 @@ where
 impl<S: BosStr, St> ManifestBuilder<S, St>
 where
     St: manifest_state::State,
-    St::Id: manifest_state::IsSet,
     St::RuntimeVersion: manifest_state::IsSet,
-    St::Metadata: manifest_state::IsSet,
+    St::LaunchAsset: manifest_state::IsSet,
     St::Extra: manifest_state::IsSet,
     St::CreatedAt: manifest_state::IsSet,
-    St::LaunchAsset: manifest_state::IsSet,
+    St::Metadata: manifest_state::IsSet,
+    St::Id: manifest_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Manifest<S> {
@@ -1926,37 +1842,37 @@ pub mod manifest_extra_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ExpoGo;
         type ExpoClient;
+        type ExpoGo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ExpoGo = Unset;
         type ExpoClient = Unset;
-    }
-    ///State transition - sets the `expo_go` field to Set
-    pub struct SetExpoGo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetExpoGo<St> {}
-    impl<St: State> State for SetExpoGo<St> {
-        type ExpoGo = Set<members::expo_go>;
-        type ExpoClient = St::ExpoClient;
+        type ExpoGo = Unset;
     }
     ///State transition - sets the `expo_client` field to Set
     pub struct SetExpoClient<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetExpoClient<St> {}
     impl<St: State> State for SetExpoClient<St> {
-        type ExpoGo = St::ExpoGo;
         type ExpoClient = Set<members::expo_client>;
+        type ExpoGo = St::ExpoGo;
+    }
+    ///State transition - sets the `expo_go` field to Set
+    pub struct SetExpoGo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExpoGo<St> {}
+    impl<St: State> State for SetExpoGo<St> {
+        type ExpoClient = St::ExpoClient;
+        type ExpoGo = Set<members::expo_go>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `expo_go` field
-        pub struct expo_go(());
         ///Marker type for the `expo_client` field
         pub struct expo_client(());
+        ///Marker type for the `expo_go` field
+        pub struct expo_go(());
     }
 }
 
@@ -2026,8 +1942,8 @@ where
 impl<S: BosStr, St> ManifestExtraBuilder<S, St>
 where
     St: manifest_extra_state::State,
-    St::ExpoGo: manifest_extra_state::IsSet,
     St::ExpoClient: manifest_extra_state::IsSet,
+    St::ExpoGo: manifest_extra_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ManifestExtra<S> {

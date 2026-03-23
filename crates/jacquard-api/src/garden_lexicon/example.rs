@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "garden.lexicon.example",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Example<S: BosStr = DefaultStr> {
     ///The user-supplied date and time the example was created.
@@ -56,13 +53,7 @@ pub struct Example<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ExampleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -128,51 +119,51 @@ pub mod example_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lexicon;
         type Value;
         type CreatedAt;
+        type Lexicon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lexicon = Unset;
         type Value = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLexicon<St> {}
-    impl<St: State> State for SetLexicon<St> {
-        type Lexicon = Set<members::lexicon>;
-        type Value = St::Value;
-        type CreatedAt = St::CreatedAt;
+        type Lexicon = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Lexicon = St::Lexicon;
         type Value = Set<members::value>;
         type CreatedAt = St::CreatedAt;
+        type Lexicon = St::Lexicon;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Lexicon = St::Lexicon;
         type Value = St::Value;
         type CreatedAt = Set<members::created_at>;
+        type Lexicon = St::Lexicon;
+    }
+    ///State transition - sets the `lexicon` field to Set
+    pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLexicon<St> {}
+    impl<St: State> State for SetLexicon<St> {
+        type Value = St::Value;
+        type CreatedAt = St::CreatedAt;
+        type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lexicon` field
-        pub struct lexicon(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `lexicon` field
+        pub struct lexicon(());
     }
 }
 
@@ -274,9 +265,9 @@ where
 impl<S: BosStr, St> ExampleBuilder<S, St>
 where
     St: example_state::State,
-    St::Lexicon: example_state::IsSet,
     St::Value: example_state::IsSet,
     St::CreatedAt: example_state::IsSet,
+    St::Lexicon: example_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Example<S> {

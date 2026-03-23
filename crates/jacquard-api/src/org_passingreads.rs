@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use serde::{Serialize, Deserialize};
 /// Basic actor information for embedding in responses
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Actor<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,13 +45,7 @@ pub struct Actor<S: BosStr = DefaultStr> {
 /// width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any unit.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -68,13 +56,7 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// Book ID entry for SSG
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BookIdEntry<S: BosStr = DefaultStr> {
     pub id: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -84,13 +66,7 @@ pub struct BookIdEntry<S: BosStr = DefaultStr> {
 /// Location entry with book count for SSG
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LocationEntry<S: BosStr = DefaultStr> {
     pub book_count: i64,
     pub h3: S,
@@ -456,37 +432,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Width;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Width = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHeight<St> {}
-    impl<St: State> State for SetHeight<St> {
-        type Height = Set<members::height>;
-        type Width = St::Width;
+        type Height = Unset;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWidth<St> {}
     impl<St: State> State for SetWidth<St> {
-        type Height = St::Height;
         type Width = Set<members::width>;
+        type Height = St::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Width = St::Width;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
@@ -556,8 +532,8 @@ where
 impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
     St: aspect_ratio_state::State,
-    St::Height: aspect_ratio_state::IsSet,
     St::Width: aspect_ratio_state::IsSet,
+    St::Height: aspect_ratio_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AspectRatio<S> {
@@ -590,37 +566,37 @@ pub mod location_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BookCount;
         type H3;
+        type BookCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BookCount = Unset;
         type H3 = Unset;
-    }
-    ///State transition - sets the `book_count` field to Set
-    pub struct SetBookCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBookCount<St> {}
-    impl<St: State> State for SetBookCount<St> {
-        type BookCount = Set<members::book_count>;
-        type H3 = St::H3;
+        type BookCount = Unset;
     }
     ///State transition - sets the `h3` field to Set
     pub struct SetH3<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetH3<St> {}
     impl<St: State> State for SetH3<St> {
-        type BookCount = St::BookCount;
         type H3 = Set<members::h3>;
+        type BookCount = St::BookCount;
+    }
+    ///State transition - sets the `book_count` field to Set
+    pub struct SetBookCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBookCount<St> {}
+    impl<St: State> State for SetBookCount<St> {
+        type H3 = St::H3;
+        type BookCount = Set<members::book_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book_count` field
-        pub struct book_count(());
         ///Marker type for the `h3` field
         pub struct h3(());
+        ///Marker type for the `book_count` field
+        pub struct book_count(());
     }
 }
 
@@ -690,8 +666,8 @@ where
 impl<S: BosStr, St> LocationEntryBuilder<S, St>
 where
     St: location_entry_state::State,
-    St::BookCount: location_entry_state::IsSet,
     St::H3: location_entry_state::IsSet,
+    St::BookCount: location_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LocationEntry<S> {

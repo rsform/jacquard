@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,7 @@ use crate::actor_rpg::stats;
 /// The six ability scores (1-30 per SRD)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Abilities<S: BosStr = DefaultStr> {
     ///Charisma
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,13 +58,7 @@ pub struct Abilities<S: BosStr = DefaultStr> {
 /// An attack action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Attack<S: BosStr = DefaultStr> {
     ///Attack bonus (e.g., +5)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -93,13 +81,7 @@ pub struct Attack<S: BosStr = DefaultStr> {
 /// Currency
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Coinage<S: BosStr = DefaultStr> {
     ///Copper pieces
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -123,13 +105,7 @@ pub struct Coinage<S: BosStr = DefaultStr> {
 /// Combat and defensive stats
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Combat<S: BosStr = DefaultStr> {
     ///Armor Class
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -153,13 +129,7 @@ pub struct Combat<S: BosStr = DefaultStr> {
 /// Status conditions and effects
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Conditions<S: BosStr = DefaultStr> {
     ///Death saving throw progress
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -177,13 +147,7 @@ pub struct Conditions<S: BosStr = DefaultStr> {
 /// A custom stat
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CustomStat<S: BosStr = DefaultStr> {
     ///Category (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -205,13 +169,7 @@ pub struct CustomStat<S: BosStr = DefaultStr> {
 /// User-defined custom stat system
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CustomStats<S: BosStr = DefaultStr> {
     ///Custom stat entries
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -229,13 +187,7 @@ pub struct CustomStats<S: BosStr = DefaultStr> {
 /// DCC ability scores (3-18 standard, can be modified by corruption/spellburn)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccAbilities<S: BosStr = DefaultStr> {
     ///Agility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -271,13 +223,7 @@ pub struct DccAbilities<S: BosStr = DefaultStr> {
 /// A weapon attack (includes deed die for warriors)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccAttack<S: BosStr = DefaultStr> {
     ///Attack modifier (e.g., +2, d16+2 for deed die)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -306,13 +252,7 @@ pub struct DccAttack<S: BosStr = DefaultStr> {
 /// Cleric spellcasting features
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccCleric<S: BosStr = DefaultStr> {
     ///Deity or supernatural patron
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -351,13 +291,7 @@ pub struct DccCleric<S: BosStr = DefaultStr> {
 /// A cleric spell
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccClericSpell<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
@@ -376,13 +310,7 @@ pub struct DccClericSpell<S: BosStr = DefaultStr> {
 /// DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccCoinage<S: BosStr = DefaultStr> {
     ///Copper pieces
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -400,13 +328,7 @@ pub struct DccCoinage<S: BosStr = DefaultStr> {
 /// Combat statistics
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccCombat<S: BosStr = DefaultStr> {
     ///Armor Class (10 + armor + AGI mod + shield)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -439,13 +361,7 @@ pub struct DccCombat<S: BosStr = DefaultStr> {
 /// A corruption effect from failed spell checks
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccCorruption<S: BosStr = DefaultStr> {
     ///Description of the corruption
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -466,13 +382,7 @@ pub struct DccCorruption<S: BosStr = DefaultStr> {
 /// Equipment and inventory
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccEquipment<S: BosStr = DefaultStr> {
     ///Armor worn (affects fumble die)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -502,13 +412,7 @@ pub struct DccEquipment<S: BosStr = DefaultStr> {
 /// Halfling class features
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccHalfling<S: BosStr = DefaultStr> {
     ///Can spend luck to aid nearby allies
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -535,13 +439,7 @@ pub struct DccHalfling<S: BosStr = DefaultStr> {
 /// Hit points (0-level characters use 1d4 + STA mod)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccHp<S: BosStr = DefaultStr> {
     ///Current HP
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -556,13 +454,7 @@ pub struct DccHp<S: BosStr = DefaultStr> {
 /// DCC character identity and progression
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccIdentity<S: BosStr = DefaultStr> {
     ///Alignment (Lawful, Neutral, Chaotic)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -589,13 +481,7 @@ pub struct DccIdentity<S: BosStr = DefaultStr> {
 /// Birth augur and luck mechanics
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccLuck<S: BosStr = DefaultStr> {
     ///Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -616,13 +502,7 @@ pub struct DccLuck<S: BosStr = DefaultStr> {
 /// DCC saving throws (3 saves, not 6)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccSaves<S: BosStr = DefaultStr> {
     ///Fortitude save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -640,13 +520,7 @@ pub struct DccSaves<S: BosStr = DefaultStr> {
 /// Current spellburn (temporary ability score sacrifice)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccSpellburn<S: BosStr = DefaultStr> {
     ///Agility points currently burned
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -667,13 +541,7 @@ pub struct DccSpellburn<S: BosStr = DefaultStr> {
 /// Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccStats<S: BosStr = DefaultStr> {
     ///The six ability scores (STR, AGI, STA, INT, PER, LUK)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -733,13 +601,7 @@ pub struct DccStats<S: BosStr = DefaultStr> {
 /// Thief class features and skills
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccThief<S: BosStr = DefaultStr> {
     ///Alignment (affects some skill targets)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -760,13 +622,7 @@ pub struct DccThief<S: BosStr = DefaultStr> {
 /// Thief skill bonuses (roll d20 + skill vs target)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccThiefSkills<S: BosStr = DefaultStr> {
     ///Backstab attack bonus
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -814,13 +670,7 @@ pub struct DccThiefSkills<S: BosStr = DefaultStr> {
 /// Warrior and Dwarf class features
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccWarrior<S: BosStr = DefaultStr> {
     ///Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -850,13 +700,7 @@ pub struct DccWarrior<S: BosStr = DefaultStr> {
 /// Wizard and Elf spellcasting features
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccWizard<S: BosStr = DefaultStr> {
     ///Corruption effects suffered (structured)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -889,13 +733,7 @@ pub struct DccWizard<S: BosStr = DefaultStr> {
 /// A wizard spell with mercurial magic effect
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DccWizardSpell<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
@@ -920,13 +758,7 @@ pub struct DccWizardSpell<S: BosStr = DefaultStr> {
 /// Death saving throw successes and failures
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeathSaves<S: BosStr = DefaultStr> {
     ///Failures (0-3)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -941,13 +773,7 @@ pub struct DeathSaves<S: BosStr = DefaultStr> {
 /// D&D 5e character sheet. All sub-objects are optional.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DndStats<S: BosStr = DefaultStr> {
     ///The six ability scores (STR, DEX, CON, INT, WIS, CHA)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1004,13 +830,7 @@ pub struct DndStats<S: BosStr = DefaultStr> {
 /// Gear and inventory
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Equipment<S: BosStr = DefaultStr> {
     ///Armor
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1031,13 +851,7 @@ pub struct Equipment<S: BosStr = DefaultStr> {
 /// Hit point tracking
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Hp<S: BosStr = DefaultStr> {
     ///Current HP
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1055,13 +869,7 @@ pub struct Hp<S: BosStr = DefaultStr> {
 /// Character identity and progression
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Identity<S: BosStr = DefaultStr> {
     ///Alignment (e.g., Lawful Good)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1095,10 +903,7 @@ pub struct Identity<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "actor.rpg.stats",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Stats<S: BosStr = DefaultStr> {
     ///Timestamp when this record was created
@@ -1128,13 +933,7 @@ pub struct Stats<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct StatsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -1145,13 +944,7 @@ pub struct StatsGetRecordOutput<S: BosStr = DefaultStr> {
 /// Passive scores (10 + skill modifier)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Passives<S: BosStr = DefaultStr> {
     ///Passive Insight
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1169,13 +962,7 @@ pub struct Passives<S: BosStr = DefaultStr> {
 /// Personality and backstory
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Personality<S: BosStr = DefaultStr> {
     ///Backstory
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1199,13 +986,7 @@ pub struct Personality<S: BosStr = DefaultStr> {
 /// Reverie House philosophical alignment
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReverieStats<S: BosStr = DefaultStr> {
     ///Authority (0-100)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1350,13 +1131,7 @@ where
 /// RPG Maker MZ character parameters
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RmmzStats<S: BosStr = DefaultStr> {
     ///Agility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1419,13 +1194,7 @@ pub struct RmmzStats<S: BosStr = DefaultStr> {
 /// Saving throw modifiers (actual values, not proficiency flags)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Saves<S: BosStr = DefaultStr> {
     ///Charisma save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1452,13 +1221,7 @@ pub struct Saves<S: BosStr = DefaultStr> {
 /// Skill modifiers (actual values, not proficiency flags)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Skills<S: BosStr = DefaultStr> {
     ///Acrobatics (DEX)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1521,13 +1284,7 @@ pub struct Skills<S: BosStr = DefaultStr> {
 /// Spells organized by level
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpellList<S: BosStr = DefaultStr> {
     ///Cantrips (at-will)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1566,13 +1323,7 @@ pub struct SpellList<S: BosStr = DefaultStr> {
 /// Spellcasting details
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Spellcasting<S: BosStr = DefaultStr> {
     ///Spellcasting ability (INT, WIS, CHA)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1596,13 +1347,7 @@ pub struct Spellcasting<S: BosStr = DefaultStr> {
 /// Spell slot entry
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Spellslot<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
@@ -7181,37 +6926,37 @@ pub mod custom_stat_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Value;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Value = St::Value;
+        type Name = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Name = St::Name;
         type Value = Set<members::value>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Value = St::Value;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -7320,8 +7065,8 @@ where
 impl<S: BosStr, St> CustomStatBuilder<S, St>
 where
     St: custom_stat_state::State,
-    St::Name: custom_stat_state::IsSet,
     St::Value: custom_stat_state::IsSet,
+    St::Name: custom_stat_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CustomStat<S> {
@@ -7360,37 +7105,37 @@ pub mod dcc_cleric_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Level;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Level = St::Level;
+        type Name = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLevel<St> {}
     impl<St: State> State for SetLevel<St> {
-        type Name = St::Name;
         type Level = Set<members::level>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Level = St::Level;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -7486,8 +7231,8 @@ impl<S: BosStr, St: dcc_cleric_spell_state::State> DccClericSpellBuilder<S, St> 
 impl<S: BosStr, St> DccClericSpellBuilder<S, St>
 where
     St: dcc_cleric_spell_state::State,
-    St::Name: dcc_cleric_spell_state::IsSet,
     St::Level: dcc_cleric_spell_state::IsSet,
+    St::Name: dcc_cleric_spell_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DccClericSpell<S> {
@@ -7524,37 +7269,37 @@ pub mod dcc_wizard_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Level;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Level = St::Level;
+        type Name = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLevel<St> {}
     impl<St: State> State for SetLevel<St> {
-        type Name = St::Name;
         type Level = Set<members::level>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Level = St::Level;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -7676,8 +7421,8 @@ impl<S: BosStr, St: dcc_wizard_spell_state::State> DccWizardSpellBuilder<S, St> 
 impl<S: BosStr, St> DccWizardSpellBuilder<S, St>
 where
     St: dcc_wizard_spell_state::State,
-    St::Name: dcc_wizard_spell_state::IsSet,
     St::Level: dcc_wizard_spell_state::IsSet,
+    St::Name: dcc_wizard_spell_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DccWizardSpell<S> {
@@ -7913,37 +7658,37 @@ pub mod spellslot_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Total;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Total = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Level = Set<members::level>;
-        type Total = St::Total;
+        type Level = Unset;
     }
     ///State transition - sets the `total` field to Set
     pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotal<St> {}
     impl<St: State> State for SetTotal<St> {
-        type Level = St::Level;
         type Total = Set<members::total>;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Total = St::Total;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `total` field
         pub struct total(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -8026,8 +7771,8 @@ impl<S: BosStr, St: spellslot_state::State> SpellslotBuilder<S, St> {
 impl<S: BosStr, St> SpellslotBuilder<S, St>
 where
     St: spellslot_state::State,
-    St::Level: spellslot_state::IsSet,
     St::Total: spellslot_state::IsSet,
+    St::Level: spellslot_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Spellslot<S> {

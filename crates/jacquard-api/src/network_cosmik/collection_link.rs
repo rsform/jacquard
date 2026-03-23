@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,10 +36,7 @@ use crate::network_cosmik::Provenance;
     rename_all = "camelCase",
     rename = "network.cosmik.collectionLink",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct CollectionLink<S: BosStr = DefaultStr> {
     ///Timestamp when the card was added to the collection.
@@ -66,13 +63,7 @@ pub struct CollectionLink<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CollectionLinkGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -139,66 +130,66 @@ pub mod collection_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
+        type AddedBy;
         type AddedAt;
         type Card;
-        type AddedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
+        type AddedBy = Unset;
         type AddedAt = Unset;
         type Card = Unset;
-        type AddedBy = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Collection = Set<members::collection>;
+        type AddedBy = St::AddedBy;
         type AddedAt = St::AddedAt;
         type Card = St::Card;
-        type AddedBy = St::AddedBy;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
-    impl<St: State> State for SetAddedAt<St> {
-        type Collection = St::Collection;
-        type AddedAt = Set<members::added_at>;
-        type Card = St::Card;
-        type AddedBy = St::AddedBy;
-    }
-    ///State transition - sets the `card` field to Set
-    pub struct SetCard<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCard<St> {}
-    impl<St: State> State for SetCard<St> {
-        type Collection = St::Collection;
-        type AddedAt = St::AddedAt;
-        type Card = Set<members::card>;
-        type AddedBy = St::AddedBy;
     }
     ///State transition - sets the `added_by` field to Set
     pub struct SetAddedBy<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAddedBy<St> {}
     impl<St: State> State for SetAddedBy<St> {
         type Collection = St::Collection;
+        type AddedBy = Set<members::added_by>;
         type AddedAt = St::AddedAt;
         type Card = St::Card;
-        type AddedBy = Set<members::added_by>;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
+    impl<St: State> State for SetAddedAt<St> {
+        type Collection = St::Collection;
+        type AddedBy = St::AddedBy;
+        type AddedAt = Set<members::added_at>;
+        type Card = St::Card;
+    }
+    ///State transition - sets the `card` field to Set
+    pub struct SetCard<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCard<St> {}
+    impl<St: State> State for SetCard<St> {
+        type Collection = St::Collection;
+        type AddedBy = St::AddedBy;
+        type AddedAt = St::AddedAt;
+        type Card = Set<members::card>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `added_by` field
+        pub struct added_by(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
         ///Marker type for the `card` field
         pub struct card(());
-        ///Marker type for the `added_by` field
-        pub struct added_by(());
     }
 }
 
@@ -354,9 +345,9 @@ impl<S: BosStr, St> CollectionLinkBuilder<S, St>
 where
     St: collection_link_state::State,
     St::Collection: collection_link_state::IsSet,
+    St::AddedBy: collection_link_state::IsSet,
     St::AddedAt: collection_link_state::IsSet,
     St::Card: collection_link_state::IsSet,
-    St::AddedBy: collection_link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionLink<S> {

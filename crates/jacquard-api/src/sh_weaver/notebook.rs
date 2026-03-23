@@ -43,7 +43,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -64,13 +64,7 @@ use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::notebook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AuthorListView<S: BosStr = DefaultStr> {
     pub index: i64,
     pub record: ProfileDataView<S>,
@@ -82,13 +76,7 @@ pub struct AuthorListView<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BookEntryRef<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -98,13 +86,7 @@ pub struct BookEntryRef<S: BosStr = DefaultStr> {
 /// An ordered entry in a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BookEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     pub index: i64,
@@ -119,13 +101,7 @@ pub struct BookEntryView<S: BosStr = DefaultStr> {
 /// An entry within a chapter context.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChapterEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     pub index: i64,
@@ -140,13 +116,7 @@ pub struct ChapterEntryView<S: BosStr = DefaultStr> {
 /// Hydrated view of a chapter.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChapterView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     pub cid: Cid<S>,
@@ -167,13 +137,7 @@ pub struct ChapterView<S: BosStr = DefaultStr> {
 /// The format of the content. This is used to determine how to render the content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContentFormat<S: BosStr = DefaultStr> {
     ///The format of the content. This is used to determine how to render the content.  Defaults to `"weaver"`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -376,16 +340,10 @@ where
 }
 
 /// Author-applied content warnings.
-pub type ContentWarnings<S: BosStr = DefaultStr> = Vec<notebook::ContentWarning<S>>;
+pub type ContentWarnings<S = DefaultStr> = Vec<notebook::ContentWarning<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EntryView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -419,13 +377,7 @@ pub struct EntryView<S: BosStr = DefaultStr> {
 /// Entry with feed-specific context (discovery reason, notebook context).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -439,13 +391,7 @@ pub struct FeedEntryView<S: BosStr = DefaultStr> {
 /// Minimal notebook context for feed display.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedNotebookContext<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
@@ -459,13 +405,7 @@ pub struct FeedNotebookContext<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum FeedReason<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.notebook.defs#reasonLike")]
     ReasonLike(Box<notebook::ReasonLike<S>>),
@@ -477,13 +417,7 @@ pub enum FeedReason<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotebookView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -521,13 +455,7 @@ pub struct NotebookView<S: BosStr = DefaultStr> {
 /// Hydrated view of a page (entries displayed together).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PageView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -545,17 +473,11 @@ pub struct PageView<S: BosStr = DefaultStr> {
 }
 
 /// The path of the notebook.
-pub type Path<S: BosStr = DefaultStr> = S;
+pub type Path<S = DefaultStr> = S;
 /// A single permission grant. For resource authority: source=resource URI, grantedAt=createdAt. For invitees: source=invite URI, grantedAt=accept createdAt.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PermissionGrant<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///For authority: record createdAt. For invitees: accept createdAt
@@ -652,13 +574,7 @@ where
 /// ACL-style permissions for a resource. Separate from authors (who contributed).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PermissionsState<S: BosStr = DefaultStr> {
     ///DIDs that can edit this resource
     pub editors: Vec<notebook::PermissionGrant<S>>,
@@ -672,13 +588,7 @@ pub struct PermissionsState<S: BosStr = DefaultStr> {
 /// A published version of an entry in a collaborator's repo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PublishedVersionView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     ///If content differs, the version it diverged from
@@ -699,13 +609,7 @@ pub struct PublishedVersionView<S: BosStr = DefaultStr> {
 /// Viewer's reading progress (appview-side state, not a record).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReadingProgress<S: BosStr = DefaultStr> {
     ///Last entry the viewer was reading.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -814,13 +718,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReasonBookmark<S: BosStr = DefaultStr> {
     pub by: ProfileViewBasic<S>,
     pub indexed_at: Datetime,
@@ -830,13 +728,7 @@ pub struct ReasonBookmark<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReasonLike<S: BosStr = DefaultStr> {
     pub by: ProfileViewBasic<S>,
     pub indexed_at: Datetime,
@@ -846,13 +738,7 @@ pub struct ReasonLike<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReasonSubscription<S: BosStr = DefaultStr> {
     pub indexed_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -862,13 +748,7 @@ pub struct ReasonSubscription<S: BosStr = DefaultStr> {
 /// View of a rendered and cached notebook entry
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RenderedView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub css: Option<BlobRef<S>>,
@@ -878,9 +758,9 @@ pub struct RenderedView<S: BosStr = DefaultStr> {
 }
 
 /// An array of tags associated with the notebook entry. Tags can help categorize and organize entries.
-pub type Tags<S: BosStr = DefaultStr> = Vec<S>;
+pub type Tags<S = DefaultStr> = Vec<S>;
 /// The title of the notebook entry.
-pub type Title<S: BosStr = DefaultStr> = S;
+pub type Title<S = DefaultStr> = S;
 impl<S: BosStr> LexiconSchema for AuthorListView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.defs"
@@ -2782,37 +2662,37 @@ pub mod chapter_entry_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entry;
         type Index;
+        type Entry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entry = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `entry` field to Set
-    pub struct SetEntry<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEntry<St> {}
-    impl<St: State> State for SetEntry<St> {
-        type Entry = Set<members::entry>;
-        type Index = St::Index;
+        type Entry = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndex<St> {}
     impl<St: State> State for SetIndex<St> {
-        type Entry = St::Entry;
         type Index = Set<members::index>;
+        type Entry = St::Entry;
+    }
+    ///State transition - sets the `entry` field to Set
+    pub struct SetEntry<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntry<St> {}
+    impl<St: State> State for SetEntry<St> {
+        type Index = St::Index;
+        type Entry = Set<members::entry>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry` field
-        pub struct entry(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `entry` field
+        pub struct entry(());
     }
 }
 
@@ -2913,8 +2793,8 @@ impl<S: BosStr, St: chapter_entry_view_state::State> ChapterEntryViewBuilder<S, 
 impl<S: BosStr, St> ChapterEntryViewBuilder<S, St>
 where
     St: chapter_entry_view_state::State,
-    St::Entry: chapter_entry_view_state::IsSet,
     St::Index: chapter_entry_view_state::IsSet,
+    St::Entry: chapter_entry_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ChapterEntryView<S> {
@@ -2951,105 +2831,105 @@ pub mod chapter_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
         type Cid;
-        type Uri;
         type Authors;
         type Record;
+        type Uri;
         type IndexedAt;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
         type Cid = Unset;
-        type Uri = Unset;
         type Authors = Unset;
         type Record = Unset;
+        type Uri = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNotebook<St> {}
-    impl<St: State> State for SetNotebook<St> {
-        type Notebook = Set<members::notebook>;
-        type Cid = St::Cid;
-        type Uri = St::Uri;
-        type Authors = St::Authors;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
+        type Notebook = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Notebook = St::Notebook;
         type Cid = Set<members::cid>;
+        type Authors = St::Authors;
+        type Record = St::Record;
         type Uri = St::Uri;
-        type Authors = St::Authors;
-        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
         type Notebook = St::Notebook;
-        type Cid = St::Cid;
-        type Uri = Set<members::uri>;
-        type Authors = St::Authors;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
-        type Notebook = St::Notebook;
         type Cid = St::Cid;
-        type Uri = St::Uri;
         type Authors = Set<members::authors>;
         type Record = St::Record;
+        type Uri = St::Uri;
         type IndexedAt = St::IndexedAt;
+        type Notebook = St::Notebook;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Notebook = St::Notebook;
         type Cid = St::Cid;
-        type Uri = St::Uri;
         type Authors = St::Authors;
         type Record = Set<members::record>;
+        type Uri = St::Uri;
         type IndexedAt = St::IndexedAt;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Authors = St::Authors;
+        type Record = St::Record;
+        type Uri = Set<members::uri>;
+        type IndexedAt = St::IndexedAt;
+        type Notebook = St::Notebook;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type Notebook = St::Notebook;
         type Cid = St::Cid;
-        type Uri = St::Uri;
         type Authors = St::Authors;
         type Record = St::Record;
+        type Uri = St::Uri;
         type IndexedAt = Set<members::indexed_at>;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Cid = St::Cid;
+        type Authors = St::Authors;
+        type Record = St::Record;
+        type Uri = St::Uri;
+        type IndexedAt = St::IndexedAt;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `authors` field
         pub struct authors(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
@@ -3244,12 +3124,12 @@ where
 impl<S: BosStr, St> ChapterViewBuilder<S, St>
 where
     St: chapter_view_state::State,
-    St::Notebook: chapter_view_state::IsSet,
     St::Cid: chapter_view_state::IsSet,
-    St::Uri: chapter_view_state::IsSet,
     St::Authors: chapter_view_state::IsSet,
     St::Record: chapter_view_state::IsSet,
+    St::Uri: chapter_view_state::IsSet,
     St::IndexedAt: chapter_view_state::IsSet,
+    St::Notebook: chapter_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ChapterView<S> {
@@ -3310,84 +3190,84 @@ pub mod entry_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type IndexedAt;
+        type Uri;
         type Authors;
         type Record;
         type Cid;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type IndexedAt = Unset;
+        type Uri = Unset;
         type Authors = Unset;
         type Record = Unset;
         type Cid = Unset;
-        type Uri = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
         type IndexedAt = Set<members::indexed_at>;
+        type Uri = St::Uri;
         type Authors = St::Authors;
         type Record = St::Record;
         type Cid = St::Cid;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthors<St> {}
-    impl<St: State> State for SetAuthors<St> {
-        type IndexedAt = St::IndexedAt;
-        type Authors = Set<members::authors>;
-        type Record = St::Record;
-        type Cid = St::Cid;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type IndexedAt = St::IndexedAt;
-        type Authors = St::Authors;
-        type Record = Set<members::record>;
-        type Cid = St::Cid;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type IndexedAt = St::IndexedAt;
-        type Authors = St::Authors;
-        type Record = St::Record;
-        type Cid = Set<members::cid>;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
         type IndexedAt = St::IndexedAt;
+        type Uri = Set<members::uri>;
         type Authors = St::Authors;
         type Record = St::Record;
         type Cid = St::Cid;
-        type Uri = Set<members::uri>;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthors<St> {}
+    impl<St: State> State for SetAuthors<St> {
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Authors = Set<members::authors>;
+        type Record = St::Record;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Authors = St::Authors;
+        type Record = Set<members::record>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Authors = St::Authors;
+        type Record = St::Record;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `authors` field
         pub struct authors(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
@@ -3695,10 +3575,10 @@ impl<S: BosStr, St> EntryViewBuilder<S, St>
 where
     St: entry_view_state::State,
     St::IndexedAt: entry_view_state::IsSet,
+    St::Uri: entry_view_state::IsSet,
     St::Authors: entry_view_state::IsSet,
     St::Record: entry_view_state::IsSet,
     St::Cid: entry_view_state::IsSet,
-    St::Uri: entry_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> EntryView<S> {
@@ -4052,85 +3932,85 @@ pub mod notebook_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Authors;
         type Uri;
-        type Cid;
         type Record;
         type IndexedAt;
+        type Cid;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Authors = Unset;
         type Uri = Unset;
-        type Cid = Unset;
         type Record = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthors<St> {}
-    impl<St: State> State for SetAuthors<St> {
-        type Authors = Set<members::authors>;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
+        type Cid = Unset;
+        type Authors = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Authors = St::Authors;
         type Uri = Set<members::uri>;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
         type Authors = St::Authors;
-        type Uri = St::Uri;
-        type Cid = Set<members::cid>;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Authors = St::Authors;
         type Uri = St::Uri;
-        type Cid = St::Cid;
         type Record = Set<members::record>;
         type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Authors = St::Authors;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type Authors = St::Authors;
         type Uri = St::Uri;
-        type Cid = St::Cid;
         type Record = St::Record;
         type IndexedAt = Set<members::indexed_at>;
+        type Cid = St::Cid;
+        type Authors = St::Authors;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Cid = Set<members::cid>;
+        type Authors = St::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthors<St> {}
+    impl<St: State> State for SetAuthors<St> {
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `authors` field
-        pub struct authors(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
@@ -4461,11 +4341,11 @@ impl<S: BosStr, St: notebook_view_state::State> NotebookViewBuilder<S, St> {
 impl<S: BosStr, St> NotebookViewBuilder<S, St>
 where
     St: notebook_view_state::State,
-    St::Authors: notebook_view_state::IsSet,
     St::Uri: notebook_view_state::IsSet,
-    St::Cid: notebook_view_state::IsSet,
     St::Record: notebook_view_state::IsSet,
     St::IndexedAt: notebook_view_state::IsSet,
+    St::Cid: notebook_view_state::IsSet,
+    St::Authors: notebook_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> NotebookView<S> {
@@ -4528,85 +4408,85 @@ pub mod page_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Notebook;
+        type Cid;
         type Record;
         type IndexedAt;
-        type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Notebook = Unset;
+        type Cid = Unset;
         type Record = Unset;
         type IndexedAt = Unset;
-        type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Notebook = St::Notebook;
-        type Record = St::Record;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNotebook<St> {}
     impl<St: State> State for SetNotebook<St> {
-        type Uri = St::Uri;
         type Notebook = Set<members::notebook>;
+        type Cid = St::Cid;
         type Record = St::Record;
         type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
         type Uri = St::Uri;
-        type Notebook = St::Notebook;
-        type Record = Set<members::record>;
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type Uri = St::Uri;
-        type Notebook = St::Notebook;
-        type Record = St::Record;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = St::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Uri = St::Uri;
         type Notebook = St::Notebook;
+        type Cid = Set<members::cid>;
         type Record = St::Record;
         type IndexedAt = St::IndexedAt;
-        type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Notebook = St::Notebook;
+        type Cid = St::Cid;
+        type Record = Set<members::record>;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Notebook = St::Notebook;
+        type Cid = St::Cid;
+        type Record = St::Record;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Notebook = St::Notebook;
+        type Cid = St::Cid;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -4781,11 +4661,11 @@ where
 impl<S: BosStr, St> PageViewBuilder<S, St>
 where
     St: page_view_state::State,
-    St::Uri: page_view_state::IsSet,
     St::Notebook: page_view_state::IsSet,
+    St::Cid: page_view_state::IsSet,
     St::Record: page_view_state::IsSet,
     St::IndexedAt: page_view_state::IsSet,
-    St::Cid: page_view_state::IsSet,
+    St::Uri: page_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PageView<S> {
@@ -4828,66 +4708,66 @@ pub mod permission_grant_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Source;
-        type Scope;
         type GrantedAt;
+        type Scope;
+        type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Source = Unset;
-        type Scope = Unset;
         type GrantedAt = Unset;
+        type Scope = Unset;
+        type Source = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Source = St::Source;
+        type GrantedAt = St::GrantedAt;
         type Scope = St::Scope;
-        type GrantedAt = St::GrantedAt;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSource<St> {}
-    impl<St: State> State for SetSource<St> {
-        type Did = St::Did;
-        type Source = Set<members::source>;
-        type Scope = St::Scope;
-        type GrantedAt = St::GrantedAt;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScope<St> {}
-    impl<St: State> State for SetScope<St> {
-        type Did = St::Did;
         type Source = St::Source;
-        type Scope = Set<members::scope>;
-        type GrantedAt = St::GrantedAt;
     }
     ///State transition - sets the `granted_at` field to Set
     pub struct SetGrantedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGrantedAt<St> {}
     impl<St: State> State for SetGrantedAt<St> {
         type Did = St::Did;
-        type Source = St::Source;
-        type Scope = St::Scope;
         type GrantedAt = Set<members::granted_at>;
+        type Scope = St::Scope;
+        type Source = St::Source;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScope<St> {}
+    impl<St: State> State for SetScope<St> {
+        type Did = St::Did;
+        type GrantedAt = St::GrantedAt;
+        type Scope = Set<members::scope>;
+        type Source = St::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSource<St> {}
+    impl<St: State> State for SetSource<St> {
+        type Did = St::Did;
+        type GrantedAt = St::GrantedAt;
+        type Scope = St::Scope;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `source` field
-        pub struct source(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
         ///Marker type for the `granted_at` field
         pub struct granted_at(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
+        ///Marker type for the `source` field
+        pub struct source(());
     }
 }
 
@@ -5001,9 +4881,9 @@ impl<S: BosStr, St> PermissionGrantBuilder<S, St>
 where
     St: permission_grant_state::State,
     St::Did: permission_grant_state::IsSet,
-    St::Source: permission_grant_state::IsSet,
-    St::Scope: permission_grant_state::IsSet,
     St::GrantedAt: permission_grant_state::IsSet,
+    St::Scope: permission_grant_state::IsSet,
+    St::Source: permission_grant_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PermissionGrant<S> {
@@ -5164,67 +5044,67 @@ pub mod published_version_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
-        type Publisher;
         type PublishedAt;
+        type Cid;
+        type Publisher;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-        type Publisher = Unset;
         type PublishedAt = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Uri = St::Uri;
-        type Publisher = St::Publisher;
-        type PublishedAt = St::PublishedAt;
+        type Cid = Unset;
+        type Publisher = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
         type Uri = Set<members::uri>;
-        type Publisher = St::Publisher;
         type PublishedAt = St::PublishedAt;
-    }
-    ///State transition - sets the `publisher` field to Set
-    pub struct SetPublisher<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPublisher<St> {}
-    impl<St: State> State for SetPublisher<St> {
         type Cid = St::Cid;
-        type Uri = St::Uri;
-        type Publisher = Set<members::publisher>;
-        type PublishedAt = St::PublishedAt;
+        type Publisher = St::Publisher;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
     impl<St: State> State for SetPublishedAt<St> {
-        type Cid = St::Cid;
         type Uri = St::Uri;
-        type Publisher = St::Publisher;
         type PublishedAt = Set<members::published_at>;
+        type Cid = St::Cid;
+        type Publisher = St::Publisher;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type PublishedAt = St::PublishedAt;
+        type Cid = Set<members::cid>;
+        type Publisher = St::Publisher;
+    }
+    ///State transition - sets the `publisher` field to Set
+    pub struct SetPublisher<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublisher<St> {}
+    impl<St: State> State for SetPublisher<St> {
+        type Uri = St::Uri;
+        type PublishedAt = St::PublishedAt;
+        type Cid = St::Cid;
+        type Publisher = Set<members::publisher>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `publisher` field
-        pub struct publisher(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `publisher` field
+        pub struct publisher(());
     }
 }
 
@@ -5394,10 +5274,10 @@ where
 impl<S: BosStr, St> PublishedVersionViewBuilder<S, St>
 where
     St: published_version_view_state::State,
-    St::Cid: published_version_view_state::IsSet,
     St::Uri: published_version_view_state::IsSet,
-    St::Publisher: published_version_view_state::IsSet,
     St::PublishedAt: published_version_view_state::IsSet,
+    St::Cid: published_version_view_state::IsSet,
+    St::Publisher: published_version_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PublishedVersionView<S> {
@@ -5574,37 +5454,37 @@ pub mod reason_like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
         type By;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
         type By = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type IndexedAt = Set<members::indexed_at>;
-        type By = St::By;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `by` field to Set
     pub struct SetBy<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBy<St> {}
     impl<St: State> State for SetBy<St> {
-        type IndexedAt = St::IndexedAt;
         type By = Set<members::by>;
+        type IndexedAt = St::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type By = St::By;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `by` field
         pub struct by(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -5674,8 +5554,8 @@ where
 impl<S: BosStr, St> ReasonLikeBuilder<S, St>
 where
     St: reason_like_state::State,
-    St::IndexedAt: reason_like_state::IsSet,
     St::By: reason_like_state::IsSet,
+    St::IndexedAt: reason_like_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ReasonLike<S> {

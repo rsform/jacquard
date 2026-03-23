@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "social.lexical.works.collectionitem",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Collectionitem<S: BosStr = DefaultStr> {
     ///
@@ -53,13 +50,7 @@ pub struct Collectionitem<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct CollectionitemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -125,49 +116,49 @@ pub mod collectionitem_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Work;
         type List;
+        type Work;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Work = Unset;
         type List = Unset;
+        type Work = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `work` field to Set
-    pub struct SetWork<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWork<St> {}
-    impl<St: State> State for SetWork<St> {
-        type Work = Set<members::work>;
-        type List = St::List;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetList<St> {}
     impl<St: State> State for SetList<St> {
-        type Work = St::Work;
         type List = Set<members::list>;
+        type Work = St::Work;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `work` field to Set
+    pub struct SetWork<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWork<St> {}
+    impl<St: State> State for SetWork<St> {
+        type List = St::List;
+        type Work = Set<members::work>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Work = St::Work;
         type List = St::List;
+        type Work = St::Work;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work` field
-        pub struct work(());
         ///Marker type for the `list` field
         pub struct list(());
+        ///Marker type for the `work` field
+        pub struct work(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -258,8 +249,8 @@ where
 impl<S: BosStr, St> CollectionitemBuilder<S, St>
 where
     St: collectionitem_state::State,
-    St::Work: collectionitem_state::IsSet,
     St::List: collectionitem_state::IsSet,
+    St::Work: collectionitem_state::IsSet,
     St::CreatedAt: collectionitem_state::IsSet,
 {
     /// Build the final struct.

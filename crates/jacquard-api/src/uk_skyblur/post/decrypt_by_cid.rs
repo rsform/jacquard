@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Cid, UriValue};
 use jacquard_common::types::value::Data;
@@ -18,13 +18,7 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DecryptByCid<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub password: S,
@@ -37,13 +31,7 @@ pub struct DecryptByCid<S: BosStr = DefaultStr> {
 /// Returns the encrypted result.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DecryptByCidOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional: Option<S>,
@@ -92,67 +80,67 @@ pub mod decrypt_by_cid_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Password;
+        type Cid;
         type Pds;
         type Repo;
-        type Cid;
+        type Password;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Password = Unset;
+        type Cid = Unset;
         type Pds = Unset;
         type Repo = Unset;
-        type Cid = Unset;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPassword<St> {}
-    impl<St: State> State for SetPassword<St> {
-        type Password = Set<members::password>;
-        type Pds = St::Pds;
-        type Repo = St::Repo;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `pds` field to Set
-    pub struct SetPds<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPds<St> {}
-    impl<St: State> State for SetPds<St> {
-        type Password = St::Password;
-        type Pds = Set<members::pds>;
-        type Repo = St::Repo;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Password = St::Password;
-        type Pds = St::Pds;
-        type Repo = Set<members::repo>;
-        type Cid = St::Cid;
+        type Password = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Password = St::Password;
+        type Cid = Set<members::cid>;
         type Pds = St::Pds;
         type Repo = St::Repo;
-        type Cid = Set<members::cid>;
+        type Password = St::Password;
+    }
+    ///State transition - sets the `pds` field to Set
+    pub struct SetPds<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPds<St> {}
+    impl<St: State> State for SetPds<St> {
+        type Cid = St::Cid;
+        type Pds = Set<members::pds>;
+        type Repo = St::Repo;
+        type Password = St::Password;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Cid = St::Cid;
+        type Pds = St::Pds;
+        type Repo = Set<members::repo>;
+        type Password = St::Password;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPassword<St> {}
+    impl<St: State> State for SetPassword<St> {
+        type Cid = St::Cid;
+        type Pds = St::Pds;
+        type Repo = St::Repo;
+        type Password = Set<members::password>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `password` field
-        pub struct password(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `pds` field
         pub struct pds(());
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
+        ///Marker type for the `password` field
+        pub struct password(());
     }
 }
 
@@ -260,10 +248,10 @@ where
 impl<S: BosStr, St> DecryptByCidBuilder<S, St>
 where
     St: decrypt_by_cid_state::State,
-    St::Password: decrypt_by_cid_state::IsSet,
+    St::Cid: decrypt_by_cid_state::IsSet,
     St::Pds: decrypt_by_cid_state::IsSet,
     St::Repo: decrypt_by_cid_state::IsSet,
-    St::Cid: decrypt_by_cid_state::IsSet,
+    St::Password: decrypt_by_cid_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DecryptByCid<S> {

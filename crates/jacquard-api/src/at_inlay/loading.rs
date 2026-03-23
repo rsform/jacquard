@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -19,13 +19,7 @@ use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Loading<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     pub fallback: Element<S>,
@@ -35,13 +29,7 @@ pub struct Loading<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LoadingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -87,37 +75,37 @@ pub mod loading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fallback;
         type Children;
+        type Fallback;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fallback = Unset;
         type Children = Unset;
-    }
-    ///State transition - sets the `fallback` field to Set
-    pub struct SetFallback<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFallback<St> {}
-    impl<St: State> State for SetFallback<St> {
-        type Fallback = Set<members::fallback>;
-        type Children = St::Children;
+        type Fallback = Unset;
     }
     ///State transition - sets the `children` field to Set
     pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetChildren<St> {}
     impl<St: State> State for SetChildren<St> {
-        type Fallback = St::Fallback;
         type Children = Set<members::children>;
+        type Fallback = St::Fallback;
+    }
+    ///State transition - sets the `fallback` field to Set
+    pub struct SetFallback<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFallback<St> {}
+    impl<St: State> State for SetFallback<St> {
+        type Children = St::Children;
+        type Fallback = Set<members::fallback>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fallback` field
-        pub struct fallback(());
         ///Marker type for the `children` field
         pub struct children(());
+        ///Marker type for the `fallback` field
+        pub struct fallback(());
     }
 }
 
@@ -187,8 +175,8 @@ where
 impl<S: BosStr, St> LoadingBuilder<S, St>
 where
     St: loading_state::State,
-    St::Fallback: loading_state::IsSet,
     St::Children: loading_state::IsSet,
+    St::Fallback: loading_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Loading<S> {

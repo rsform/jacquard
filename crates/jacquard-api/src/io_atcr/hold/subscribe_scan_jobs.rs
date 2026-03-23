@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -37,20 +37,22 @@ pub struct SubscribeScanJobs {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeScanJobsMessage<'a> {
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub enum SubscribeScanJobsMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "#scanJob")]
     ScanJob(Box<subscribe_scan_jobs::ScanJob<S>>),
     #[serde(rename = "#scanResult")]
     ScanResult(Box<subscribe_scan_jobs::ScanResult<S>>),
 }
 
-impl<'a> SubscribeScanJobsMessage<'a> {
+impl<S: BosStr> SubscribeScanJobsMessage<S> {
     /// Decode a framed DAG-CBOR message (header + body).
-    pub fn decode_framed<'de: 'a>(
+    pub fn decode_framed<'de>(
         bytes: &'de [u8],
-    ) -> Result<SubscribeScanJobsMessage<'a>, jacquard_common::error::DecodeError> {
+    ) -> Result<SubscribeScanJobsMessage<S>, jacquard_common::error::DecodeError>
+    where
+        S: serde::Deserialize<'de>,
+    {
         let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
             bytes,
         )?;
@@ -122,13 +124,7 @@ impl core::fmt::Display for SubscribeScanJobsError {
 /// A scan job dispatched from hold to scanner. Sent as a JSON WebSocket message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScanJob<S: BosStr = DefaultStr> {
     ///Manifest digest (e.g., sha256:abc123...)
     pub digest: S,
@@ -157,13 +153,7 @@ pub struct ScanJob<S: BosStr = DefaultStr> {
 /// A scan result sent from scanner back to hold. Sent as a JSON WebSocket message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScanResult<S: BosStr = DefaultStr> {
     ///Manifest digest that was scanned
     pub digest: S,
@@ -191,13 +181,7 @@ pub struct ScanResult<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VulnSummary<S: BosStr = DefaultStr> {
     ///Count of critical severity vulnerabilities
     pub critical: i64,
@@ -219,7 +203,7 @@ pub struct SubscribeScanJobsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeScanJobsStream {
     const NSID: &'static str = "io.atcr.hold.subscribeScanJobs";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Message<'de> = SubscribeScanJobsMessage<'de>;
+    type Message<S: BosStr> = SubscribeScanJobsMessage<S>;
     type Error = SubscribeScanJobsError;
 }
 
@@ -233,7 +217,7 @@ pub struct SubscribeScanJobsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeScanJobsEndpoint {
     const PATH: &'static str = "/xrpc/io.atcr.hold.subscribeScanJobs";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Params<'de> = SubscribeScanJobs;
+    type Params<S: BosStr> = SubscribeScanJobs;
     type Stream = SubscribeScanJobsStream;
 }
 
@@ -494,127 +478,127 @@ pub mod scan_job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
-        type Type;
-        type Repository;
-        type Seq;
-        type UserDid;
-        type HoldDid;
         type HoldEndpoint;
+        type Type;
+        type UserDid;
+        type Seq;
+        type Digest;
+        type Repository;
+        type HoldDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
-        type Type = Unset;
-        type Repository = Unset;
-        type Seq = Unset;
-        type UserDid = Unset;
-        type HoldDid = Unset;
         type HoldEndpoint = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDigest<St> {}
-    impl<St: State> State for SetDigest<St> {
-        type Digest = Set<members::digest>;
-        type Type = St::Type;
-        type Repository = St::Repository;
-        type Seq = St::Seq;
-        type UserDid = St::UserDid;
-        type HoldDid = St::HoldDid;
-        type HoldEndpoint = St::HoldEndpoint;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Digest = St::Digest;
-        type Type = Set<members::r#type>;
-        type Repository = St::Repository;
-        type Seq = St::Seq;
-        type UserDid = St::UserDid;
-        type HoldDid = St::HoldDid;
-        type HoldEndpoint = St::HoldEndpoint;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepository<St> {}
-    impl<St: State> State for SetRepository<St> {
-        type Digest = St::Digest;
-        type Type = St::Type;
-        type Repository = Set<members::repository>;
-        type Seq = St::Seq;
-        type UserDid = St::UserDid;
-        type HoldDid = St::HoldDid;
-        type HoldEndpoint = St::HoldEndpoint;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSeq<St> {}
-    impl<St: State> State for SetSeq<St> {
-        type Digest = St::Digest;
-        type Type = St::Type;
-        type Repository = St::Repository;
-        type Seq = Set<members::seq>;
-        type UserDid = St::UserDid;
-        type HoldDid = St::HoldDid;
-        type HoldEndpoint = St::HoldEndpoint;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUserDid<St> {}
-    impl<St: State> State for SetUserDid<St> {
-        type Digest = St::Digest;
-        type Type = St::Type;
-        type Repository = St::Repository;
-        type Seq = St::Seq;
-        type UserDid = Set<members::user_did>;
-        type HoldDid = St::HoldDid;
-        type HoldEndpoint = St::HoldEndpoint;
-    }
-    ///State transition - sets the `hold_did` field to Set
-    pub struct SetHoldDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHoldDid<St> {}
-    impl<St: State> State for SetHoldDid<St> {
-        type Digest = St::Digest;
-        type Type = St::Type;
-        type Repository = St::Repository;
-        type Seq = St::Seq;
-        type UserDid = St::UserDid;
-        type HoldDid = Set<members::hold_did>;
-        type HoldEndpoint = St::HoldEndpoint;
+        type Type = Unset;
+        type UserDid = Unset;
+        type Seq = Unset;
+        type Digest = Unset;
+        type Repository = Unset;
+        type HoldDid = Unset;
     }
     ///State transition - sets the `hold_endpoint` field to Set
     pub struct SetHoldEndpoint<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHoldEndpoint<St> {}
     impl<St: State> State for SetHoldEndpoint<St> {
-        type Digest = St::Digest;
-        type Type = St::Type;
-        type Repository = St::Repository;
-        type Seq = St::Seq;
-        type UserDid = St::UserDid;
-        type HoldDid = St::HoldDid;
         type HoldEndpoint = Set<members::hold_endpoint>;
+        type Type = St::Type;
+        type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type Digest = St::Digest;
+        type Repository = St::Repository;
+        type HoldDid = St::HoldDid;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type HoldEndpoint = St::HoldEndpoint;
+        type Type = Set<members::r#type>;
+        type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type Digest = St::Digest;
+        type Repository = St::Repository;
+        type HoldDid = St::HoldDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserDid<St> {}
+    impl<St: State> State for SetUserDid<St> {
+        type HoldEndpoint = St::HoldEndpoint;
+        type Type = St::Type;
+        type UserDid = Set<members::user_did>;
+        type Seq = St::Seq;
+        type Digest = St::Digest;
+        type Repository = St::Repository;
+        type HoldDid = St::HoldDid;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSeq<St> {}
+    impl<St: State> State for SetSeq<St> {
+        type HoldEndpoint = St::HoldEndpoint;
+        type Type = St::Type;
+        type UserDid = St::UserDid;
+        type Seq = Set<members::seq>;
+        type Digest = St::Digest;
+        type Repository = St::Repository;
+        type HoldDid = St::HoldDid;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type HoldEndpoint = St::HoldEndpoint;
+        type Type = St::Type;
+        type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type Digest = Set<members::digest>;
+        type Repository = St::Repository;
+        type HoldDid = St::HoldDid;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
+        type HoldEndpoint = St::HoldEndpoint;
+        type Type = St::Type;
+        type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type Digest = St::Digest;
+        type Repository = Set<members::repository>;
+        type HoldDid = St::HoldDid;
+    }
+    ///State transition - sets the `hold_did` field to Set
+    pub struct SetHoldDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHoldDid<St> {}
+    impl<St: State> State for SetHoldDid<St> {
+        type HoldEndpoint = St::HoldEndpoint;
+        type Type = St::Type;
+        type UserDid = St::UserDid;
+        type Seq = St::Seq;
+        type Digest = St::Digest;
+        type Repository = St::Repository;
+        type HoldDid = Set<members::hold_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
-        ///Marker type for the `seq` field
-        pub struct seq(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
-        ///Marker type for the `hold_did` field
-        pub struct hold_did(());
         ///Marker type for the `hold_endpoint` field
         pub struct hold_endpoint(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
+        ///Marker type for the `hold_did` field
+        pub struct hold_did(());
     }
 }
 
@@ -815,13 +799,13 @@ where
 impl<S: BosStr, St> ScanJobBuilder<S, St>
 where
     St: scan_job_state::State,
-    St::Digest: scan_job_state::IsSet,
-    St::Type: scan_job_state::IsSet,
-    St::Repository: scan_job_state::IsSet,
-    St::Seq: scan_job_state::IsSet,
-    St::UserDid: scan_job_state::IsSet,
-    St::HoldDid: scan_job_state::IsSet,
     St::HoldEndpoint: scan_job_state::IsSet,
+    St::Type: scan_job_state::IsSet,
+    St::UserDid: scan_job_state::IsSet,
+    St::Seq: scan_job_state::IsSet,
+    St::Digest: scan_job_state::IsSet,
+    St::Repository: scan_job_state::IsSet,
+    St::HoldDid: scan_job_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ScanJob<S> {
@@ -1153,51 +1137,51 @@ pub mod scan_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
         type Summary;
         type Type;
+        type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
         type Summary = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDigest<St> {}
-    impl<St: State> State for SetDigest<St> {
-        type Digest = Set<members::digest>;
-        type Summary = St::Summary;
-        type Type = St::Type;
+        type Digest = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSummary<St> {}
     impl<St: State> State for SetSummary<St> {
-        type Digest = St::Digest;
         type Summary = Set<members::summary>;
         type Type = St::Type;
+        type Digest = St::Digest;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Digest = St::Digest;
         type Summary = St::Summary;
         type Type = Set<members::r#type>;
+        type Digest = St::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type Summary = St::Summary;
+        type Type = St::Type;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `summary` field
         pub struct summary(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
     }
 }
 
@@ -1346,9 +1330,9 @@ impl<S: BosStr, St: scan_result_state::State> ScanResultBuilder<S, St> {
 impl<S: BosStr, St> ScanResultBuilder<S, St>
 where
     St: scan_result_state::State,
-    St::Digest: scan_result_state::IsSet,
     St::Summary: scan_result_state::IsSet,
     St::Type: scan_result_state::IsSet,
+    St::Digest: scan_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ScanResult<S> {
@@ -1391,85 +1375,85 @@ pub mod vuln_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Medium;
-        type High;
         type Low;
-        type Total;
+        type Medium;
         type Critical;
+        type Total;
+        type High;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Medium = Unset;
-        type High = Unset;
         type Low = Unset;
-        type Total = Unset;
+        type Medium = Unset;
         type Critical = Unset;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMedium<St> {}
-    impl<St: State> State for SetMedium<St> {
-        type Medium = Set<members::medium>;
-        type High = St::High;
-        type Low = St::Low;
-        type Total = St::Total;
-        type Critical = St::Critical;
-    }
-    ///State transition - sets the `high` field to Set
-    pub struct SetHigh<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHigh<St> {}
-    impl<St: State> State for SetHigh<St> {
-        type Medium = St::Medium;
-        type High = Set<members::high>;
-        type Low = St::Low;
-        type Total = St::Total;
-        type Critical = St::Critical;
+        type Total = Unset;
+        type High = Unset;
     }
     ///State transition - sets the `low` field to Set
     pub struct SetLow<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLow<St> {}
     impl<St: State> State for SetLow<St> {
-        type Medium = St::Medium;
-        type High = St::High;
         type Low = Set<members::low>;
-        type Total = St::Total;
-        type Critical = St::Critical;
-    }
-    ///State transition - sets the `total` field to Set
-    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTotal<St> {}
-    impl<St: State> State for SetTotal<St> {
         type Medium = St::Medium;
-        type High = St::High;
-        type Low = St::Low;
-        type Total = Set<members::total>;
         type Critical = St::Critical;
+        type Total = St::Total;
+        type High = St::High;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMedium<St> {}
+    impl<St: State> State for SetMedium<St> {
+        type Low = St::Low;
+        type Medium = Set<members::medium>;
+        type Critical = St::Critical;
+        type Total = St::Total;
+        type High = St::High;
     }
     ///State transition - sets the `critical` field to Set
     pub struct SetCritical<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCritical<St> {}
     impl<St: State> State for SetCritical<St> {
-        type Medium = St::Medium;
-        type High = St::High;
         type Low = St::Low;
-        type Total = St::Total;
+        type Medium = St::Medium;
         type Critical = Set<members::critical>;
+        type Total = St::Total;
+        type High = St::High;
+    }
+    ///State transition - sets the `total` field to Set
+    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotal<St> {}
+    impl<St: State> State for SetTotal<St> {
+        type Low = St::Low;
+        type Medium = St::Medium;
+        type Critical = St::Critical;
+        type Total = Set<members::total>;
+        type High = St::High;
+    }
+    ///State transition - sets the `high` field to Set
+    pub struct SetHigh<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHigh<St> {}
+    impl<St: State> State for SetHigh<St> {
+        type Low = St::Low;
+        type Medium = St::Medium;
+        type Critical = St::Critical;
+        type Total = St::Total;
+        type High = Set<members::high>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `medium` field
-        pub struct medium(());
-        ///Marker type for the `high` field
-        pub struct high(());
         ///Marker type for the `low` field
         pub struct low(());
-        ///Marker type for the `total` field
-        pub struct total(());
+        ///Marker type for the `medium` field
+        pub struct medium(());
         ///Marker type for the `critical` field
         pub struct critical(());
+        ///Marker type for the `total` field
+        pub struct total(());
+        ///Marker type for the `high` field
+        pub struct high(());
     }
 }
 
@@ -1596,11 +1580,11 @@ where
 impl<S: BosStr, St> VulnSummaryBuilder<S, St>
 where
     St: vuln_summary_state::State,
-    St::Medium: vuln_summary_state::IsSet,
-    St::High: vuln_summary_state::IsSet,
     St::Low: vuln_summary_state::IsSet,
-    St::Total: vuln_summary_state::IsSet,
+    St::Medium: vuln_summary_state::IsSet,
     St::Critical: vuln_summary_state::IsSet,
+    St::Total: vuln_summary_state::IsSet,
+    St::High: vuln_summary_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> VulnSummary<S> {

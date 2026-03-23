@@ -17,7 +17,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,13 +34,7 @@ use serde::{Serialize, Deserialize};
 /// Reference to a Magic: The Gathering card with printing and oracle identifiers.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardRef<S: BosStr = DefaultStr> {
     /**Oracle card URI (oracle:<uuid>) - for external indexing.
 Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
@@ -76,37 +70,37 @@ pub mod card_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type OracleUri;
         type ScryfallUri;
+        type OracleUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type OracleUri = Unset;
         type ScryfallUri = Unset;
-    }
-    ///State transition - sets the `oracle_uri` field to Set
-    pub struct SetOracleUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOracleUri<St> {}
-    impl<St: State> State for SetOracleUri<St> {
-        type OracleUri = Set<members::oracle_uri>;
-        type ScryfallUri = St::ScryfallUri;
+        type OracleUri = Unset;
     }
     ///State transition - sets the `scryfall_uri` field to Set
     pub struct SetScryfallUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetScryfallUri<St> {}
     impl<St: State> State for SetScryfallUri<St> {
-        type OracleUri = St::OracleUri;
         type ScryfallUri = Set<members::scryfall_uri>;
+        type OracleUri = St::OracleUri;
+    }
+    ///State transition - sets the `oracle_uri` field to Set
+    pub struct SetOracleUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOracleUri<St> {}
+    impl<St: State> State for SetOracleUri<St> {
+        type ScryfallUri = St::ScryfallUri;
+        type OracleUri = Set<members::oracle_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `oracle_uri` field
-        pub struct oracle_uri(());
         ///Marker type for the `scryfall_uri` field
         pub struct scryfall_uri(());
+        ///Marker type for the `oracle_uri` field
+        pub struct oracle_uri(());
     }
 }
 
@@ -176,8 +170,8 @@ where
 impl<S: BosStr, St> CardRefBuilder<S, St>
 where
     St: card_ref_state::State,
-    St::OracleUri: card_ref_state::IsSet,
     St::ScryfallUri: card_ref_state::IsSet,
+    St::OracleUri: card_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CardRef<S> {

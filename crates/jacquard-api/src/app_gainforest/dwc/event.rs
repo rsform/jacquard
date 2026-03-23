@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "app.gainforest.dwc.event",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Event<S: BosStr = DefaultStr> {
     ///Uncertainty radius in meters around the coordinates.
@@ -125,13 +122,7 @@ pub struct Event<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct EventGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -480,49 +471,49 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EventId;
         type EventDate;
+        type EventId;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EventId = Unset;
         type EventDate = Unset;
+        type EventId = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `event_id` field to Set
-    pub struct SetEventId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEventId<St> {}
-    impl<St: State> State for SetEventId<St> {
-        type EventId = Set<members::event_id>;
-        type EventDate = St::EventDate;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `event_date` field to Set
     pub struct SetEventDate<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEventDate<St> {}
     impl<St: State> State for SetEventDate<St> {
-        type EventId = St::EventId;
         type EventDate = Set<members::event_date>;
+        type EventId = St::EventId;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `event_id` field to Set
+    pub struct SetEventId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEventId<St> {}
+    impl<St: State> State for SetEventId<St> {
+        type EventDate = St::EventDate;
+        type EventId = Set<members::event_id>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type EventId = St::EventId;
         type EventDate = St::EventDate;
+        type EventId = St::EventId;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event_id` field
-        pub struct event_id(());
         ///Marker type for the `event_date` field
         pub struct event_date(());
+        ///Marker type for the `event_id` field
+        pub struct event_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -984,8 +975,8 @@ impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
 impl<S: BosStr, St> EventBuilder<S, St>
 where
     St: event_state::State,
-    St::EventId: event_state::IsSet,
     St::EventDate: event_state::IsSet,
+    St::EventId: event_state::IsSet,
     St::CreatedAt: event_state::IsSet,
 {
     /// Build the final struct.

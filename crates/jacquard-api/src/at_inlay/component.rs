@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,13 +32,7 @@ use crate::at_inlay::component;
 /// Component rendered by calling a remote XRPC endpoint
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BodyExternal<S: BosStr = DefaultStr> {
     ///DID of the service hosting this component
     pub did: Did<S>,
@@ -49,13 +43,7 @@ pub struct BodyExternal<S: BosStr = DefaultStr> {
 /// Component rendered by the host from a serialized element tree
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BodyTemplate<S: BosStr = DefaultStr> {
     ///Serialized element tree with bindings
     pub node: Data<S>,
@@ -70,10 +58,7 @@ pub struct BodyTemplate<S: BosStr = DefaultStr> {
     rename_all = "camelCase",
     rename = "at.inlay.component",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Component<S: BosStr = DefaultStr> {
     ///How this component is rendered. Omit for primitives rendered by the host.
@@ -104,13 +89,7 @@ pub struct Component<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ComponentBody<S: BosStr = DefaultStr> {
     #[serde(rename = "at.inlay.component#bodyExternal")]
     BodyExternal(Box<component::BodyExternal<S>>),
@@ -121,13 +100,7 @@ pub enum ComponentBody<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct ComponentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -138,13 +111,7 @@ pub struct ComponentGetRecordOutput<S: BosStr = DefaultStr> {
 /// Declares what data this component views and which prop receives it.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     ///Data types this view accepts.
     pub accepts: Vec<ViewAcceptsItem<S>>,
@@ -157,13 +124,7 @@ pub struct View<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ViewAcceptsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "at.inlay.component#viewRecord")]
     ViewRecord(Box<component::ViewRecord<S>>),
@@ -174,13 +135,7 @@ pub enum ViewAcceptsItem<S: BosStr = DefaultStr> {
 /// View accepts a primitive value type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewPrimitive<S: BosStr = DefaultStr> {
     ///String format constraint. Only applies when type is 'string'.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -404,13 +359,7 @@ where
 /// View accepts individual records of a collection. Omit collection for a generic record view. When rkey is present, the component accepts bare DIDs (expanded to full AT URIs) and appears on identity pages.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewRecord<S: BosStr = DefaultStr> {
     ///The collection this component views. Omit for any-collection.
     #[serde(skip_serializing_if = "Option::is_none")]

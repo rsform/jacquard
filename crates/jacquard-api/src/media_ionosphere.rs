@@ -16,7 +16,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,17 +32,11 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::media_ionosphere;
 /// BearerURI as specified in ETSI TS 103 270
-pub type Bearer<S: BosStr = DefaultStr> = UriValue<S>;
+pub type Bearer<S = DefaultStr> = UriValue<S>;
 /// Represents the method of accessing a broadcast; i.e. live
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Broadcast<S: BosStr = DefaultStr> {
     pub bearer: media_ionosphere::Bearer<S>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods  Defaults to `0`.
@@ -65,13 +59,7 @@ pub struct Broadcast<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Credit<S: BosStr = DefaultStr> {
     pub entity: media_ionosphere::Entity<S>,
     ///Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
@@ -165,13 +153,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Entity<S: BosStr = DefaultStr> {
     pub name: S,
     pub r#type: S,
@@ -180,16 +162,10 @@ pub struct Entity<S: BosStr = DefaultStr> {
 }
 
 /// TV-Anytime classification scheme URIs permitted by ETSI TS 102 818 section 5.3
-pub type Genre<S: BosStr = DefaultStr> = UriValue<S>;
+pub type Genre<S = DefaultStr> = UriValue<S>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Geocoordinates<S: BosStr = DefaultStr> {
     pub latitude: S,
     pub longitude: S,
@@ -200,13 +176,7 @@ pub struct Geocoordinates<S: BosStr = DefaultStr> {
 /// Represents membership to a group, optionally with an index
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Membership<S: BosStr = DefaultStr> {
     pub group: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -218,13 +188,7 @@ pub struct Membership<S: BosStr = DefaultStr> {
 /// Represents the method of accessing a recording
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Recording<S: BosStr = DefaultStr> {
     pub bearer: media_ionosphere::Bearer<S>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods  Defaults to `0`.
@@ -243,13 +207,7 @@ pub struct Recording<S: BosStr = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Track<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
@@ -946,37 +904,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Role;
         type Entity;
+        type Role;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Role = Unset;
         type Entity = Unset;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRole<St> {}
-    impl<St: State> State for SetRole<St> {
-        type Role = Set<members::role>;
-        type Entity = St::Entity;
+        type Role = Unset;
     }
     ///State transition - sets the `entity` field to Set
     pub struct SetEntity<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEntity<St> {}
     impl<St: State> State for SetEntity<St> {
-        type Role = St::Role;
         type Entity = Set<members::entity>;
+        type Role = St::Role;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRole<St> {}
+    impl<St: State> State for SetRole<St> {
+        type Entity = St::Entity;
+        type Role = Set<members::role>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `entity` field
         pub struct entity(());
+        ///Marker type for the `role` field
+        pub struct role(());
     }
 }
 
@@ -1046,8 +1004,8 @@ where
 impl<S: BosStr, St> CreditBuilder<S, St>
 where
     St: credit_state::State,
-    St::Role: credit_state::IsSet,
     St::Entity: credit_state::IsSet,
+    St::Role: credit_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Credit<S> {

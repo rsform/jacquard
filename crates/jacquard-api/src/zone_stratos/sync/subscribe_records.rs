@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,13 +29,7 @@ use crate::zone_stratos::sync::subscribe_records;
 /// A commit event containing record operations.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Commit<S: BosStr = DefaultStr> {
     ///The DID of the account.
     pub did: Did<S>,
@@ -54,13 +48,7 @@ pub struct Commit<S: BosStr = DefaultStr> {
 /// An enrollment event indicating a user has enrolled or unenrolled from the service.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Enrollment<S: BosStr = DefaultStr> {
     ///The enrollment action.
     pub action: EnrollmentAction<S>,
@@ -160,13 +148,7 @@ where
 /// An informational message about the subscription state.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Info<S: BosStr = DefaultStr> {
     ///Additional details about the info message.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -254,13 +236,7 @@ where
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscribeRecords<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
@@ -276,9 +252,8 @@ pub struct SubscribeRecords<S: BosStr = DefaultStr> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeRecordsMessage<'a> {
+#[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub enum SubscribeRecordsMessage<S: BosStr = DefaultStr> {
     #[serde(rename = "#commit")]
     Commit(Box<subscribe_records::Commit<S>>),
     #[serde(rename = "#enrollment")]
@@ -287,11 +262,14 @@ pub enum SubscribeRecordsMessage<'a> {
     Info(Box<subscribe_records::Info<S>>),
 }
 
-impl<'a> SubscribeRecordsMessage<'a> {
+impl<S: BosStr> SubscribeRecordsMessage<S> {
     /// Decode a framed DAG-CBOR message (header + body).
-    pub fn decode_framed<'de: 'a>(
+    pub fn decode_framed<'de>(
         bytes: &'de [u8],
-    ) -> Result<SubscribeRecordsMessage<'a>, jacquard_common::error::DecodeError> {
+    ) -> Result<SubscribeRecordsMessage<S>, jacquard_common::error::DecodeError>
+    where
+        S: serde::Deserialize<'de>,
+    {
         let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
             bytes,
         )?;
@@ -379,13 +357,7 @@ impl core::fmt::Display for SubscribeRecordsError {
 /// A single record operation within a commit.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordOp<S: BosStr = DefaultStr> {
     ///The type of operation.
     pub action: RecordOpAction<S>,
@@ -567,11 +539,11 @@ pub struct SubscribeRecordsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeRecordsStream {
     const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Message<'de> = SubscribeRecordsMessage<'de>;
+    type Message<S: BosStr> = SubscribeRecordsMessage<S>;
     type Error = SubscribeRecordsError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcSubscription for SubscribeRecords<'a> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcSubscription for SubscribeRecords<S> {
     const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeRecordsStream;
@@ -581,7 +553,7 @@ pub struct SubscribeRecordsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeRecordsEndpoint {
     const PATH: &'static str = "/xrpc/zone.stratos.sync.subscribeRecords";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Params<'de> = SubscribeRecords<'de>;
+    type Params<S: BosStr> = SubscribeRecords<S>;
     type Stream = SubscribeRecordsStream;
 }
 
@@ -633,84 +605,84 @@ pub mod commit_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Seq;
+        type Rev;
         type Ops;
         type Time;
         type Did;
-        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Seq = Unset;
+        type Rev = Unset;
         type Ops = Unset;
         type Time = Unset;
         type Did = Unset;
-        type Rev = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSeq<St> {}
     impl<St: State> State for SetSeq<St> {
         type Seq = Set<members::seq>;
+        type Rev = St::Rev;
         type Ops = St::Ops;
         type Time = St::Time;
         type Did = St::Did;
-        type Rev = St::Rev;
-    }
-    ///State transition - sets the `ops` field to Set
-    pub struct SetOps<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOps<St> {}
-    impl<St: State> State for SetOps<St> {
-        type Seq = St::Seq;
-        type Ops = Set<members::ops>;
-        type Time = St::Time;
-        type Did = St::Did;
-        type Rev = St::Rev;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTime<St> {}
-    impl<St: State> State for SetTime<St> {
-        type Seq = St::Seq;
-        type Ops = St::Ops;
-        type Time = Set<members::time>;
-        type Did = St::Did;
-        type Rev = St::Rev;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Seq = St::Seq;
-        type Ops = St::Ops;
-        type Time = St::Time;
-        type Did = Set<members::did>;
-        type Rev = St::Rev;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRev<St> {}
     impl<St: State> State for SetRev<St> {
         type Seq = St::Seq;
+        type Rev = Set<members::rev>;
         type Ops = St::Ops;
         type Time = St::Time;
         type Did = St::Did;
-        type Rev = Set<members::rev>;
+    }
+    ///State transition - sets the `ops` field to Set
+    pub struct SetOps<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOps<St> {}
+    impl<St: State> State for SetOps<St> {
+        type Seq = St::Seq;
+        type Rev = St::Rev;
+        type Ops = Set<members::ops>;
+        type Time = St::Time;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTime<St> {}
+    impl<St: State> State for SetTime<St> {
+        type Seq = St::Seq;
+        type Rev = St::Rev;
+        type Ops = St::Ops;
+        type Time = Set<members::time>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Seq = St::Seq;
+        type Rev = St::Rev;
+        type Ops = St::Ops;
+        type Time = St::Time;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `seq` field
         pub struct seq(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
         ///Marker type for the `ops` field
         pub struct ops(());
         ///Marker type for the `time` field
         pub struct time(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
     }
 }
 
@@ -844,10 +816,10 @@ impl<S: BosStr, St> CommitBuilder<S, St>
 where
     St: commit_state::State,
     St::Seq: commit_state::IsSet,
+    St::Rev: commit_state::IsSet,
     St::Ops: commit_state::IsSet,
     St::Time: commit_state::IsSet,
     St::Did: commit_state::IsSet,
-    St::Rev: commit_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Commit<S> {
@@ -1192,51 +1164,51 @@ pub mod enrollment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Action;
         type Time;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Action = Unset;
         type Time = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Action = St::Action;
-        type Time = St::Time;
+        type Did = Unset;
     }
     ///State transition - sets the `action` field to Set
     pub struct SetAction<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAction<St> {}
     impl<St: State> State for SetAction<St> {
-        type Did = St::Did;
         type Action = Set<members::action>;
         type Time = St::Time;
+        type Did = St::Did;
     }
     ///State transition - sets the `time` field to Set
     pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTime<St> {}
     impl<St: State> State for SetTime<St> {
-        type Did = St::Did;
         type Action = St::Action;
         type Time = Set<members::time>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Action = St::Action;
+        type Time = St::Time;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `action` field
         pub struct action(());
         ///Marker type for the `time` field
         pub struct time(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -1357,9 +1329,9 @@ where
 impl<S: BosStr, St> EnrollmentBuilder<S, St>
 where
     St: enrollment_state::State,
-    St::Did: enrollment_state::IsSet,
     St::Action: enrollment_state::IsSet,
     St::Time: enrollment_state::IsSet,
+    St::Did: enrollment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Enrollment<S> {

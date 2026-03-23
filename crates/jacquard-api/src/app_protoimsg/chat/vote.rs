@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,10 +34,7 @@ use serde::{Serialize, Deserialize};
     rename_all = "camelCase",
     rename = "app.protoimsg.chat.vote",
     tag = "$type",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Vote<S: BosStr = DefaultStr> {
     ///Timestamp of vote.
@@ -53,13 +50,7 @@ pub struct Vote<S: BosStr = DefaultStr> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(
-        serialize = "S: Serialize + BosStr",
-        deserialize = "S: Deserialize<'de> + BosStr"
-    )
-)]
+#[serde(rename_all = "camelCase")]
 pub struct VoteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -136,49 +127,49 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type SelectedOptions;
+        type CreatedAt;
         type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type SelectedOptions = Unset;
+        type CreatedAt = Unset;
         type Poll = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type SelectedOptions = St::SelectedOptions;
-        type Poll = St::Poll;
     }
     ///State transition - sets the `selected_options` field to Set
     pub struct SetSelectedOptions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSelectedOptions<St> {}
     impl<St: State> State for SetSelectedOptions<St> {
-        type CreatedAt = St::CreatedAt;
         type SelectedOptions = Set<members::selected_options>;
+        type CreatedAt = St::CreatedAt;
+        type Poll = St::Poll;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type SelectedOptions = St::SelectedOptions;
+        type CreatedAt = Set<members::created_at>;
         type Poll = St::Poll;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPoll<St> {}
     impl<St: State> State for SetPoll<St> {
-        type CreatedAt = St::CreatedAt;
         type SelectedOptions = St::SelectedOptions;
+        type CreatedAt = St::CreatedAt;
         type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `selected_options` field
         pub struct selected_options(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `poll` field
         pub struct poll(());
     }
@@ -269,8 +260,8 @@ where
 impl<S: BosStr, St> VoteBuilder<S, St>
 where
     St: vote_state::State,
-    St::CreatedAt: vote_state::IsSet,
     St::SelectedOptions: vote_state::IsSet,
+    St::CreatedAt: vote_state::IsSet,
     St::Poll: vote_state::IsSet,
 {
     /// Build the final struct.
